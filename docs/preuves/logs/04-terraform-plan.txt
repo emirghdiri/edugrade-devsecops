@@ -1,0 +1,168 @@
+# Preuve : 04-terraform-plan
+# Date   : 2026-11-11 16:54:15 CET
+# Dossier: terraform/github
+$ terraform plan -no-color -input=false -out=tfplan
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # github_actions_secret.app_secret_key will be created
+  + resource "github_actions_secret" "app_secret_key" {
+      + created_at        = (known after apply)
+      + id                = (known after apply)
+      + key_id            = (known after apply)
+      + remote_updated_at = (known after apply)
+      + repository        = "edugrade-devsecops"
+      + repository_id     = (known after apply)
+      + secret_name       = "APP_SECRET_KEY"
+      + updated_at        = (known after apply)
+      + value             = (sensitive value)
+    }
+
+  # github_actions_secret.postgres_password will be created
+  + resource "github_actions_secret" "postgres_password" {
+      + created_at        = (known after apply)
+      + id                = (known after apply)
+      + key_id            = (known after apply)
+      + remote_updated_at = (known after apply)
+      + repository        = "edugrade-devsecops"
+      + repository_id     = (known after apply)
+      + secret_name       = "POSTGRES_PASSWORD"
+      + updated_at        = (known after apply)
+      + value             = (sensitive value)
+    }
+
+  # github_branch.develop will be created
+  + resource "github_branch" "develop" {
+      + branch        = "develop"
+      + etag          = (known after apply)
+      + id            = (known after apply)
+      + ref           = (known after apply)
+      + repository    = "edugrade-devsecops"
+      + sha           = (known after apply)
+      + source_branch = "main"
+      + source_sha    = (known after apply)
+    }
+
+  # github_branch_default.main will be created
+  + resource "github_branch_default" "main" {
+      + branch          = "main"
+      + etag            = (known after apply)
+      + id              = (known after apply)
+      + rename          = false
+      + repository      = "edugrade-devsecops"
+      + repository_id   = (known after apply)
+      + wait_for_rename = false
+    }
+
+  # github_branch_protection.main will be created
+  + resource "github_branch_protection" "main" {
+      + allows_deletions                = false
+      + allows_force_pushes             = false
+      + enforce_admins                  = false
+      + id                              = (known after apply)
+      + lock_branch                     = false
+      + pattern                         = "main"
+      + repository_id                   = (known after apply)
+      + require_conversation_resolution = false
+      + require_signed_commits          = false
+      + required_linear_history         = false
+
+      + required_pull_request_reviews {
+          + dismiss_stale_reviews           = true
+          + require_last_push_approval      = false
+          + required_approving_review_count = 1
+        }
+
+      + required_status_checks {
+          + contexts = [
+              + "build-test",
+            ]
+          + strict   = true
+        }
+    }
+
+  # github_repository.edugrade will be created
+  + resource "github_repository" "edugrade" {
+      + allow_auto_merge                        = false
+      + allow_forking                           = (known after apply)
+      + allow_merge_commit                      = true
+      + allow_rebase_merge                      = false
+      + allow_squash_merge                      = false
+      + archived                                = false
+      + auto_init                               = true
+      + default_branch                          = (known after apply)
+      + delete_branch_on_merge                  = true
+      + description                             = "EduGrade : portail de gestion de notes (projet DevSecOps ING-5-SSIR, données fictives)"
+      + etag                                    = (known after apply)
+      + fork                                    = (known after apply)
+      + full_name                               = (known after apply)
+      + git_clone_url                           = (known after apply)
+      + has_issues                              = true
+      + has_projects                            = false
+      + has_wiki                                = false
+      + html_url                                = (known after apply)
+      + http_clone_url                          = (known after apply)
+      + id                                      = (known after apply)
+      + ignore_vulnerability_alerts_during_read = false
+      + merge_commit_message                    = "PR_TITLE"
+      + merge_commit_title                      = "MERGE_MESSAGE"
+      + name                                    = "edugrade-devsecops"
+      + node_id                                 = (known after apply)
+      + primary_language                        = (known after apply)
+      + private                                 = (known after apply)
+      + repo_id                                 = (known after apply)
+      + source_owner                            = (known after apply)
+      + source_repo                             = (known after apply)
+      + squash_merge_commit_message             = "COMMIT_MESSAGES"
+      + squash_merge_commit_title               = "COMMIT_OR_PR_TITLE"
+      + ssh_clone_url                           = (known after apply)
+      + svn_url                                 = (known after apply)
+      + topics                                  = (known after apply)
+      + visibility                              = "public"
+      + vulnerability_alerts                    = (known after apply)
+      + web_commit_signoff_required             = (known after apply)
+
+      + security_and_analysis (known after apply)
+    }
+
+  # github_repository_collaborator.binome will be created
+  + resource "github_repository_collaborator" "binome" {
+      + id                          = (known after apply)
+      + invitation_id               = (known after apply)
+      + permission                  = "push"
+      + permission_diff_suppression = false
+      + repository                  = "edugrade-devsecops"
+      + username                    = "arijcheikhrouhou"
+    }
+
+  # github_repository_vulnerability_alerts.edugrade will be created
+  + resource "github_repository_vulnerability_alerts" "edugrade" {
+      + enabled       = true
+      + id            = (known after apply)
+      + repository    = "edugrade-devsecops"
+      + repository_id = (known after apply)
+    }
+
+Plan: 8 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + actions_secrets      = [
+      + "APP_SECRET_KEY",
+      + "POSTGRES_PASSWORD",
+    ]
+  + clone_url_https      = (known after apply)
+  + protected_branch     = "main"
+  + repository_full_name = (known after apply)
+  + repository_url       = (known after apply)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+[code de retour : 0]
