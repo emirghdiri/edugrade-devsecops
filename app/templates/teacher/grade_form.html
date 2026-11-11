@@ -15,7 +15,7 @@
     <select id="subject" name="subject" required>
       <option value="">— Choisir —</option>
       {% for s in config.SUBJECTS %}
-        <option value="{{ s }}" {{ 'selected' if s == grade.subject }}>{{ s }}</option>
+        <option value="{{ s }}"{% if s == grade.subject %} selected{% endif %}>{{ s }}</option>
       {% endfor %}
     </select>
 
