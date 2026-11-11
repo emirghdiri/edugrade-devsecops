@@ -53,8 +53,14 @@ REL_DIR="${RUN_DIR/#$ROOT/.}"
   echo "[code de retour : $RC]"
 } | mask >"$LOG"
 
+# Repli sans sudo : bibliothèques de Chromium extraites localement
+# (voir README, section « Captures ») si « playwright install-deps » n'a pas été lancé.
+PW_DEPS="${PLAYWRIGHT_DEPS_DIR:-$HOME/.local/lib/playwright-deps}"
+RENDER_ENV=()
+[ -d "$PW_DEPS" ] && RENDER_ENV=(env "LD_LIBRARY_PATH=$PW_DEPS:$PW_DEPS/nss${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}")
+
 if [ -x "$PYTHON" ]; then
-  "$PYTHON" "$ROOT/scripts/render_terminal.py" "$LOG" "$PNG" "${CAPTURE_TITLE:-$NAME}" \
+  "${RENDER_ENV[@]}" "$PYTHON" "$ROOT/scripts/render_terminal.py" "$LOG" "$PNG" "${CAPTURE_TITLE:-$NAME}" \
     || echo "avertissement : rendu PNG impossible pour $NAME" >&2
 else
   echo "avertissement : $PYTHON introuvable, capture PNG non générée" >&2
