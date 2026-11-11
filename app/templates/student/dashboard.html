@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Bonjour {{ session.name }}</h1>
+    <p class="muted">Votre espace étudiant</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('student.grades', student_id=session.user_id) }}">Voir mes notes</a>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-label">Notes enregistrées</div>
+    <div class="stat-value">{{ count }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Moyenne générale</div>
+    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small class="muted"> / 20</small></div>
+  </div>
+</div>
+{% endblock %}
