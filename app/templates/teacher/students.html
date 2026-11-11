@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Étudiants{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Étudiants</h1>
+    <p class="muted">Consultez les notes et ajoutez des évaluations</p>
+  </div>
+</div>
+
+<form method="get" action="{{ url_for('teacher.students') }}" class="search" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher un étudiant par nom…" aria-label="Rechercher par nom">
+  <button type="submit" class="btn btn-primary">Rechercher</button>
+  {% if q %}<a class="btn" href="{{ url_for('teacher.students') }}">Réinitialiser</a>{% endif %}
+</form>
+
+{% if q %}
+  <h2 id="search-title">Résultats pour « {{ q }} » ({{ students|length }})</h2>
+{% endif %}
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Nom</th><th>E-mail</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr data-testid="student-row">
+        <td>{{ s.name }}</td>
+        <td>{{ s.email }}</td>
+        <td class="actions">
+          <a class="btn btn-small" href="{{ url_for('student.grades', student_id=s.id) }}">Voir les notes</a>
+          <a class="btn btn-small btn-primary" href="{{ url_for('teacher.new_grade', student_id=s.id) }}">Ajouter une note</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="empty">Aucun étudiant trouvé.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
