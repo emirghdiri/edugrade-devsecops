@@ -11,7 +11,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip \
- && pip install -r /tmp/requirements.txt
+ && pip install -r /tmp/requirements.txt \
+ && pip uninstall -y pip
 
 
 # ---------- Étape 2 : image d'exécution minimale ----------
@@ -28,7 +29,9 @@ ENV PATH="/opt/venv/bin:$PATH" \
 # Utilisateur applicatif sans privilège, UID/GID fixes (10001) pour pouvoir
 # l'imposer côté Kubernetes (runAsUser) et dans les politiques Kyverno.
 RUN groupadd --system --gid 10001 app \
- && useradd --system --uid 10001 --gid 10001 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin app
+ && useradd --system --uid 10001 --gid 10001 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin app \
+ && python -m pip uninstall -y pip \
+ && rm -rf /usr/local/lib/python3.12/ensurepip
 
 WORKDIR /srv
 
