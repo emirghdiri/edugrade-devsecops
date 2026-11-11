@@ -17,8 +17,9 @@ bp = Blueprint("teacher", __name__, url_prefix="/teacher")
 
 
 def search_students(term: str) -> list[dict]:
-    sql = "SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE %s ORDER BY name"
-    return query_all(sql, (f"%{term}%",))
+    # VULN-V2 (volontaire, voir docs/VULNERABILITES.md)
+    sql = f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE '%{term}%' ORDER BY name"
+    return query_all(sql)
 
 
 @bp.route("/students")
