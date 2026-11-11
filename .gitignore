@@ -1,0 +1,54 @@
+# ---------- Secrets et configuration locale ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---------- Terraform ----------
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+*.tfplan
+tfplan
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ---------- Preuves temporaires ----------
+docs/preuves/tmp/
+*.tmp.html
+
+# ---------- Rapports de scan bruts (régénérables) ----------
+reports/
+
+# ---------- Éditeurs / OS ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
