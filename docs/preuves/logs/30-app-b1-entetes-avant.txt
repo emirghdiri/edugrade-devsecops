@@ -1,0 +1,15 @@
+# Bonus 1 — en-têtes de GET http://localhost:8080/login (HTTP 200)
+connection: keep-alive
+content-length: 1249
+content-type: text/html; charset=utf-8
+date: Wed, 11 Nov 2026 17:11:47 GMT
+server: nginx
+vary: Cookie
+
+# En-têtes de sécurité
+content-security-policy: ABSENT
+x-frame-options: ABSENT
+x-content-type-options: ABSENT
+referrer-policy: ABSENT
+strict-transport-security: ABSENT
+permissions-policy: ABSENT

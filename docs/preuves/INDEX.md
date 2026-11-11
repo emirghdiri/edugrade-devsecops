@@ -36,6 +36,35 @@ Les valeurs factices de V3 sont masquées (`****MASQUÉ****`) dans tous les jour
 | 11 | pytest : 29 tests fonctionnels verts (connexion, rôles, notes, journaux, /healthz) | [logs/11-pytest-fonctionnels.txt](logs/11-pytest-fonctionnels.txt) | [captures/11-pytest-fonctionnels.png](captures/11-pytest-fonctionnels.png) |
 | 12 | pytest `-m security` : 4 échecs attendus (V1 IDOR, V2 injection SQL) | [logs/12-pytest-securite-echec-attendu.txt](logs/12-pytest-securite-echec-attendu.txt) | [captures/12-pytest-securite-echec-attendu.png](captures/12-pytest-securite-echec-attendu.png) |
 
+## Phase 5 — Docker
+
+| N° | Ce que la preuve montre | Journal | Capture |
+|----|-------------------------|---------|---------|
+| 13 | `docker compose up -d` : les trois services démarrent | [logs/13-docker-compose-up.txt](logs/13-docker-compose-up.txt) | [captures/13-docker-compose-up.png](captures/13-docker-compose-up.png) |
+| 14 | `docker compose ps` : frontend, backend, db `healthy`, seul le port 8080 publié | [logs/14-docker-compose-ps.txt](logs/14-docker-compose-ps.txt) | [captures/14-docker-compose-ps.png](captures/14-docker-compose-ps.png) |
+| 15 | `docker compose exec … id` : backend UID 10001, Nginx UID 101 (non-root) | [logs/15-docker-compose-exec-id.txt](logs/15-docker-compose-exec-id.txt) | [captures/15-docker-compose-exec-id.png](captures/15-docker-compose-exec-id.png) |
+| 16 | `docker run … id` : image non-root (`User=10001:10001`), ni pip ni gcc embarqués | [logs/16-docker-run-id-nonroot.txt](logs/16-docker-run-id-nonroot.txt) | [captures/16-docker-run-id-nonroot.png](captures/16-docker-run-id-nonroot.png) |
+| 17 | `trivy image` (rapport) : V4 dans l'image, HIGH de l'OS de base, aucun secret détecté par Trivy | [logs/17-trivy-image.txt](logs/17-trivy-image.txt) | [captures/17-trivy-image.png](captures/17-trivy-image.png) |
+| 18 | Journaux JSON du backend : `login_success`, `login_failed`, `access_denied`, `suspicious_input`, `grade_created` | [logs/18-journaux-json-securite.txt](logs/18-journaux-json-securite.txt) | [captures/18-journaux-json-securite.png](captures/18-journaux-json-securite.png) |
+
+## Phase 7 — Application (captures Playwright, version vulnérable « avant »)
+
+Générées par `scripts/capture_app.py --phase avant` sur l'instance Docker Compose.
+
+| N° | Ce que la preuve montre | Capture | Journal |
+|----|-------------------------|---------|---------|
+| 20 | Page de connexion | [captures/20-app-connexion-avant.png](captures/20-app-connexion-avant.png) | |
+| 21 | Étudiante : « Mes notes » (matière, note, date, moyenne) | [captures/21-app-etudiant-mes-notes-avant.png](captures/21-app-etudiant-mes-notes-avant.png) | |
+| 22 | Enseignante : liste des étudiants | [captures/22-app-enseignant-liste-avant.png](captures/22-app-enseignant-liste-avant.png) | |
+| 23 | Recherche par nom (« Martin ») | [captures/23-app-recherche-avant.png](captures/23-app-recherche-avant.png) | |
+| 24 | Ajout de note : formulaire | [captures/24-app-ajout-note-formulaire-avant.png](captures/24-app-ajout-note-formulaire-avant.png) | |
+| 25 | Ajout de note : résultat | [captures/25-app-ajout-note-resultat-avant.png](captures/25-app-ajout-note-resultat-avant.png) | |
+| 26 | **V1 IDOR** : l'étudiante lit les notes d'un autre étudiant (HTTP 200) | [captures/26-app-v1-idor-avant.png](captures/26-app-v1-idor-avant.png) | [logs/26-app-v1-idor-avant.txt](logs/26-app-v1-idor-avant.txt) |
+| 27 | **V2 injection SQL** : `' OR '1'='1` renvoie les 6 étudiants | [captures/27-app-v2-sqli-tautologie-avant.png](captures/27-app-v2-sqli-tautologie-avant.png) | [logs/27-app-v2-sqli-avant.txt](logs/27-app-v2-sqli-avant.txt) |
+| 28 | **V2 injection SQL** : `UNION` exfiltre les hachages de mots de passe | [captures/28-app-v2-sqli-union-avant.png](captures/28-app-v2-sqli-union-avant.png) | [logs/27-app-v2-sqli-avant.txt](logs/27-app-v2-sqli-avant.txt) |
+| 29 | **Bonus 2 XSS** : script injecté exécuté (bannière rouge) | [captures/29-app-b2-xss-avant.png](captures/29-app-b2-xss-avant.png) | [logs/29-app-b2-xss-avant.txt](logs/29-app-b2-xss-avant.txt) |
+| 30 | **Bonus 1** : en-têtes de sécurité absents (cookie masqué) | [captures/30-app-b1-entetes-avant.png](captures/30-app-b1-entetes-avant.png) | [logs/30-app-b1-entetes-avant.txt](logs/30-app-b1-entetes-avant.txt) |
+
 ### Captures manuelles (navigateur)
 
 | N° | URL | Ce qu'il faut montrer | Fichier attendu |
@@ -46,3 +75,7 @@ Les valeurs factices de V3 sont masquées (`****MASQUÉ****`) dans tous les jour
 | M04 | https://github.com/emirghdiri/edugrade-devsecops/settings/access | Collaboratrice `arijcheikhrouhou` (droit Write) | `captures/M04-collaboratrice.png` |
 | M05 | https://github.com/emirghdiri/edugrade-devsecops/settings/secrets/actions | Secrets `APP_SECRET_KEY` et `POSTGRES_PASSWORD` (noms seulement, valeurs jamais visibles) | `captures/M05-secrets-actions.png` |
 | M06 | https://github.com/emirghdiri/edugrade-devsecops/pulls?q=is%3Apr | PR `feature/terraform-github` → `develop` | `captures/M06-pr-terraform.png` |
+| M07 | https://github.com/emirghdiri/edugrade-devsecops/pulls?q=is%3Apr | PR `feature/app-core` et `feature/docker` | `captures/M07-pr-app-docker.png` |
+| M08 | https://github.com/emirghdiri/edugrade-devsecops/network | Graphe des branches (`main`, `develop`, `feature/*`) | `captures/M08-graphe-branches.png` |
+| M09 | https://github.com/emirghdiri/edugrade-devsecops/tags | Tag annoté `v0.1-vulnerable` (après fusion des PR) | `captures/M09-tag-v0.1-vulnerable.png` |
+| M10 | http://localhost:8080 | Application dans le navigateur (optionnel, en complément des captures Playwright) | `captures/M10-app-navigateur.png` |
