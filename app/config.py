@@ -3,8 +3,21 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
+import yaml
 from psycopg.conninfo import make_conninfo
+
+SETTINGS_PATH = Path(__file__).with_name("settings.yaml")
+
+
+def load_settings(path: Path = SETTINGS_PATH) -> dict:
+    """Charge les paramètres fonctionnels (matières, barème) depuis le fichier YAML."""
+    with open(path, encoding="utf-8") as fh:
+        return yaml.full_load(fh) or {}
+
+
+SETTINGS = load_settings()
 
 # VULN-V3 (volontaire, voir docs/VULNERABILITES.md) : valeurs factices écrites en dur
 SECRET_KEY = "f3b9c2e8a17d4e6b9c0a5d2e7f1b8c4a"
@@ -29,7 +42,7 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = 3600  # secondes
 
-    SUBJECTS = ["Mathématiques", "Réseaux", "Cryptographie", "Systèmes", "Anglais"]
+    SUBJECTS = list(SETTINGS.get("subjects", []))
 
 
 def build_database_url(cfg: dict) -> str:
