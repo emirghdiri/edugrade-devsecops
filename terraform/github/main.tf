@@ -53,3 +53,33 @@ resource "github_branch_default" "main" {
   branch     = "main"
 }
 
+# ---------------------------------------------------------------------------
+# Protection de main
+# main ne reçoit que des Pull Requests relues (1 approbation, par l'autre
+# membre) et dont le job CI est vert. Ni force push ni suppression.
+# ---------------------------------------------------------------------------
+resource "github_branch_protection" "main" {
+  repository_id = github_repository.edugrade.node_id
+  pattern       = "main"
+
+  # Les administrateurs ne sont pas soumis à la règle : cela permet le commit
+  # initial et une intervention d'urgence ; tout le reste passe par PR.
+  enforce_admins = false
+
+  required_pull_request_reviews {
+    required_approving_review_count = 1
+    dismiss_stale_reviews           = true
+  }
+
+  required_status_checks {
+    # strict : la branche doit être à jour avec main avant la fusion.
+    strict   = true
+    contexts = [var.required_status_check]
+  }
+
+  allows_force_pushes = false
+  allows_deletions    = false
+
+  depends_on = [github_branch_default.main]
+}
+
