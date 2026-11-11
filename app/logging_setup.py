@@ -51,10 +51,15 @@ class JsonFormatter(logging.Formatter):
 
 
 def configure_logging(level: str = "INFO") -> None:
+    root = logging.getLogger()
+    # Remplace uniquement le gestionnaire posé par un appel précédent : les autres
+    # (ceux de Gunicorn ou de pytest, par exemple) sont conservés.
+    for existing in [h for h in root.handlers if getattr(h, "edugrade_json", False)]:
+        root.removeHandler(existing)
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
-    root = logging.getLogger()
-    root.handlers[:] = [handler]
+    handler.edugrade_json = True
+    root.addHandler(handler)
     root.setLevel(level.upper())
     # Les journaux d'accès de Werkzeug feraient doublon avec l'événement http_request.
     logging.getLogger("werkzeug").setLevel(logging.WARNING)
