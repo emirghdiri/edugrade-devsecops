@@ -13,13 +13,6 @@ from .logging_setup import log_event
 bp = Blueprint("auth", __name__)
 
 
-def _safe_next(target: str | None) -> str | None:
-    # Redirection interne uniquement (pas d'open redirect vers un autre domaine).
-    if target and target.startswith("/") and not target.startswith("//"):
-        return target
-    return None
-
-
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
@@ -43,7 +36,8 @@ def login():
     session["role"] = user["role"]
     session["name"] = user["name"]
     log_event("login_success", status=302)
-    return redirect(_safe_next(request.args.get("next")) or url_for("student.index"))
+    # Toujours vers l'accueil interne : aucune URL de redirection n'est lue dans la requête.
+    return redirect(url_for("student.index"))
 
 
 @bp.route("/logout", methods=["POST"])

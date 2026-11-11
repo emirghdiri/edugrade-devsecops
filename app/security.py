@@ -41,7 +41,7 @@ def login_required(view: Callable) -> Callable:
     @wraps(view)
     def wrapped(*args, **kwargs):
         if "user_id" not in session:
-            return redirect(url_for("auth.login", next=request.path))
+            return redirect(url_for("auth.login"))
         return view(*args, **kwargs)
 
     return wrapped
