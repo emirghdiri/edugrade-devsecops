@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}EduGrade{% endblock %} · EduGrade</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{ url_for('auth.login') if not session.user_id else '/' }}">
+        <span class="brand-mark">EG</span> EduGrade
+      </a>
+      {% if session.user_id %}
+      <nav class="nav">
+        {% if session.role == 'teacher' %}
+          <a href="{{ url_for('teacher.students') }}">Étudiants</a>
+        {% else %}
+          <a href="{{ url_for('student.dashboard') }}">Tableau de bord</a>
+          <a href="{{ url_for('student.grades', student_id=session.user_id) }}">Mes notes</a>
+        {% endif %}
+      </nav>
+      <div class="user">
+        <span class="user-name">{{ session.name }}</span>
+        <span class="badge badge-{{ session.role }}">{{ 'Enseignant' if session.role == 'teacher' else 'Étudiant' }}</span>
+        <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ghost">Déconnexion</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer container">
+    EduGrade · projet pédagogique DevSecOps · données fictives
+  </footer>
+</body>
+</html>
