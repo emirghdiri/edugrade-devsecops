@@ -83,3 +83,33 @@ resource "github_branch_protection" "main" {
   depends_on = [github_branch_default.main]
 }
 
+# ---------------------------------------------------------------------------
+# Collaboratrice
+# La binôme reçoit le droit push (pas admin) : elle crée ses branches et ses
+# PR, mais ne peut pas modifier la configuration du dépôt ni la protection.
+# GitHub envoie une invitation qu'elle doit accepter.
+# ---------------------------------------------------------------------------
+resource "github_repository_collaborator" "binome" {
+  repository = github_repository.edugrade.name
+  username   = var.collaborator_username
+  permission = "push"
+}
+
+# ---------------------------------------------------------------------------
+# Secrets GitHub Actions
+# La CI lit ces valeurs via ${{ secrets.* }} au lieu de les trouver dans le
+# code. Les valeurs sont factices et viennent de terraform.tfvars (non
+# versionné). Remarque : elles apparaissent en clair dans l'état local
+# terraform.tfstate, qui est donc ignoré par git.
+# ---------------------------------------------------------------------------
+resource "github_actions_secret" "app_secret_key" {
+  repository  = github_repository.edugrade.name
+  secret_name = "APP_SECRET_KEY"
+  value       = var.app_secret_key
+}
+
+resource "github_actions_secret" "postgres_password" {
+  repository  = github_repository.edugrade.name
+  secret_name = "POSTGRES_PASSWORD"
+  value       = var.postgres_password
+}
