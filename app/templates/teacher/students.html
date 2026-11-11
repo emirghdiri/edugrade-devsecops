@@ -15,7 +15,8 @@
 </form>
 
 {% if q %}
-  <h2 id="search-title">Résultats pour « {{ q }} » ({{ students|length }})</h2>
+  {# VULN-B2 (volontaire, voir docs/VULNERABILITES.md) #}
+  <h2 id="search-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
 {% endif %}
 {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 
