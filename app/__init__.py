@@ -35,6 +35,11 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(student.bp)
     app.register_blueprint(teacher.bp)
 
+    @app.get("/healthz")
+    def healthz():
+        ok = db.ping()
+        return {"status": "ok" if ok else "degraded", "database": "ok" if ok else "unreachable"}, 200 if ok else 503
+
     _register_error_handlers(app)
     _register_request_log(app)
     return app
