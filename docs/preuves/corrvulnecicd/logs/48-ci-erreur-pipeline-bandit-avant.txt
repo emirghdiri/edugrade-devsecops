@@ -1,0 +1,49 @@
+# Preuve : 48-ci-erreur-pipeline-bandit-avant
+# Date   : 2026-11-12 19:20:01 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 sast 'Bandit|bandit|Issue|Severity|Location|High:|Medium:|Low:|##\[error\]'
+Job : sast (semgrep, bandit) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385359367
+------------------------------------------------------------
+##[error]Process completed with exit code 1.
+﻿2026-11-12T18:06:16.6163399Z ##[group]Run pip install bandit==1.9.4
+pip install bandit==1.9.4
+bandit -r app -f json -o reports/bandit.json --exit-zero
+bandit -r app -f txt
+bandit -r app --severity-level high --confidence-level medium -q
+Collecting bandit==1.9.4
+  Downloading bandit-1.9.4-py3-none-any.whl.metadata (7.1 kB)
+Requirement already satisfied: PyYAML>=5.3.1 in /usr/lib/python3/dist-packages (from bandit==1.9.4) (6.0.1)
+Collecting stevedore>=1.20.0 (from bandit==1.9.4)
+Requirement already satisfied: rich in /usr/lib/python3/dist-packages (from bandit==1.9.4) (13.7.1)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/lib/python3/dist-packages (from rich->bandit==1.9.4) (3.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/lib/python3/dist-packages (from rich->bandit==1.9.4) (2.17.2)
+Requirement already satisfied: mdurl~=0.1 in /usr/lib/python3/dist-packages (from markdown-it-py>=2.2.0->rich->bandit==1.9.4) (0.1.2)
+Downloading bandit-1.9.4-py3-none-any.whl (134 kB)
+Installing collected packages: stevedore, bandit
+Successfully installed bandit-1.9.4 stevedore-5.10.0
+[json]	INFO	JSON output written to file: reports/bandit.json
+>> Issue: [B105:hardcoded_password_string] Possible ****MASQUÉ****
+   Severity: Low   Confidence: Medium
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/config.py:23:13
+>> Issue: [B105:hardcoded_password_string] Possible ****MASQUÉ****
+   Severity: Low   Confidence: Medium
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/config.py:24:14
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: app/seed.py:73:18
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/teacher.py:22:22
+		Low: 3
+		Medium: 1
+		High: 0
+		Low: 0
+		Medium: 3
+		High: 1
+##[error]Process completed with exit code 1.
+[code de retour : 0]

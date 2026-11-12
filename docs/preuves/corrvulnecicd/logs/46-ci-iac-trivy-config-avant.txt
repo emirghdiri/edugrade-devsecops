@@ -1,0 +1,18 @@
+# Preuve : 46-ci-iac-trivy-config-avant
+# Date   : 2026-11-12 19:19:44 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 iac 'GIT-|Tests:|Failures:|main.tf|##\[error\]'
+Job : iac (trivy config, checkov) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385360737
+------------------------------------------------------------
+│ terraform/github/main.tf │ terraform  │         2         │
+terraform/github/main.tf (terraform)
+Tests: 2 (SUCCESSES: 0, FAILURES: 2)
+Failures: 2 (HIGH: 1, CRITICAL: 1)
+GIT-0001 (CRITICAL): Repository is public.
+ terraform/github/main.tf:9
+   via terraform/github/main.tf:6-28 (github_repository.edugrade)
+GIT-0004 (HIGH): Branch protection does not require signed commits.
+ terraform/github/main.tf:61-84
+##[error]Process completed with exit code 1.
+[code de retour : 0]
