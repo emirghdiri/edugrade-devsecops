@@ -1,0 +1,21 @@
+# Exceptions Trivy (constats IaC acceptés). Chaque entrée est limitée à un
+# fichier, porte une justification et expire : passé la date, le constat
+# redevient bloquant et doit être réexaminé. Détail : docs/POLITIQUE_BLOCAGE.md.
+misconfigurations:
+  - id: GIT-0001
+    paths:
+      - "terraform/github/main.tf"
+    statement: >-
+      Dépôt public volontaire : la protection de branche est gratuite pour un
+      dépôt public et toutes les données du projet sont fictives (README).
+    expired_at: 2027-06-30
+
+  - id: GIT-0004
+    paths:
+      - "terraform/github/main.tf"
+    statement: >-
+      Commits signés non exigés sur main : les fusions de Pull Request
+      embarquent des commits non signés et seraient toutes refusées. Compensé
+      par PR obligatoire, 1 approbation, check build-test, ni force push ni
+      suppression. À activer si l'équipe signe ses commits (gpg/ssh).
+    expired_at: 2027-06-30

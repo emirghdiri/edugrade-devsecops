@@ -41,7 +41,7 @@ build-test ─┬─ security-tests ─┐
 | SAST | Bandit | sévérité **HIGH** et confiance ≥ MEDIUM | LOW, MEDIUM | V2 (B608), V3 (B105) rapportés |
 | Secrets | Gitleaks (historique **complet**) | au moins une fuite | — | V3 |
 | Dépendances | Trivy fs | **HIGH/CRITICAL avec correctif** disponible | sans correctif | V4 |
-| IaC | Trivy config | **HIGH/CRITICAL** non couvert par une exception | MEDIUM, LOW | V5 (Partie 2), dépôt GitHub |
+| IaC | Trivy config | **HIGH/CRITICAL** non couvert par une exception (`.trivyignore.yaml`) | MEDIUM, LOW | V5 (Partie 2), dépôt GitHub |
 | IaC | Checkov | jamais (`--soft-fail`) | tout | second avis IaC |
 | Image | Trivy image | **HIGH/CRITICAL avec correctif** | sans correctif | V4 dans l'image |
 | SBOM | Syft (SPDX JSON) | génération impossible | — | traçabilité |
@@ -74,13 +74,19 @@ build-test ─┬─ security-tests ─┐
 
 ## Exceptions
 
-Toute exception est déclarée dans un fichier versionné (`.trivyignore`, etc.),
-relue en Pull Request et justifiée ici. Aucune exception n'est accordée pour une
-faille volontaire V1-V5 ou Bonus.
+Toute exception est déclarée dans un fichier versionné (`.trivyignore.yaml`,
+`.gitleaksignore`), relue en Pull Request, **limitée** (un fichier, une
+empreinte) et justifiée ici. Aucune exception ne masque une faille encore
+présente dans le code : chaque faille volontaire est corrigée, pas ignorée.
 
-| Outil | Identifiant | Fichier | Justification | Revue |
-|-------|-------------|---------|---------------|-------|
-| _aucune pour l'instant_ | | | | |
+| Outil | Identifiant | Portée | Justification | Revue |
+|-------|-------------|--------|---------------|-------|
+| Trivy config | GIT-0001 (CRITICAL) « dépôt public » | `terraform/github/main.tf` uniquement | Choix délibéré : protection de branche gratuite pour un dépôt public ; données entièrement fictives. | expire le 2027-06-30 |
+| Trivy config | GIT-0004 (HIGH) « commits signés non exigés » | `terraform/github/main.tf` uniquement | Exiger la signature refuserait toutes les fusions (commits de PR non signés). Compensé par : PR obligatoire, 1 approbation, check `build-test`, ni force push ni suppression. | expire le 2027-06-30 |
+| Gitleaks | 2 × `generic-api-key` | commit `f78fd00`, `app/config.py` lignes 10-11 (empreintes exactes) | V3 corrigée : les valeurs ne sont plus lues par l'application (rotation, cookie forgé avec l'ancienne clé refusé, preuve 70). L'historique n'est pas réécrit car `main` interdit le force push et la réécriture casserait les clones. Toute nouvelle fuite reste bloquante. | à revoir si l'historique est purgé (`git filter-repo`) |
+
+Contrôle effectué : avec ces exceptions, un nouveau `github_repository` public
+déclaré dans un autre fichier est toujours bloqué par Trivy (code 1).
 
 ## Secrets utilisés par le pipeline
 
