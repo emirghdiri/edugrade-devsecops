@@ -64,7 +64,7 @@ jobs:
           python -m compileall -q app
       - name: Tests fonctionnels (pytest -m "not security")
         run: pytest -m "not security" --junitxml=reports/pytest.xml
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: pytest-report
@@ -121,14 +121,20 @@ jobs:
           print(f"\n{len(res)} constat(s), dont {len(blocking)} ERROR (bloquant)")
           sys.exit(1 if blocking else 0)
           PY
+      # Format « custom » sans {msg} ni extrait de code : Bandit cite sinon la
+      # valeur des mots de passe en dur (B105) dans un journal public.
       - name: Bandit (HIGH bloquant, tout est rapporté)
         if: ${{ !cancelled() }}
+        env:
+          FMT: "{relpath}:{line} {test_id} {severity}/{confidence}"
         run: |
           pip install bandit==1.9.4
-          bandit -r app -f json -o reports/bandit.json --exit-zero
-          bandit -r app -f txt
-          bandit -r app --severity-level high --confidence-level medium -q
-      - uses: actions/upload-artifact@v5
+          echo "== Tous les constats (rapportés) =="
+          bandit -r app -q -f custom --msg-template "$FMT" --exit-zero | tee reports/bandit.txt
+          echo "== Constats bloquants (HIGH, confiance >= MEDIUM) =="
+          bandit -r app -q -f custom --msg-template "$FMT" --severity-level high --confidence-level medium
+          echo "aucun constat bloquant"
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: sast-reports
@@ -149,7 +155,7 @@ jobs:
           docker run --rm -v "$PWD:/repo" "$GITLEAKS_IMAGE" git /repo \
             --redact --no-banner -v --exit-code 1 \
             --report-format json --report-path /repo/reports/gitleaks.json
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: gitleaks-report
@@ -197,7 +203,7 @@ jobs:
           docker save "$IMAGE_NAME:${{ github.sha }}" -o image.tar
       # Transmise avant les contrôles : le DAST l'utilise même si Trivy bloque ;
       # le job publish, lui, exige que ce job soit entièrement vert.
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: image
           path: image.tar
@@ -212,7 +218,7 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/w" "$TRIVY_IMAGE" image --input /w/image.tar \
             --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: sbom
@@ -284,7 +290,7 @@ jobs:
       - name: Journaux applicatifs
         if: always()
         run: docker compose logs backend --no-log-prefix | tail -50
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: zap-report
