@@ -39,10 +39,10 @@ Rôles (équipe de deux) :
 2. Identifier la ou les **adresses IP** (tableau « Adresses IP à l'origine des
    échecs ») et les **comptes** visés (`user_id`, `email` absent des journaux
    par conception : retrouver le compte par `user_id`).
-   Limite connue : dans k3s, le champ `ip` contient l'adresse du pod Traefik
-   (deux proxys, `ProxyFix(x_for=1)`). En attendant le passage à `x_for=2`,
-   corréler avec les journaux d'accès Traefik
-   (`kubectl -n kube-system logs deploy/traefik`) pour l'IP réelle.
+   Le champ `ip` est l'IP réelle du client : l'application remonte
+   `X-Forwarded-For` d'autant de proxys de confiance qu'il y en a
+   (`TRUSTED_PROXY_COUNT` : 1 en Compose, 2 en k3s — Traefik puis Nginx).
+   Traefik remplace l'en-tête envoyé par un client : il ne peut pas être forgé.
 3. Requêtes Loki utiles :
    ```logql
    {namespace="edugrade", event="login_failed"} | json | line_format "{{.ip}} {{.route}} {{.status}}"
