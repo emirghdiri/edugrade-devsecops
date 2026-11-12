@@ -1,0 +1,19 @@
+# Preuve : 81-ci-publish-ghcr-cosign-apres
+# Date   : 2026-11-12 19:55:54 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281516275 publish 'image publiée|Pushing signature|tlog entry|signature vérifiée|Verification for|The following checks|- The|Error' --all
+Job : publish (ghcr, cosign) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281516275/job/131405620854
+------------------------------------------------------------
+echo "image publiée : $DIGEST"
+image publiée : ghcr.io/emirghdiri/edugrade-backend@sha256:3f41934dbdfc3651465822647eb8174a6894f883bdbb226e320105f02a8c7235
+tlog entry created with index: 3838012220
+Pushing signature to: ghcr.io/emirghdiri/edugrade-backend
+tlog entry created with index: 3838013101
+echo "signature vérifiée pour $DIGEST"
+Verification for ghcr.io/emirghdiri/edugrade-backend@sha256:3f41934dbdfc3651465822647eb8174a6894f883bdbb226e320105f02a8c7235 --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - The code-signing certificate was verified using trusted certificate authority certificates
+signature vérifiée pour ghcr.io/emirghdiri/edugrade-backend@sha256:3f41934dbdfc3651465822647eb8174a6894f883bdbb226e320105f02a8c7235
+[code de retour : 0]
