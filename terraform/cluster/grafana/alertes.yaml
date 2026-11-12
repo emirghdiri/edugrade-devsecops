@@ -1,0 +1,98 @@
+# Règles d'alerte Grafana (provisionnées par le sidecar, label grafana_alert).
+# Source : événements JSON du backend dans Loki (labels « event » posés par Alloy).
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: edugrade-securite
+    folder: EduGrade
+    interval: 30s
+    rules:
+      - uid: edugrade-brute-force
+        title: "EduGrade - Force brute sur la connexion"
+        condition: C
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels: { severity: critical, application: edugrade }
+        annotations:
+          summary: "Plus de 5 connexions échouées en 5 minutes"
+          description: "Tentative probable de force brute ou de bourrage d'identifiants sur /login. Voir le tableau de bord Sécurité EduGrade et docs/PLAN_REPONSE_INCIDENT.md."
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              editorMode: code
+              expr: 'sum(count_over_time({namespace="edugrade", event="login_failed"}[5m]))'
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last, settings: { mode: replaceNN, replaceWithValue: 0 } }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [5] } }]
+
+      - uid: edugrade-injection
+        title: "EduGrade - Tentative d'injection (SQLi / XSS)"
+        condition: C
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels: { severity: critical, application: edugrade }
+        annotations:
+          summary: "Entrée suspecte (motif SQL ou script) reçue par l'application"
+          description: "Événement suspicious_input : motifs d'injection SQL ou de XSS dans une saisie. Voir le champ patterns dans Loki."
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              editorMode: code
+              expr: 'sum(count_over_time({namespace="edugrade", event="suspicious_input"}[5m]))'
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last, settings: { mode: replaceNN, replaceWithValue: 0 } }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+
+      - uid: edugrade-idor
+        title: "EduGrade - Tentatives d'accès non autorisé (IDOR)"
+        condition: C
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels: { severity: warning, application: edugrade }
+        annotations:
+          summary: "Plus de 3 accès refusés en 5 minutes"
+          description: "Événements access_denied répétés : énumération d'identifiants (IDOR) ou escalade de rôle."
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              editorMode: code
+              expr: 'sum(count_over_time({namespace="edugrade", event="access_denied"}[5m]))'
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last, settings: { mode: replaceNN, replaceWithValue: 0 } }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions: [{ evaluator: { type: gt, params: [3] } }]
