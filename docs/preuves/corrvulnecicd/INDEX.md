@@ -86,3 +86,36 @@ est vert une fois les corrections réunies.
 | 81 | `publish` : image poussée sur GHCR (tag = SHA), **signée par Cosign sans clé (OIDC)**, entrée dans le journal de transparence Rekor, signature **vérifiée** | [log](logs/81-ci-publish-ghcr-cosign-apres.txt) | [capture](captures/81-ci-publish-ghcr-cosign-apres.png) |
 | 83 | SBOM Syft (SPDX JSON) : 101 paquets ; Trivy image sans HIGH/CRITICAL corrigeable | [log](logs/83-ci-sbom-syft-apres.txt) | [capture](captures/83-ci-sbom-syft-apres.png) |
 | 84 | `dast` : ZAP authentifié, **aucune alerte High** (reste 1 Low « Cookie Slack Detector », informative) | [log](logs/84-ci-dast-zap-tout-vert.txt) | [capture](captures/84-ci-dast-zap-tout-vert.png) |
+| 85 | `develop` après fusion des PR #9 à #17 : **9 jobs sur 9 verts**, image du commit `a4511f2` publiée et signée (`sha256:d3707f8d…`) — c'est l'image déployée sur k3s | [log](logs/85-ci-develop-tout-vert.txt) | [terminal](captures/85-ci-develop-tout-vert.png) · [GitHub](captures/86-ci-develop-tout-vert-web.png) |
+
+## Partie k3s — cluster, V5, segmentation, détection
+
+| N° | Ce que la preuve montre | Journal | Capture |
+|----|-------------------------|---------|---------|
+| 90 | `terraform plan` du cluster : 20 ressources (namespaces, Secrets, 5 NetworkPolicies, Kyverno + règles, Prometheus/Grafana, Loki, Alloy, tableau de bord, alertes) | [log](logs/90-k3s-terraform-plan.txt) | [capture](captures/90-k3s-terraform-plan.png) |
+| 91 | Cluster appliqué : état Terraform, namespaces (PSA `restricted` sur `edugrade`), Secrets, NetworkPolicies, releases Helm, règles Kyverno `READY` | [log](logs/91-k3s-cluster-terraform-apply.txt) | [capture](captures/91-k3s-cluster-terraform-apply.png) |
+| 92 | **Trouvaille** : NetworkPolicies non appliquées — le frontend joint la base et Internet. Cause : `iptables-restore` v1.8.11 (nf_tables) d'Ubuntu 26.04 incompatible avec kube-router de k3s (« Aborting sync ») | [log](logs/92-k3s-netpol-non-appliquees-iptables-nft.txt) | [capture](captures/92-k3s-netpol-non-appliquees-iptables-nft.png) |
+| 95 | Correction : `prefer-bundled-bin: true` dans `/etc/rancher/k3s/config.yaml` (iptables fournis par k3s) ; plus aucune erreur de synchronisation | [log](logs/95-k3s-correctif-iptables-k3s.txt) | [capture](captures/95-k3s-correctif-iptables-k3s.png) |
+
+### V5 — NetworkPolicy backend ouverte vers Internet
+
+| Étape | N° | Ce que la preuve montre | Journal | Capture |
+|-------|----|-------------------------|---------|---------|
+| Erreur CI | 93 | PR #19 : **seul `iac` rouge** — Trivy config KUBE-0002 (HIGH), `terraform/cluster/network.tf:129` | [log](logs/93-ci-iac-v5-avant.txt) | [terminal](captures/93-ci-iac-v5-avant.png) · [GitHub](captures/93-ci-iac-v5-avant-web.png) |
+| Erreur cluster | 94 | Segmentation : flux légitimes OK, frontend isolé, mais **backend → 1.1.1.1:443 autorisé** (exfiltration possible) | [log](logs/94-k3s-segmentation-v5-avant.txt) | [capture](captures/94-k3s-segmentation-v5-avant.png) |
+| Correction | 96 | Diff `fix/v5-egress` (bloc `0.0.0.0/0` supprimé) et `terraform apply` : 1 ressource modifiée | [log](logs/96-k3s-v5-correction-apply.txt) | [capture](captures/96-k3s-v5-correction-apply.png) |
+| Après cluster | 97 | **12 tests sur 12 conformes** : 5 tests réseau (backend → Internet **bloqué**) + 7 tests d'admission Kyverno / PSA (image signée acceptée ; autre branche, non signée, registre non autorisé, `latest`, root, `privileged` refusés) | [log](logs/97-k3s-segmentation-v5-apres.txt) | [capture](captures/97-k3s-segmentation-v5-apres.png) |
+| Après CI | 101 | PR #20 : **tous les contrôles verts**, `terraform/cluster` 0 constat | [log](logs/101-ci-iac-v5-apres.txt) | [terminal](captures/101-ci-iac-v5-apres.png) · [GitHub](captures/101-ci-iac-v5-apres-web.png) |
+
+### Scénario d'attaque fictive et détection
+
+| N° | Ce que la preuve montre | Journal | Capture |
+|----|-------------------------|---------|---------|
+| 98 | `scripts/attack_scenario.sh` contre k3s : force brute (12 × HTTP 401), injections SQL/XSS (0 ligne, aucun hachage divulgué), IDOR (6 × HTTP 403) — **attaques bloquées par les corrections** | [log](logs/98-k3s-scenario-attaque.txt) | [capture](captures/98-k3s-scenario-attaque.png) |
+| 99 | Loki : événements `login_failed`, `suspicious_input`, `access_denied` retrouvés avec utilisateur, rôle, route, statut ; **3 alertes Grafana `firing`** (force brute, injection, IDOR) | [log](logs/99-k3s-detection-loki-alertes.txt) | [capture](captures/99-k3s-detection-loki-alertes.png) |
+| 100 | Grafana « Sécurité EduGrade » : 12 connexions échouées, 6 accès refusés, 4 entrées suspectes en 5 min, histogramme des vagues d'attaque, journal détaillé | — | [tableau de bord](captures/100-grafana-tableau-de-bord.png) · [alertes](captures/100-grafana-alertes.png) |
+
+Limite relevée : dans k3s, l'IP journalisée est celle de Traefik (`10.42.0.9`) et non
+celle du client, car deux proxys se succèdent (Traefik → Nginx) alors que
+`ProxyFix(x_for=1)` n'en fait confiance qu'à un. Amélioration prévue : `x_for=2`
+en environnement Kubernetes (voir `docs/PLAN_REPONSE_INCIDENT.md`).

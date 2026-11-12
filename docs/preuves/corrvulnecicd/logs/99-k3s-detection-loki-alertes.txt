@@ -1,0 +1,23 @@
+# Preuve : 99-k3s-detection-loki-alertes
+# Date   : 2026-11-12 22:30:22 WAT
+# Dossier: .
+$ scripts/observability_check.sh
+=== Loki : événements de sécurité (namespace edugrade, 15 min) ===
+access_denied      12
+login_failed       24
+login_success      4
+suspicious_input   8
+
+=== Loki : exemples (suspicious_input, access_denied) ===
+2026-11-12T21:29:35.260+00:00 access_denied user=3 role=student route=/grades/9 status=403 
+2026-11-12T21:29:35.205+00:00 access_denied user=3 role=student route=/grades/8 status=403 
+2026-11-12T21:29:35.179+00:00 access_denied user=3 role=student route=/grades/7 status=403 
+2026-11-12T21:29:35.144+00:00 access_denied user=3 role=student route=/grades/6 status=403 
+2026-11-12T21:29:35.131+00:00 access_denied user=3 role=student route=/grades/5 status=403 
+2026-11-12T21:29:35.116+00:00 access_denied user=3 role=student route=/grades/4 status=403 
+
+=== Grafana : règles d'alerte EduGrade ===
+firing    EduGrade - Force brute sur la connexion
+firing    EduGrade - Tentative d'injection (SQLi / XSS)
+firing    EduGrade - Tentatives d'accès non autorisé (IDOR)
+[code de retour : 0]

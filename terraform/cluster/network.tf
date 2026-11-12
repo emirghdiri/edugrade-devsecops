@@ -120,16 +120,9 @@ resource "kubernetes_network_policy" "backend" {
         port     = "8000"
       }
     }
-    # VULN-V5 (volontaire, voir docs/VULNERABILITES.md) : sortie vers tout
-    # Internet ouverte « pour les mises à jour ». Un backend compromis (V2, V3)
-    # peut exfiltrer la base vers n'importe quelle adresse.
-    egress {
-      to {
-        ip_block {
-          cidr = "0.0.0.0/0"
-        }
-      }
-    }
+    # Correctif V5 : plus de sortie vers 0.0.0.0/0. Le backend ne joint que la
+    # base (et le DNS, policy allow-dns) ; les mises à jour passent par une
+    # nouvelle image construite et signée par le pipeline, jamais par le pod.
     egress {
       to {
         pod_selector {
