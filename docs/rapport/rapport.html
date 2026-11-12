@@ -4,477 +4,464 @@
 <meta charset="utf-8">
 <title>EduGrade — Rapport de projet DevSecOps</title>
 <style>
-  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
   :root {
-    --navy: #1f3a6e; --navy-2: #2c5299; --ink: #1d2433; --muted: #5b6475;
+    --navy: #1f3a6e; --navy-2: #2c5299; --gold: #c9a227; --ink: #1d2433; --muted: #5b6475;
     --line: #d8dee9; --soft: #f3f6fb; --red: #b42318; --red-soft: #fdecea;
     --green: #1a7f37; --green-soft: #e6f4ea; --amber: #9a6700; --amber-soft: #fff4d6;
   }
   * { box-sizing: border-box; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif; color: var(--ink);
-         font-size: 10.2pt; line-height: 1.5; margin: 0; }
-  h1, h2, h3 { color: var(--navy); line-height: 1.25; }
-  h1 { font-size: 19pt; margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 2.5px solid var(--navy); }
-  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; }
-  h3 { font-size: 11pt; margin: 5mm 0 2mm; color: var(--navy-2); }
-  p { margin: 0 0 2.6mm; text-align: justify; }
-  ul, ol { margin: 0 0 3mm 5mm; padding-left: 4mm; }
-  li { margin-bottom: 1mm; }
-  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.6pt; background: var(--soft);
-         padding: 0 1.2mm; border-radius: 2px; }
-  /* Sections enchaînées : seuls la page de garde, le sommaire et les annexes
-     commencent une nouvelle page ; un titre n'est jamais laissé seul en bas. */
-  .chapter { margin-top: 9mm; }
-  .chapter.newpage { break-before: page; margin-top: 0; }
-  h1, h2, h3 { break-after: avoid; }
-  h1 + p, h2 + p, h2 + table, h1 + table { break-before: avoid; }
-  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.8pt; break-inside: auto; }
-  th { background: var(--navy); color: #fff; text-align: left; padding: 1.6mm 2mm; font-weight: 600; }
-  td { padding: 1.5mm 2mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+         font-size: 10.2pt; line-height: 1.55; margin: 0; }
+  .chapter { break-before: page; }
+  .chapter-head { margin: 0 0 7mm; padding-bottom: 3mm; border-bottom: 2.5px solid var(--navy); }
+  .chapter-head .num { font-size: 9.5pt; font-weight: 700; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; }
+  .chapter-head h1 { font-size: 20pt; color: var(--navy); margin: 1mm 0 0; line-height: 1.2; }
+  h2 { font-size: 13pt; color: var(--navy); margin: 7mm 0 2.5mm; line-height: 1.3; break-after: avoid; }
+  h2 .n { color: var(--gold); margin-right: 2mm; }
+  p { margin: 0 0 2.8mm; text-align: justify; }
+  ul, ol { margin: 0 0 3.2mm 4mm; padding-left: 4mm; }
+  li { margin-bottom: 1.1mm; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.5pt; background: var(--soft); padding: 0 1.1mm; border-radius: 2px; }
+  .intro { color: #3b4456; font-size: 10.6pt; border-left: 3px solid var(--gold); padding-left: 4mm; margin-bottom: 5mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2.5mm 0 4.5mm; font-size: 8.9pt; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 1.8mm 2.2mm; font-weight: 600; }
+  td { padding: 1.6mm 2.2mm; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr:nth-child(even) td { background: #fafbfd; }
   tr { break-inside: avoid; }
-  .tag { display: inline-block; padding: 0 1.8mm; border-radius: 2mm; font-size: 7.8pt; font-weight: 700; }
+  .tag { display: inline-block; padding: 0 1.8mm; border-radius: 2mm; font-size: 7.8pt; font-weight: 700; white-space: nowrap; }
   .ko { background: var(--red-soft); color: var(--red); }
   .ok { background: var(--green-soft); color: var(--green); }
   .warn { background: var(--amber-soft); color: var(--amber); }
-  figure { margin: 3mm 0 4.5mm; break-inside: avoid; text-align: center; }
-  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: 2px; }
-  figure.crop .frame { max-height: 92mm; overflow: hidden; border: 1px solid var(--line); border-radius: 2px; }
-  figure.crop .frame img { border: 0; width: 100%; }
-  figure.small img { max-width: 78%; }
-  figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 1.5mm; }
-  .duo { display: flex; gap: 4mm; }
-  .duo figure { flex: 1; margin-top: 1mm; }
-  .box { border-left: 3.5px solid var(--navy-2); background: var(--soft); padding: 2.5mm 3.5mm; margin: 3mm 0 4mm; break-inside: avoid; }
+  figure { margin: 3.5mm 0 5mm; break-inside: avoid; }
+  figure img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 2px; }
+  figure .frame { overflow: hidden; border: 1px solid var(--line); border-radius: 2px; }
+  figure .frame img { border: 0; }
+  .h70 .frame { max-height: 70mm; } .h85 .frame { max-height: 85mm; } .h100 .frame { max-height: 100mm; }
+  figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 1.8mm; text-align: center; }
+  figcaption b { color: var(--navy); }
+  /* Paires de figures : grille insécable (une paire n'est jamais coupée entre deux pages). */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; break-inside: avoid; page-break-inside: avoid; margin: 3.5mm 0 5mm; }
+  .duo figure { margin: 0; }
+  figure.w85 img { width: 85%; margin: 0 auto; }
+  .box { border-left: 3.5px solid var(--navy-2); background: var(--soft); padding: 3mm 4mm; margin: 3.5mm 0 4.5mm; break-inside: avoid; }
   .box.red { border-color: var(--red); background: var(--red-soft); }
   .box.green { border-color: var(--green); background: var(--green-soft); }
   .box p:last-child { margin-bottom: 0; }
-  .kpis { display: flex; gap: 3mm; margin: 3mm 0 4mm; }
-  .kpi { flex: 1; border: 1px solid var(--line); border-radius: 2mm; padding: 2.5mm; text-align: center; }
-  .kpi b { display: block; font-size: 16pt; color: var(--navy); }
-  .kpi span { font-size: 8pt; color: var(--muted); }
-
-  /* Page de garde */
-  .cover { height: 258mm; display: flex; flex-direction: column; }
-  .cover .uni { display: flex; justify-content: space-between; align-items: flex-start;
-                border-bottom: 2px solid var(--navy); padding-bottom: 4mm; }
-  .cover .uni .name { font-size: 17pt; font-weight: 700; color: var(--navy); letter-spacing: .5px; }
-  .cover .uni .sub { font-size: 9.5pt; color: var(--muted); }
-  .cover .title { margin-top: 26mm; }
-  .cover .kicker { font-size: 10.5pt; color: var(--navy-2); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
-  .cover h1.big { font-size: 29pt; border: 0; margin: 3mm 0 2mm; padding: 0; }
-  .cover .tagline { font-size: 13pt; color: var(--muted); }
-  .cover .art { margin: 12mm 0 0; }
-  .cover .art img { width: 100%; border: 1px solid var(--line); border-radius: 2mm; }
-  .cover .people { margin-top: auto; display: flex; gap: 8mm; border-top: 1px solid var(--line); padding-top: 5mm; }
-  .cover .people div { flex: 1; }
-  .cover .people h4 { margin: 0 0 1.5mm; font-size: 8.6pt; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .cover .people p { margin: 0; font-size: 10.6pt; text-align: left; }
-  .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: none; }
-  .toc li { display: flex; border-bottom: 1px dotted var(--line); padding: 1.6mm 0; font-size: 10.6pt; }
-  .toc li span:first-child { width: 10mm; color: var(--navy-2); font-weight: 700; }
-  .muted { color: var(--muted); }
-  .center { text-align: center; }
+  .box .t { font-weight: 700; color: var(--navy); display: block; margin-bottom: 1mm; }
+  .box.red .t { color: var(--red); } .box.green .t { color: var(--green); }
+  .kpis { display: flex; gap: 3mm; margin: 3.5mm 0 5mm; break-inside: avoid; page-break-inside: avoid; }
+  .kpi { flex: 1; border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: 1.5mm; padding: 2.5mm 1.5mm; text-align: center; }
+  .kpi b { display: block; font-size: 17pt; color: var(--navy); line-height: 1.2; }
+  .kpi span { font-size: 7.9pt; color: var(--muted); line-height: 1.35; display: block; }
+  .front h1 { font-size: 18pt; color: var(--navy); margin: 0 0 6mm; padding-bottom: 3mm; border-bottom: 2.5px solid var(--navy); }
+  .keywords { margin-top: 5mm; font-size: 9.6pt; }
+  .keywords b { color: var(--navy); }
+  .toc { list-style: none; margin: 0; padding: 0; }
+  .toc li { display: flex; align-items: baseline; margin: 0; padding: 1.25mm 0; }
+  .toc li .t { white-space: nowrap; }
+  .toc li .dots { flex: 1; border-bottom: 1px dotted #9aa3b2; margin: 0 2mm; transform: translateY(-1mm); }
+  .toc li .pg { min-width: 7mm; text-align: right; font-weight: 600; color: var(--navy); }
+  .toc li.lvl1 { font-weight: 700; color: var(--navy); margin-top: 2.6mm; font-size: 10.6pt; }
+  .toc li.lvl2 { padding-left: 7mm; font-size: 9.7pt; }
+  .toc li.lvl2 .t span { color: var(--gold); margin-right: 1.5mm; }
+  .abbr td:first-child { font-weight: 700; color: var(--navy); width: 22%; white-space: nowrap; }
 </style>
 </head>
 <body>
 
-<!-- ========================= PAGE DE GARDE ========================= -->
-<section class="cover">
-  <div class="uni">
-    <div>
-      <div class="name">TEK-UP University</div>
-      <div class="sub">École supérieure privée d'ingénierie et de technologies</div>
-    </div>
-    <div class="sub" style="text-align:right">Module DevSecOps — ING-5-SSIR<br>Année universitaire 2026-2027</div>
-  </div>
-  <div class="title">
-    <div class="kicker">Rapport de projet</div>
-    <h1 class="big">EduGrade</h1>
-    <div class="tagline">Portail de gestion de notes sécurisé de bout en bout&nbsp;: de l'application volontairement vulnérable au déploiement Kubernetes signé, observé et défendu</div>
-  </div>
-  <div class="art"><img src="../architecture/edugrade-architecture.png" alt="Architecture EduGrade"></div>
-  <div class="people">
-    <div>
-      <h4>Réalisé par</h4>
-      <p>Amir Ghdiri<br>Arij Cheikhrouhou<br>Oumaima Ben Othmen<br>Nasrallah Hadhri</p>
-    </div>
-    <div>
-      <h4>Encadré par</h4>
-      <p>M. Malek Ferchichi</p>
-    </div>
-    <div>
-      <h4>Dépôt</h4>
-      <p style="font-size:9.4pt">github.com/emirghdiri/<br>edugrade-devsecops</p>
-      <p class="muted" style="font-size:8.6pt;margin-top:1.5mm">Novembre 2026 · données fictives</p>
-    </div>
+<section class="front">
+  <h1 id="resume">Résumé</h1>
+  <p>Ce projet, réalisé dans le cadre du module DevSecOps, démontre qu'une chaîne de livraison logicielle peut <b>empêcher</b> une faille connue d'atteindre la production, puis <b>détecter</b> une attaque contre l'application déployée. Nous avons développé EduGrade, un portail de gestion de notes universitaires (Flask, PostgreSQL), publié d'abord dans une version <b>volontairement vulnérable</b> contenant sept failles&nbsp;: contrôle d'accès défaillant (IDOR), injection SQL, secrets écrits dans le code, dépendance vulnérable, NetworkPolicy permissive, en-têtes de sécurité absents et XSS réfléchi.</p>
+  <p>Un pipeline GitHub Actions de neuf contrôles (tests, SAST, détection de secrets, analyse des dépendances, de l'infrastructure et de l'image, DAST) a bloqué chacune de ces failles. Elles ont ensuite été corrigées une à une, chaque correction étant prouvée par un nouveau passage du pipeline. L'image livrée est accompagnée d'une SBOM et signée sans clé par Cosign&nbsp;; le cluster k3s, entièrement décrit en Terraform, n'admet que cette image signée, impose des conteneurs non-root et isole les composants par des NetworkPolicies. Enfin, une attaque fictive a été bloquée par l'application, retrouvée dans Loki et signalée par trois alertes Grafana.</p>
+  <p>La démarche a également mis au jour des défaillances réelles — un outil de sécurité exposant des secrets dans ses journaux, des règles d'admission et des NetworkPolicies installées mais inopérantes — qui illustrent l'enseignement central du projet&nbsp;: <b>une mesure de sécurité n'existe que si un test prouve qu'elle résiste à une tentative de contournement</b>.</p>
+  <div class="keywords"><b>Mots-clés&nbsp;:</b> DevSecOps, CI/CD, GitHub Actions, SAST, DAST, OWASP ZAP, Trivy, Gitleaks, SBOM, Cosign, Terraform, Kubernetes, k3s, Kyverno, NetworkPolicy, Grafana, Loki, STRIDE.</div>
+</section>
+
+<section class="front chapter">
+  <h1 id="sommaire">Sommaire</h1>
+  <ul class="toc">
+    <li class="lvl1"><span class="t">Liste des abréviations</span><span class="dots"></span><span class="pg" data-ref="abbr"></span></li>
+    <li class="lvl1"><span class="t">Introduction générale</span><span class="dots"></span><span class="pg" data-ref="intro"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 1 — Présentation du projet</span><span class="dots"></span><span class="pg" data-ref="c1"></span></li>
+    <li class="lvl2"><span class="t"><span>1.1</span>L'application EduGrade</span><span class="dots"></span><span class="pg" data-ref="c1-1"></span></li>
+    <li class="lvl2"><span class="t"><span>1.2</span>Architecture et technologies</span><span class="dots"></span><span class="pg" data-ref="c1-2"></span></li>
+    <li class="lvl2"><span class="t"><span>1.3</span>Organisation du travail</span><span class="dots"></span><span class="pg" data-ref="c1-3"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 2 — Infrastructure as Code</span><span class="dots"></span><span class="pg" data-ref="c2"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 3 — Les vulnérabilités volontaires</span><span class="dots"></span><span class="pg" data-ref="c3"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 4 — Le pipeline CI/CD bloquant</span><span class="dots"></span><span class="pg" data-ref="c4"></span></li>
+    <li class="lvl2"><span class="t"><span>4.1</span>Les neuf contrôles</span><span class="dots"></span><span class="pg" data-ref="c4-1"></span></li>
+    <li class="lvl2"><span class="t"><span>4.2</span>Politique de blocage</span><span class="dots"></span><span class="pg" data-ref="c4-2"></span></li>
+    <li class="lvl2"><span class="t"><span>4.3</span>Premier run sur la version vulnérable</span><span class="dots"></span><span class="pg" data-ref="c4-3"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 5 — Correction et vérification des failles</span><span class="dots"></span><span class="pg" data-ref="c5"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 6 — Chaîne d'approvisionnement logicielle</span><span class="dots"></span><span class="pg" data-ref="c6"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 7 — Déploiement sécurisé sur Kubernetes</span><span class="dots"></span><span class="pg" data-ref="c7"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 8 — Observabilité et réponse à incident</span><span class="dots"></span><span class="pg" data-ref="c8"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 9 — Analyse des risques (STRIDE)</span><span class="dots"></span><span class="pg" data-ref="c9"></span></li>
+    <li class="lvl1"><span class="t">Chapitre 10 — Difficultés rencontrées et enseignements</span><span class="dots"></span><span class="pg" data-ref="c10"></span></li>
+    <li class="lvl1"><span class="t">Conclusion générale et perspectives</span><span class="dots"></span><span class="pg" data-ref="concl"></span></li>
+    <li class="lvl1"><span class="t">Déclaration d'usage de l'intelligence artificielle</span><span class="dots"></span><span class="pg" data-ref="ia"></span></li>
+    <li class="lvl1"><span class="t">Annexes</span><span class="dots"></span><span class="pg" data-ref="annexes"></span></li>
+  </ul>
+</section>
+
+<section class="front chapter">
+  <h1 id="abbr">Liste des abréviations</h1>
+  <table class="abbr">
+    <tr><th>Sigle</th><th>Signification</th></tr>
+    <tr><td>CI/CD</td><td>Intégration et livraison continues (Continuous Integration / Continuous Delivery)</td></tr>
+    <tr><td>CSP</td><td>Content Security Policy — politique de sécurité du contenu (en-tête HTTP)</td></tr>
+    <tr><td>CSRF</td><td>Cross-Site Request Forgery — falsification de requête intersite</td></tr>
+    <tr><td>CVE</td><td>Common Vulnerabilities and Exposures — identifiant public de vulnérabilité</td></tr>
+    <tr><td>DAST</td><td>Dynamic Application Security Testing — test de sécurité de l'application en fonctionnement</td></tr>
+    <tr><td>GHCR</td><td>GitHub Container Registry — registre d'images de GitHub</td></tr>
+    <tr><td>IaC</td><td>Infrastructure as Code — infrastructure décrite par du code</td></tr>
+    <tr><td>IDOR</td><td>Insecure Direct Object Reference — accès direct non contrôlé à un objet</td></tr>
+    <tr><td>OIDC</td><td>OpenID Connect — protocole d'identité utilisé pour la signature sans clé</td></tr>
+    <tr><td>OWASP</td><td>Open Worldwide Application Security Project</td></tr>
+    <tr><td>PR</td><td>Pull Request — demande de fusion relue</td></tr>
+    <tr><td>PSA</td><td>Pod Security Admission — contrôle natif de la sécurité des pods Kubernetes</td></tr>
+    <tr><td>SAST</td><td>Static Application Security Testing — analyse statique du code</td></tr>
+    <tr><td>SBOM</td><td>Software Bill of Materials — inventaire des composants d'un logiciel</td></tr>
+    <tr><td>STRIDE</td><td>Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege</td></tr>
+    <tr><td>XSS</td><td>Cross-Site Scripting — injection de script dans une page</td></tr>
+  </table>
+  <div class="box">
+    <span class="t">Convention de preuve</span>
+    <p>Chaque résultat cité renvoie à une preuve numérotée du dépôt (par exemple <i>preuve 41</i>)&nbsp;: un journal contenant la commande exacte, sa sortie complète et son code de retour, accompagné de sa capture. Preuves 00 à 34&nbsp;: Partie 1 (<code>docs/preuves/</code>)&nbsp;; preuves 40 à 105&nbsp;: Partie 2 (<code>docs/preuves/corrvulnecicd/</code>). Aucune valeur de secret n'y figure.</p>
   </div>
 </section>
 
-<!-- ========================= SOMMAIRE ========================= -->
-<section class="chapter newpage toc">
-  <h1>Sommaire</h1>
-  <ol>
-    <li><span>1</span><span>Introduction, objectifs et périmètre</span></li>
-    <li><span>2</span><span>L'application EduGrade et son architecture</span></li>
-    <li><span>3</span><span>Organisation du travail et Infrastructure as Code</span></li>
-    <li><span>4</span><span>Les vulnérabilités volontaires</span></li>
-    <li><span>5</span><span>Le pipeline CI/CD bloquant et sa politique</span></li>
-    <li><span>6</span><span>Détection, correction, vérification : faille par faille</span></li>
-    <li><span>7</span><span>Chaîne d'approvisionnement : image, SBOM, signature</span></li>
-    <li><span>8</span><span>Déploiement sécurisé sur k3s et faille V5</span></li>
-    <li><span>9</span><span>Observabilité et détection d'une attaque</span></li>
-    <li><span>10</span><span>Modèle de menaces STRIDE</span></li>
-    <li><span>11</span><span>Difficultés rencontrées et enseignements</span></li>
-    <li><span>12</span><span>Plan de réponse à incident</span></li>
-    <li><span>13</span><span>Déclaration d'usage de l'intelligence artificielle</span></li>
-    <li><span>14</span><span>Conclusion et perspectives</span></li>
-    <li><span>A</span><span>Annexes : index des preuves et captures complémentaires</span></li>
-  </ol>
-  <div class="box" style="margin-top:8mm">
-    <p><b>Lecture des preuves.</b> Chaque affirmation du rapport renvoie à une preuve numérotée du dépôt (par exemple <i>preuve 41</i>)&nbsp;: un journal texte contenant la commande exacte, sa sortie complète et son code de retour (<code>docs/preuves/…/logs/</code>) et sa capture (<code>…/captures/</code>). Les preuves 00 à 34 relèvent de la Partie 1 (<code>docs/preuves/</code>), les preuves 40 à 105 de la Partie 2 (<code>docs/preuves/corrvulnecicd/</code>). Aucune valeur de secret n'y figure.</p>
-  </div>
-</section>
-
-<!-- ========================= 1. INTRODUCTION ========================= -->
-<section class="chapter newpage">
-  <h1>1. Introduction, objectifs et périmètre</h1>
-  <p>Le module DevSecOps demande de démontrer qu'une chaîne de livraison logicielle peut <b>empêcher</b> une faille connue d'atteindre la production, puis <b>détecter</b> une attaque contre ce qui est déployé. Pour le prouver de manière vérifiable, nous avons construit EduGrade, un portail de gestion de notes universitaires, <b>volontairement vulnérable</b> dans sa première version (tag <code>v0.1-vulnerable</code>). Chaque faille a ensuite été détectée par un outil automatique, bloquée par le pipeline, corrigée dans une branche dédiée et vérifiée de nouveau, preuves à l'appui.</p>
+<section class="chapter">
+  <div class="chapter-head"><div class="num">Introduction générale</div><h1 id="intro">Contexte, problématique et objectifs</h1></div>
+  <h2>Contexte</h2>
+  <p>Les applications web sont aujourd'hui livrées en continu&nbsp;: chaque modification du code peut atteindre la production en quelques minutes. Cette rapidité multiplie les occasions d'introduire une faille. La démarche <b>DevSecOps</b> répond à ce risque en intégrant la sécurité à chaque étape du cycle de vie — écriture, construction, test, livraison, déploiement et exploitation — sous forme de contrôles automatiques plutôt que d'audits ponctuels.</p>
+  <h2>Problématique</h2>
+  <p>Comment garantir, de manière <b>vérifiable</b>, qu'une faille connue ne peut pas être livrée, que ce qui s'exécute en production est exactement ce qui a été contrôlé, et qu'une attaque contre l'application déployée est détectée&nbsp;?</p>
+  <h2>Démarche</h2>
+  <p>Pour répondre à cette question de façon démontrable, nous avons volontairement introduit des failles dans une application, puis construit la chaîne qui doit les arrêter. Chaque faille suit le même cycle, documenté par des preuves&nbsp;: <b>introduire</b> (version <code>v0.1-vulnerable</code>) → <b>détecter</b> automatiquement → <b>bloquer</b> la livraison → <b>corriger</b> (une Pull Request par faille) → <b>vérifier</b> le retour au vert.</p>
   <h2>Objectifs</h2>
   <ul>
-    <li><b>Tout déclarer en code</b>&nbsp;: dépôt GitHub, protection de branche, secrets, cluster Kubernetes, politiques de sécurité, tableaux de bord.</li>
-    <li><b>Bloquer la livraison</b> dès qu'une faille exploitable est détectée (tests, SAST, secrets, dépendances, IaC, image, DAST).</li>
-    <li><b>Garantir l'intégrité</b> de ce qui est déployé&nbsp;: image scannée, décrite par une SBOM, signée et vérifiée à l'admission.</li>
+    <li><b>Tout déclarer en code</b>&nbsp;: dépôt, protection de branche, secrets, cluster, politiques de sécurité, tableaux de bord.</li>
+    <li><b>Bloquer la livraison</b> dès qu'une faille exploitable est détectée.</li>
+    <li><b>Garantir l'intégrité</b> de l'image déployée&nbsp;: scannée, inventoriée, signée, vérifiée à l'admission.</li>
     <li><b>Durcir l'exécution</b>&nbsp;: conteneurs non-root, segmentation réseau, refus des images non conformes.</li>
-    <li><b>Observer et réagir</b>&nbsp;: journaux de sécurité centralisés, alertes, plan de réponse à incident.</li>
+    <li><b>Observer et réagir</b>&nbsp;: journaux centralisés, alertes et plan de réponse à incident.</li>
   </ul>
-  <h2>Résultat en chiffres</h2>
+  <h2>Résultats obtenus</h2>
   <div class="kpis">
-    <div class="kpi"><b>7</b><span>failles volontaires<br>(V1-V5, Bonus 1-2)</span></div>
+    <div class="kpi"><b>7</b><span>failles détectées<br>et corrigées</span></div>
     <div class="kpi"><b>9</b><span>contrôles bloquants<br>dans le pipeline</span></div>
-    <div class="kpi"><b>57</b><span>tests automatisés<br>(dont 5 de sécurité)</span></div>
+    <div class="kpi"><b>57</b><span>tests automatisés<br>dont 5 de sécurité</span></div>
     <div class="kpi"><b>12/12</b><span>tests de segmentation<br>et d'admission</span></div>
     <div class="kpi"><b>3</b><span>alertes déclenchées<br>par l'attaque fictive</span></div>
   </div>
-  <h2>Périmètre</h2>
-  <p>Le projet couvre l'application Flask et sa base PostgreSQL, leur conteneurisation, le pipeline GitHub Actions, le registre GitHub Container Registry (GHCR), un cluster k3s local sous WSL2 et la pile d'observabilité Prometheus / Grafana / Loki. Toutes les données (identités, notes, secrets) sont fictives&nbsp;; aucun système réel n'a été visé. Le dépôt est public afin de bénéficier gratuitement de la protection de branche&nbsp;; ce choix est documenté comme risque accepté (section&nbsp;10).</p>
+  <p>Le rapport suit l'ordre de la chaîne&nbsp;: présentation du projet (chapitre 1) et de son infrastructure (chapitre 2), failles introduites (chapitre 3), pipeline qui les bloque (chapitre 4) et leur correction (chapitre 5), intégrité de l'image livrée (chapitre 6), déploiement durci (chapitre 7), observabilité (chapitre 8), puis analyse des risques (chapitre 9) et retour d'expérience (chapitre 10).</p>
 </section>
 
-<!-- ========================= 2. APPLICATION ========================= -->
 <section class="chapter">
-  <h1>2. L'application EduGrade et son architecture</h1>
-  <h2>Fonctionnalités</h2>
+  <div class="chapter-head"><div class="num">Chapitre 1</div><h1 id="c1">Présentation du projet</h1></div>
+  <p class="intro">Ce chapitre présente l'application EduGrade, son architecture technique et l'organisation adoptée par l'équipe.</p>
+  <h2 id="c1-1"><span class="n">1.1</span>L'application EduGrade</h2>
+  <p>EduGrade est un portail web de gestion de notes universitaires. Toutes les données qu'il manipule (identités, notes, secrets) sont fictives.</p>
   <table>
     <tr><th style="width:22%">Rôle</th><th>Fonctionnalités</th></tr>
-    <tr><td>Administrateur</td><td>Gestion des comptes enseignants et étudiants (création avec mot de passe haché, modification, suppression avec confirmation).</td></tr>
+    <tr><td>Administrateur</td><td>Gestion des comptes enseignants et étudiants&nbsp;: création avec mot de passe haché, modification, suppression avec confirmation.</td></tr>
     <tr><td>Enseignant</td><td>Gestion des notes et des matières, recherche des étudiants, statistiques de la promotion.</td></tr>
     <tr><td>Étudiant</td><td>Lecture seule&nbsp;: tableau de bord (moyenne, mention, meilleure note) et consultation de <b>ses</b> notes.</td></tr>
   </table>
-  <p>Sécurité applicative de base&nbsp;: rôles contrôlés côté serveur, mots de passe hachés avec scrypt, jeton anti-CSRF sur tous les formulaires, cookie de session <code>HttpOnly</code> et <code>SameSite</code>, interface sans JavaScript ni ressource externe (compatible avec une politique CSP stricte). L'application écrit une ligne JSON par événement (<code>login_failed</code>, <code>access_denied</code>, <code>suspicious_input</code>, <code>grade_updated</code>…) sans jamais y placer de mot de passe ni de valeur de note.</p>
-  <h2>Architecture technique</h2>
-  <figure><img src="../architecture/edugrade-architecture.png"><figcaption>Figure 1 — Architecture d'ensemble&nbsp;: du code au cluster observé, en six étapes (écrire, construire, tester, livrer, déployer, observer).</figcaption></figure>
+  <p>Mesures de sécurité de base&nbsp;: contrôle des rôles côté serveur, mots de passe hachés avec scrypt, jeton anti-CSRF sur tous les formulaires, cookie de session <code>HttpOnly</code> et <code>SameSite</code>, interface sans JavaScript ni ressource externe. L'application écrit une ligne JSON par événement de sécurité (<code>login_failed</code>, <code>access_denied</code>, <code>suspicious_input</code>…) sans jamais y inscrire de mot de passe.</p>
+  <h2 id="c1-2"><span class="n">1.2</span>Architecture et technologies</h2>
+  <figure class="w85"><img src="../architecture/edugrade-architecture.png"><figcaption><b>Figure 1</b> — Architecture d'ensemble&nbsp;: du code au cluster observé, en six étapes.</figcaption></figure>
   <table>
     <tr><th style="width:24%">Couche</th><th>Technologies</th></tr>
-    <tr><td>Application</td><td>Python 3.12, Flask 3.1, Jinja2, psycopg 3, Gunicorn ; PostgreSQL 16</td></tr>
-    <tr><td>Conteneurs</td><td>Dockerfile multi-étapes, utilisateur UID 10001, système de fichiers en lecture seule ; Nginx non-root en reverse proxy</td></tr>
+    <tr><td>Application</td><td>Python 3.12, Flask 3.1, Jinja2, psycopg 3, Gunicorn&nbsp;; PostgreSQL 16</td></tr>
+    <tr><td>Conteneurs</td><td>Dockerfile multi-étapes, utilisateur UID 10001, système de fichiers en lecture seule&nbsp;; Nginx non-root</td></tr>
     <tr><td>Infrastructure as Code</td><td>Terraform 1.17 (providers <code>github</code>, <code>kubernetes</code>, <code>helm</code>, <code>random</code>)</td></tr>
-    <tr><td>CI/CD et sécurité</td><td>GitHub Actions, pytest, Semgrep 1.185, Bandit 1.9, Gitleaks 8.30, Trivy 0.76, Checkov, Syft, Cosign, OWASP ZAP</td></tr>
-    <tr><td>Orchestration</td><td>k3s 1.37 (WSL2, Ubuntu 26.04), Traefik, Kyverno 1.20, Pod Security Admission</td></tr>
-    <tr><td>Observabilité</td><td>kube-prometheus-stack (Prometheus, Alertmanager, Grafana 13), Loki 3.6, Grafana Alloy</td></tr>
+    <tr><td>CI/CD et sécurité</td><td>GitHub Actions, pytest, Semgrep, Bandit, Gitleaks, Trivy, Checkov, Syft, Cosign, OWASP ZAP</td></tr>
+    <tr><td>Orchestration</td><td>k3s 1.37 (WSL2), Traefik, Kyverno 1.20, Pod Security Admission</td></tr>
+    <tr><td>Observabilité</td><td>Prometheus, Alertmanager, Grafana 13, Loki 3.6, Grafana Alloy</td></tr>
   </table>
-  <p>Flux applicatif&nbsp;: <code>navigateur → Traefik (Ingress) → frontend Nginx :8080 → backend Flask :8000 → PostgreSQL :5432</code>. Seul le backend joint la base, et seul Traefik joint le frontend&nbsp;: c'est ce que garantissent les NetworkPolicies (section&nbsp;8).</p>
+  <p>Chemin d'une requête&nbsp;: <code>navigateur → Traefik → frontend Nginx :8080 → backend Flask :8000 → PostgreSQL :5432</code>. Seul Traefik joint le frontend et seul le backend joint la base (chapitre 7).</p>
+  <h2 id="c1-3"><span class="n">1.3</span>Organisation du travail</h2>
+  <table>
+    <tr><th style="width:22%">Branche</th><th>Rôle et règles</th></tr>
+    <tr><td><code>main</code></td><td>Version livrée, <b>protégée</b>&nbsp;: Pull Request obligatoire, approbation par un autre membre, contrôle CI <code>build-test</code> vert et à jour, ni force push ni suppression.</td></tr>
+    <tr><td><code>develop</code></td><td>Branche d'intégration&nbsp;: toutes les branches de travail en partent et y reviennent par Pull Request.</td></tr>
+    <tr><td><code>feature/*</code>, <code>fix/*</code></td><td>Évolutions et corrections&nbsp;: une faille = une branche = une Pull Request.</td></tr>
+    <tr><td>Tags</td><td><code>v0.1-vulnerable</code> (avant correction), <code>v1.0-secure</code> (version finale).</td></tr>
+  </table>
+  <p>Vingt-trois Pull Requests ont été ouvertes et relues. Depuis l'introduction du pipeline (PR&nbsp;#9), chacune déclenche les neuf contrôles de sécurité. La répartition détaillée du travail figure dans les fiches de contribution individuelles.</p>
 </section>
 
-<!-- ========================= 3. ORGANISATION / IaC ========================= -->
 <section class="chapter">
-  <h1>3. Organisation du travail et Infrastructure as Code</h1>
-  <h2>Organisation Git</h2>
+  <div class="chapter-head"><div class="num">Chapitre 2</div><h1 id="c2">Infrastructure as Code</h1></div>
+  <p class="intro">Aucune ressource du projet n'a été configurée à la main&nbsp;: le dépôt GitHub comme le cluster sont décrits en Terraform, relus en Pull Request et reproductibles.</p>
+  <h2><span class="n">2.1</span>Le dépôt GitHub</h2>
+  <p><code>terraform/github/</code> déclare le dépôt, les branches <code>main</code> et <code>develop</code>, la protection de <code>main</code>, la collaboratrice (droit <code>push</code>, sans administration), les alertes Dependabot et les GitHub Secrets <code>APP_SECRET_KEY</code> et <code>POSTGRES_PASSWORD</code> utilisés par la CI. Leurs valeurs ne figurent que dans un fichier <code>terraform.tfvars</code> non versionné.</p>
+  <figure class="h85"><div class="frame"><img src="../preuves/captures/04-terraform-plan.png"></div><figcaption><b>Figure 2</b> — <code>terraform plan</code> du dépôt&nbsp;: 8 ressources, secrets masqués <i>(sensitive value)</i> (preuve 04).</figcaption></figure>
+  <h2><span class="n">2.2</span>Le cluster Kubernetes</h2>
+  <p><code>terraform/cluster/</code> crée 20 ressources&nbsp;:</p>
   <ul>
-    <li><code>main</code>&nbsp;: version livrée, <b>protégée</b> — Pull Request obligatoire, une approbation par un autre membre, contrôle CI <code>build-test</code> vert et à jour, ni force push ni suppression.</li>
-    <li><code>develop</code>&nbsp;: intégration&nbsp;; toutes les branches en partent et y reviennent par Pull Request.</li>
-    <li><code>feature/*</code> pour les évolutions, <code>fix/*</code> pour les corrections (une faille = une branche = une PR).</li>
-    <li>Tags&nbsp;: <code>v0.1-vulnerable</code> (avant correction), <code>v1.0-secure</code> (version finale).</li>
+    <li>les namespaces <code>edugrade</code> (Pod Security Admission <b>restricted</b>) et <code>monitoring</code>&nbsp;;</li>
+    <li>les Secrets Kubernetes de l'application et de Grafana, <b>générés aléatoirement</b> par Terraform et jamais écrits dans git&nbsp;;</li>
+    <li>cinq NetworkPolicies (chapitre 7)&nbsp;;</li>
+    <li>par Helm, avec des versions épinglées&nbsp;: Kyverno, kube-prometheus-stack, Loki et Alloy, ainsi que le tableau de bord et les alertes Grafana.</li>
   </ul>
-  <p>Au total, 23 Pull Requests ont été ouvertes et relues&nbsp;; depuis l'introduction du pipeline (PR #9), chacune déclenche les neuf contrôles. La répartition détaillée du travail entre les membres figure dans les fiches de contribution individuelles.</p>
-  <h2>Le dépôt GitHub créé par Terraform</h2>
-  <p>Le dépôt lui-même n'a pas été configuré à la main&nbsp;: <code>terraform/github/</code> déclare le dépôt, les branches <code>main</code> et <code>develop</code>, la protection de <code>main</code>, la collaboratrice (droit <code>push</code>, sans administration), les alertes Dependabot et les GitHub Secrets <code>APP_SECRET_KEY</code> et <code>POSTGRES_PASSWORD</code> utilisés par la CI. Les valeurs de ces secrets ne sont présentes que dans un fichier <code>terraform.tfvars</code> non versionné.</p>
-  <figure class="crop"><div class="frame"><img src="../preuves/captures/04-terraform-plan.png"></div><figcaption>Figure 2 — <code>terraform plan</code> du dépôt GitHub&nbsp;: 8 ressources, secrets affichés <i>(sensitive value)</i> (preuve 04).</figcaption></figure>
-  <h2>Le cluster créé par Terraform</h2>
-  <p><code>terraform/cluster/</code> crée 20 ressources&nbsp;: les namespaces <code>edugrade</code> (Pod Security Admission <b>restricted</b>) et <code>monitoring</code>&nbsp;; les Secrets Kubernetes de l'application et de Grafana, <b>générés aléatoirement</b> par Terraform (jamais écrits dans git)&nbsp;; cinq NetworkPolicies&nbsp;; et, par Helm, Kyverno, kube-prometheus-stack, Loki et Alloy, avec des versions de charts épinglées. Les charts sont téléchargés une fois par <code>scripts/fetch_charts.sh</code>, ce qui rend <code>plan</code> et <code>apply</code> indépendants de la disponibilité des dépôts Helm.</p>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/91-k3s-cluster-terraform-apply.png"></div><figcaption>Figure 3 — Cluster appliqué&nbsp;: état Terraform, namespaces et labels Pod Security, Secrets, NetworkPolicies, releases Helm, règles Kyverno prêtes (preuve 91).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/91-k3s-cluster-terraform-apply.png"></div><figcaption><b>Figure 3</b> — Cluster appliqué&nbsp;: état Terraform, namespaces et labels Pod Security, Secrets, NetworkPolicies, releases Helm, règles Kyverno prêtes (preuve 91).</figcaption></figure>
 </section>
 
-<!-- ========================= 4. VULNERABILITES ========================= -->
 <section class="chapter">
-  <h1>4. Les vulnérabilités volontaires</h1>
-  <p>Sept failles ont été introduites, chacune signalée dans le code par un commentaire <code>VULN-…</code> et documentée dans <code>docs/VULNERABILITES.md</code>&nbsp;:</p>
+  <div class="chapter-head"><div class="num">Chapitre 3</div><h1 id="c3">Les vulnérabilités volontaires</h1></div>
+  <p class="intro">Sept failles ont été introduites dans la version <code>v0.1-vulnerable</code>. Chacune est signalée dans le code par un commentaire <code>VULN-…</code> et documentée dans <code>docs/VULNERABILITES.md</code>.</p>
   <table>
-    <tr><th>ID</th><th>Faille</th><th>Emplacement</th><th>OWASP 2021</th><th>Impact démontré</th></tr>
-    <tr><td><b>V1</b></td><td>IDOR sur les notes</td><td><code>app/student.py</code></td><td>A01</td><td>Un étudiant lit les notes et l'e-mail de n'importe quel autre étudiant (HTTP 200).</td></tr>
-    <tr><td><b>V2</b></td><td>Injection SQL</td><td><code>app/teacher.py</code></td><td>A03</td><td><code>UNION</code> : les 8 hachages de mots de passe sont exfiltrés.</td></tr>
-    <tr><td><b>V3</b></td><td>Secrets en dur</td><td><code>app/config.py</code></td><td>A07</td><td>Avec la clé lue dans le dépôt public, un cookie enseignant forgé ouvre l'espace enseignant <b>sans mot de passe</b>.</td></tr>
-    <tr><td><b>V4</b></td><td>PyYAML 5.3.1</td><td><code>requirements.txt</code></td><td>A06</td><td>CVE-2020-14343 (CRITICAL)&nbsp;: exécution de code par un YAML malveillant.</td></tr>
+    <tr><th style="width:6%">ID</th><th style="width:19%">Faille</th><th style="width:25%">Emplacement</th><th style="width:9%">OWASP</th><th>Impact démontré</th></tr>
+    <tr><td><b>V1</b></td><td>IDOR sur les notes</td><td><code>app/student.py</code></td><td>A01</td><td>Un étudiant lit les notes et l'e-mail de n'importe quel autre étudiant.</td></tr>
+    <tr><td><b>V2</b></td><td>Injection SQL</td><td><code>app/teacher.py</code></td><td>A03</td><td>Une requête <code>UNION</code> exfiltre les 8 hachages de mots de passe.</td></tr>
+    <tr><td><b>V3</b></td><td>Secrets en dur</td><td><code>app/config.py</code></td><td>A07</td><td>Avec la clé lue dans le dépôt public, un cookie enseignant forgé donne accès sans mot de passe.</td></tr>
+    <tr><td><b>V4</b></td><td>PyYAML 5.3.1</td><td><code>requirements.txt</code></td><td>A06</td><td>CVE-2020-14343 (CRITICAL)&nbsp;: exécution de code par un fichier YAML.</td></tr>
     <tr><td><b>V5</b></td><td>NetworkPolicy permissive</td><td><code>terraform/cluster/network.tf</code></td><td>A05</td><td>Le backend peut sortir vers tout Internet&nbsp;: exfiltration possible.</td></tr>
-    <tr><td><b>B1</b></td><td>En-têtes HTTP absents</td><td><code>docker/nginx.conf</code></td><td>A05</td><td>Ni CSP, ni anti-clickjacking, ni <code>nosniff</code>.</td></tr>
-    <tr><td><b>B2</b></td><td>XSS réfléchi</td><td><code>students.html</code></td><td>A03</td><td>Script exécuté dans la session d'un enseignant (filtre <code>|safe</code>).</td></tr>
+    <tr><td><b>B1</b></td><td>En-têtes HTTP absents</td><td><code>docker/nginx.conf</code></td><td>A05</td><td>Ni CSP, ni protection anti-clickjacking, ni <code>nosniff</code>.</td></tr>
+    <tr><td><b>B2</b></td><td>XSS réfléchi</td><td><code>students.html</code></td><td>A03</td><td>Script exécuté dans la session d'un enseignant.</td></tr>
   </table>
+  <h2><span class="n">3.1</span>Démonstration sur l'application</h2>
   <div class="duo">
-    <figure><img src="../preuves/captures/26-app-v1-idor-avant.png"><figcaption>Figure 4 — V1&nbsp;: connectée en Lina, <code>/grades/4</code> affiche les notes de Youssef (preuve 26).</figcaption></figure>
-    <figure><div style="max-height:96mm;overflow:hidden;border:1px solid var(--line)"><img style="border:0" src="../preuves/captures/28-app-v2-sqli-union-avant.png"></div><figcaption>Figure 5 — V2&nbsp;: l'injection <code>UNION</code> affiche les hachages scrypt (preuve 28).</figcaption></figure>
+    <figure><img src="../preuves/captures/26-app-v1-idor-avant.png"><figcaption><b>Figure 4</b> — V1&nbsp;: connectée en Lina, la page de Youssef s'affiche (preuve 26).</figcaption></figure>
+    <figure class="h70"><div class="frame"><img src="../preuves/captures/28-app-v2-sqli-union-avant.png"></div><figcaption><b>Figure 5</b> — V2&nbsp;: les hachages scrypt apparaissent (preuve 28).</figcaption></figure>
   </div>
   <div class="duo">
-    <figure><img src="../preuves/captures/29-app-b2-xss-avant.png"><figcaption>Figure 6 — Bonus 2&nbsp;: le script injecté s'exécute (preuve 29).</figcaption></figure>
-    <figure><img src="../preuves/captures/30-app-b1-entetes-avant.png"><figcaption>Figure 7 — Bonus 1&nbsp;: aucun en-tête de sécurité (preuve 30).</figcaption></figure>
+    <figure><img src="../preuves/captures/29-app-b2-xss-avant.png"><figcaption><b>Figure 6</b> — Bonus 2&nbsp;: le script injecté s'exécute (preuve 29).</figcaption></figure>
+    <figure><img src="../preuves/captures/30-app-b1-entetes-avant.png"><figcaption><b>Figure 7</b> — Bonus 1&nbsp;: aucun en-tête de sécurité (preuve 30).</figcaption></figure>
   </div>
 </section>
 
-<!-- ========================= 5. PIPELINE ========================= -->
 <section class="chapter">
-  <h1>5. Le pipeline CI/CD bloquant et sa politique</h1>
-  <p>Le pipeline <code>.github/workflows/ci.yml</code> s'exécute sur chaque Pull Request et chaque push vers <code>develop</code> et <code>main</code>. Il suit l'ordre exigé par le cahier des charges&nbsp;: build, tests, SAST, secrets, dépendances, IaC, image, SBOM, publication, signature, Docker Compose de test, DAST.</p>
+  <div class="chapter-head"><div class="num">Chapitre 4</div><h1 id="c4">Le pipeline CI/CD bloquant</h1></div>
+  <p class="intro">Le pipeline <code>.github/workflows/ci.yml</code> s'exécute sur chaque Pull Request et chaque push vers <code>develop</code> et <code>main</code>. Une faille exploitable détectée empêche la publication de l'image.</p>
+  <h2 id="c4-1"><span class="n">4.1</span>Les neuf contrôles</h2>
   <table>
-    <tr><th style="width:23%">Job</th><th style="width:30%">Outils</th><th>Bloque si…</th></tr>
-    <tr><td><code>build-test</code></td><td>pip, pytest + PostgreSQL de service</td><td>un test fonctionnel échoue (contrôle exigé par la protection de <code>main</code>)</td></tr>
+    <tr><th style="width:19%">Job</th><th style="width:33%">Outils</th><th>Bloque si…</th></tr>
+    <tr><td><code>build-test</code></td><td>pytest + PostgreSQL de service</td><td>un test fonctionnel échoue (contrôle exigé par la protection de <code>main</code>)</td></tr>
     <tr><td><code>security-tests</code></td><td>pytest <code>-m security</code></td><td>un test d'IDOR, d'injection SQL ou de XSS échoue</td></tr>
-    <tr><td><code>sast</code></td><td>Semgrep (<code>p/default</code> + <code>p/security-audit</code>), Bandit</td><td>constat Semgrep <b>ERROR</b> ; Bandit <b>HIGH</b></td></tr>
-    <tr><td><code>secrets</code></td><td>Gitleaks sur <b>tout l'historique</b></td><td>une fuite, hors exceptions ciblées</td></tr>
-    <tr><td><code>dependencies</code></td><td>Trivy fs</td><td>HIGH/CRITICAL <b>avec correctif disponible</b></td></tr>
-    <tr><td><code>iac</code></td><td>Trivy config (+ Checkov en rapport)</td><td>HIGH/CRITICAL hors exceptions datées</td></tr>
-    <tr><td><code>image</code></td><td>docker build, Syft (SBOM SPDX), Trivy image</td><td>HIGH/CRITICAL avec correctif dans l'image</td></tr>
-    <tr><td><code>publish</code></td><td>GHCR (tag = SHA), Cosign keyless (OIDC)</td><td>ne s'exécute que si <b>tout</b> est vert, et jamais sur une PR</td></tr>
+    <tr><td><code>sast</code></td><td>Semgrep, Bandit</td><td>constat Semgrep <b>ERROR</b>&nbsp;; Bandit <b>HIGH</b></td></tr>
+    <tr><td><code>secrets</code></td><td>Gitleaks sur tout l'historique git</td><td>une fuite, hors exceptions ciblées</td></tr>
+    <tr><td><code>dependencies</code></td><td>Trivy fs</td><td>vulnérabilité HIGH/CRITICAL <b>corrigeable</b></td></tr>
+    <tr><td><code>iac</code></td><td>Trivy config (Checkov en rapport)</td><td>HIGH/CRITICAL hors exceptions datées</td></tr>
+    <tr><td><code>image</code></td><td>docker build, Syft, Trivy image</td><td>HIGH/CRITICAL corrigeable dans l'image</td></tr>
+    <tr><td><code>publish</code></td><td>GHCR, Cosign</td><td>s'exécute uniquement si <b>tout</b> est vert, jamais sur une PR</td></tr>
     <tr><td><code>dast</code></td><td>Docker Compose + OWASP ZAP authentifié</td><td>au moins une alerte <b>High</b></td></tr>
   </table>
-  <h2>Principes de conception</h2>
+  <h2 id="c4-2"><span class="n">4.2</span>Politique de blocage</h2>
+  <p>La politique complète (<code>docs/POLITIQUE_BLOCAGE.md</code>) repose sur quatre principes&nbsp;:</p>
   <ul>
-    <li><b>Ce qui est scanné est ce qui est livré</b>&nbsp;: l'image est construite une seule fois, transmise en artefact, puis testée par ZAP, publiée et signée sans reconstruction.</li>
-    <li><b>Une faille exploitable bloque, le bruit ne bloque pas</b>&nbsp;: les seuils sont calibrés sur la version vulnérable (chaque faille est bloquée par au moins un contrôle) sans rendre le pipeline rouge en permanence. Par exemple <code>--ignore-unfixed</code> pour Trivy&nbsp;: les vulnérabilités Debian sans correctif restent visibles dans la SBOM mais n'exigent aucune action possible.</li>
-    <li><b>ZAP authentifié</b>&nbsp;: le script <code>scripts/zap_scan.sh</code> se connecte en enseignant (jeton CSRF lu dans la page), afin de tester les pages réellement exposées aux failles.</li>
-    <li><b>Exceptions explicites</b>&nbsp;: déclarées dans <code>.trivyignore.yaml</code> et <code>.gitleaksignore</code>, limitées à un fichier ou à une empreinte, justifiées et datées dans <code>docs/POLITIQUE_BLOCAGE.md</code>.</li>
+    <li><b>Une faille exploitable bloque, le bruit ne bloque pas.</b> Les seuils sont calibrés sur la version vulnérable&nbsp;: chaque faille est bloquée par au moins un contrôle, sans rendre le pipeline rouge en permanence (les vulnérabilités Debian sans correctif restent visibles dans la SBOM mais ne bloquent pas).</li>
+    <li><b>Ce qui est scanné est ce qui est livré.</b> L'image est construite une seule fois, puis testée par ZAP, publiée et signée sans reconstruction.</li>
+    <li><b>Le DAST est authentifié.</b> ZAP se connecte en enseignant (jeton CSRF lu dans la page) pour tester les pages réellement exposées.</li>
+    <li><b>Les exceptions sont explicites.</b> Déclarées dans un fichier versionné, limitées à un fichier ou à une empreinte, justifiées et datées.</li>
   </ul>
-  <h2>Premier run&nbsp;: la version vulnérable est bloquée</h2>
-  <figure><img src="../preuves/corrvulnecicd/captures/40-ci-run1-pipeline-rouge-web.png"><figcaption>Figure 8 — Premier run sur la version vulnérable&nbsp;: <code>build-test</code> vert, 7 contrôles rouges, <code>publish</code> sauté — aucune image vulnérable n'est publiée (preuve 40).</figcaption></figure>
-</section>
-
-<section class="chapter">
-  <h2 style="margin-top:0">Ce que chaque contrôle a détecté sur la version vulnérable</h2>
+  <h2 id="c4-3"><span class="n">4.3</span>Premier run sur la version vulnérable</h2>
+  <figure><img src="../preuves/corrvulnecicd/captures/40-ci-run1-pipeline-rouge-web.png"><figcaption><b>Figure 8</b> — Premier run&nbsp;: <code>build-test</code> vert, 7 contrôles rouges, <code>publish</code> sauté — aucune image vulnérable n'est publiée (preuve 40).</figcaption></figure>
   <table>
-    <tr><th style="width:18%">Job</th><th>Résultat du premier run</th><th style="width:9%">Preuve</th></tr>
-    <tr><td>security-tests</td><td>4 échecs&nbsp;: notes de Youssef accessibles, aucun <code>access_denied</code>&nbsp;; 6 étudiants renvoyés par une tautologie&nbsp;; hachages divulgués</td><td>41</td></tr>
-    <tr><td>sast</td><td>Semgrep <code>sqlalchemy-execute-raw-query</code> (ERROR, V2) et <code>template-unescaped-with-safe</code> (B2)</td><td>42</td></tr>
-    <tr><td>secrets</td><td>Gitleaks&nbsp;: 2 × <code>generic-api-key</code> dans <code>app/config.py</code>, commit <code>f78fd00</code> (V3)</td><td>43</td></tr>
-    <tr><td>dependencies</td><td>Trivy fs&nbsp;: PyYAML 5.3.1, CVE-2020-14343 CRITICAL (V4)</td><td>44</td></tr>
-    <tr><td>image</td><td>V4 dans l'image + <b>zlib CVE-2026-76844 / CVE-2026-85091</b> (HIGH) dans l'image de base Debian — trouvaille hors failles volontaires</td><td>45</td></tr>
-    <tr><td>iac</td><td>GIT-0001 (dépôt public, CRITICAL), GIT-0004 (commits non signés, HIGH)</td><td>46</td></tr>
-    <tr><td>dast</td><td>ZAP&nbsp;: <b>3 alertes High</b> (SQL Injection, XSS réfléchi, XSS DOM) + en-têtes absents (Medium/Low)</td><td>47</td></tr>
+    <tr><th style="width:18%">Job</th><th>Ce qui a été détecté</th><th style="width:9%">Preuve</th></tr>
+    <tr><td>security-tests</td><td>4 échecs&nbsp;: notes d'un autre étudiant accessibles, aucun <code>access_denied</code>&nbsp;; tautologie SQL&nbsp;; hachages divulgués</td><td>41</td></tr>
+    <tr><td>sast</td><td>Semgrep <code>sqlalchemy-execute-raw-query</code> (V2) et <code>template-unescaped-with-safe</code> (B2)</td><td>42</td></tr>
+    <tr><td>secrets</td><td>Gitleaks&nbsp;: 2 secrets dans <code>app/config.py</code> (V3)</td><td>43</td></tr>
+    <tr><td>dependencies</td><td>PyYAML 5.3.1, CVE-2020-14343 CRITICAL (V4)</td><td>44</td></tr>
+    <tr><td>image</td><td>V4 et <b>zlib vulnérable</b> dans l'image de base — trouvaille hors failles volontaires</td><td>45</td></tr>
+    <tr><td>iac</td><td>Dépôt public (CRITICAL) et commits non signés (HIGH)</td><td>46</td></tr>
+    <tr><td>dast</td><td>ZAP&nbsp;: <b>3 alertes High</b> (injection SQL, XSS réfléchi, XSS DOM) et en-têtes absents</td><td>47</td></tr>
   </table>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/47-ci-dast-zap-v2-b1-b2-avant.png"></div><figcaption>Figure 9 — Synthèse ZAP du premier run&nbsp;: trois alertes High, la livraison est bloquée (preuve 47).</figcaption></figure>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/41-ci-security-tests-v1-v2-avant.png"></div><figcaption>Figure 10 — Tests de sécurité en échec sur la version vulnérable (preuve 41).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/47-ci-dast-zap-v2-b1-b2-avant.png"></div><figcaption><b>Figure 9</b> — Synthèse ZAP du premier run&nbsp;: trois alertes High, la livraison est bloquée (preuve 47).</figcaption></figure>
   <div class="box red">
-    <p><b>Erreur du pipeline lui-même (preuves 48 → 51 → 52).</b> Bandit faisait échouer le job alors qu'aucun constat n'était HIGH, et surtout il <b>affichait en clair les secrets V3 dans le journal public</b> de GitHub Actions. Correction&nbsp;: format de sortie sans message ni extrait de code, blocage sur HIGH uniquement. Un outil de sécurité mal configuré peut lui-même devenir une source de fuite.</p>
+    <span class="t">Constat&nbsp;: une erreur du pipeline lui-même (preuves 48, 51, 52)</span>
+    <p>Bandit faisait échouer son job alors qu'aucun constat n'était HIGH, et surtout il <b>affichait en clair les secrets V3 dans le journal public</b> de GitHub Actions. Correction&nbsp;: format de sortie sans valeur, blocage sur HIGH uniquement. Un outil de sécurité mal configuré peut lui-même devenir une source de fuite.</p>
   </div>
 </section>
 
-<!-- ========================= 6. FAILLE PAR FAILLE ========================= -->
 <section class="chapter">
-  <h1>6. Détection, correction, vérification&nbsp;: faille par faille</h1>
-  <p>Chaque faille a été corrigée dans sa propre branche <code>fix/*</code> et sa propre Pull Request&nbsp;; le pipeline de la PR montre l'erreur disparue. Les preuves suivent toujours le même triptyque <i>erreur → correction → après</i>.</p>
+  <div class="chapter-head"><div class="num">Chapitre 5</div><h1 id="c5">Correction et vérification des failles</h1></div>
+  <p class="intro">Chaque faille a été corrigée dans sa propre branche <code>fix/*</code> et sa propre Pull Request. Les preuves suivent toujours le même triptyque&nbsp;: <i>erreur → correction → après</i>.</p>
+  <h2><span class="n">5.1</span>Synthèse des corrections</h2>
   <table>
-    <tr><th style="width:12%">Faille</th><th>Correction</th><th style="width:30%">Vérification</th><th style="width:11%">Preuves</th></tr>
-    <tr><td><b>V1</b> · PR #10</td><td>Contrôle d'appartenance côté serveur&nbsp;: un étudiant qui demande les notes d'un autre reçoit <b>403</b> et l'événement <code>access_denied</code> est journalisé&nbsp;; enseignants et administrateur conservent l'accès.</td><td>2 tests IDOR <span class="tag ok">PASSED</span></td><td>41 → 60 → 61</td></tr>
-    <tr><td><b>V2</b> · PR #11</td><td>Requête paramétrée <code>ILIKE %s</code> + paramètre lié, jokers LIKE échappés.</td><td>tests SQLi <span class="tag ok">PASSED</span>, <code>sast</code> vert, plus d'alerte ZAP</td><td>41-42 → 62 → 63</td></tr>
-    <tr><td><b>B2</b> · PR #12</td><td>Suppression de <code>|safe</code> (échappement Jinja) + test de non-régression <code>test_xss.py</code>.</td><td>plus aucune alerte ZAP XSS</td><td>47 → 64 → 65</td></tr>
-    <tr><td><b>B1</b> · PR #13</td><td>Nginx&nbsp;: CSP stricte (<code>script-src 'none'</code>, <code>frame-ancestors 'none'</code>), X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP/CORP/COEP. Vérifié sans violation CSP dans Chromium.</td><td>plus d'alerte ZAP d'en-tête</td><td>47 → 66 → 67</td></tr>
-    <tr><td><b>V3</b> · PR #14</td><td>Secrets lus uniquement dans l'environnement&nbsp;; refus de démarrer sans <code>SECRET_KEY</code>&nbsp;; <b>rotation</b>&nbsp;; exception Gitleaks limitée aux deux empreintes historiques.</td><td><code>no leaks found</code>&nbsp;; cookie forgé avec l'ancienne clé → <b>302 /login</b></td><td>43 → 68 → 69, 70</td></tr>
-    <tr><td><b>V4</b> · PR #15</td><td>PyYAML 6.0.3 + <code>yaml.safe_load</code> (un YAML <code>!!python/object/apply</code> est refusé).</td><td><code>dependencies</code> vert</td><td>44 → 71 → 72</td></tr>
-    <tr><td><b>zlib</b> · PR #16</td><td><code>apt-get upgrade</code> dans l'image d'exécution, cache apt supprimé, image toujours non-root.</td><td>plus de HIGH zlib</td><td>45 → 73 → 74</td></tr>
-    <tr><td><b>IaC</b> · PR #17</td><td>Dépôt public et commits non signés&nbsp;: choix documentés, exceptions <code>.trivyignore.yaml</code> limitées à <code>main.tf</code> et expirant le 30/06/2027.</td><td><code>iac</code> vert&nbsp;; un nouveau dépôt public ailleurs reste bloqué</td><td>46 → 75 → 76</td></tr>
+    <tr><th style="width:11%">Faille</th><th>Correction appliquée</th><th style="width:27%">Vérification</th><th style="width:11%">Preuves</th></tr>
+    <tr><td><b>V1</b><br>PR #10</td><td>Contrôle d'appartenance côté serveur&nbsp;: réponse <b>403</b> et événement <code>access_denied</code>&nbsp;; enseignants et administrateur gardent l'accès.</td><td>tests IDOR <span class="tag ok">PASSED</span></td><td>41, 60, 61</td></tr>
+    <tr><td><b>V2</b><br>PR #11</td><td>Requête paramétrée (<code>ILIKE %s</code> et paramètre lié).</td><td>tests SQLi <span class="tag ok">PASSED</span>, SAST vert</td><td>42, 62, 63</td></tr>
+    <tr><td><b>B2</b><br>PR #12</td><td>Suppression du filtre <code>|safe</code>, test de non-régression XSS.</td><td>plus d'alerte ZAP XSS</td><td>47, 64, 65</td></tr>
+    <tr><td><b>B1</b><br>PR #13</td><td>En-têtes dans Nginx&nbsp;: CSP stricte, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP/CORP/COEP.</td><td>plus d'alerte ZAP d'en-tête</td><td>47, 66, 67</td></tr>
+    <tr><td><b>V3</b><br>PR #14</td><td>Secrets lus uniquement dans l'environnement, <b>rotation</b>, exception Gitleaks limitée aux deux empreintes historiques.</td><td><code>no leaks found</code>&nbsp;; ancienne clé refusée</td><td>43, 68-70</td></tr>
+    <tr><td><b>V4</b><br>PR #15</td><td>PyYAML 6.0.3 et <code>yaml.safe_load</code>.</td><td>analyse des dépendances verte</td><td>44, 71, 72</td></tr>
+    <tr><td><b>zlib</b><br>PR #16</td><td>Correctifs Debian appliqués à chaque construction de l'image.</td><td>plus de HIGH dans l'image</td><td>45, 73, 74</td></tr>
+    <tr><td><b>IaC</b><br>PR #17</td><td>Choix documentés&nbsp;: exceptions limitées à un fichier, expirant le 30/06/2027.</td><td>analyse IaC verte</td><td>46, 75, 76</td></tr>
   </table>
+  <h2><span class="n">5.2</span>Exemples&nbsp;: V1 et V3</h2>
   <div class="duo">
-    <figure><img src="../preuves/corrvulnecicd/captures/60-v1-idor-correction.png"><figcaption>Figure 11 — Correction V1&nbsp;: contrôle d'appartenance (preuve 60).</figcaption></figure>
-    <figure><img src="../preuves/corrvulnecicd/captures/61-v1-idor-apres.png"><figcaption>Figure 12 — Après&nbsp;: les tests IDOR passent dans la CI (preuve 61).</figcaption></figure>
+    <figure><img src="../preuves/corrvulnecicd/captures/60-v1-idor-correction.png"><figcaption><b>Figure 10</b> — Correction V1&nbsp;: contrôle d'appartenance (preuve 60).</figcaption></figure>
+    <figure><img src="../preuves/corrvulnecicd/captures/61-v1-idor-apres.png"><figcaption><b>Figure 11</b> — Après&nbsp;: les tests IDOR passent en CI (preuve 61).</figcaption></figure>
   </div>
-  <div class="duo">
-    <figure><img src="../preuves/corrvulnecicd/captures/62-v2-sqli-correction.png"><figcaption>Figure 13 — Correction V2&nbsp;: requête paramétrée (preuve 62).</figcaption></figure>
-    <figure><img src="../preuves/corrvulnecicd/captures/70-v3-rotation-ancienne-cle-refusee-apres.png"><figcaption>Figure 14 — V3&nbsp;: un cookie forgé avec l'ancienne clé est refusé, la rotation est effective (preuve 70).</figcaption></figure>
+  <figure class="h70"><div class="frame"><img src="../preuves/corrvulnecicd/captures/70-v3-rotation-ancienne-cle-refusee-apres.png"></div><figcaption><b>Figure 12</b> — V3&nbsp;: un cookie forgé avec l'ancienne clé est désormais refusé (redirection vers <code>/login</code>)&nbsp;: la rotation est effective (preuve 70).</figcaption></figure>
+  <h2><span class="n">5.3</span>Résultat&nbsp;: le pipeline est vert</h2>
+  <figure><img src="../preuves/corrvulnecicd/captures/86-ci-develop-tout-vert-web.png"><figcaption><b>Figure 13</b> — Pipeline de <code>develop</code> après fusion des corrections&nbsp;: 9 jobs sur 9 verts, image publiée et signée (preuves 85-86).</figcaption></figure>
+  <div class="box green">
+    <span class="t">Bilan</span>
+    <p>Avant&nbsp;: 7 contrôles rouges et publication bloquée. Après&nbsp;: 9 contrôles verts, ZAP sans alerte High, image publiée et signée. Chaque transition est tracée par une Pull Request relue et un run consultable sur GitHub.</p>
   </div>
 </section>
 
 <section class="chapter">
-  <h2 style="margin-top:0">Toutes les corrections réunies&nbsp;: le pipeline est vert</h2>
-  <p>Après fusion des huit corrections dans <code>develop</code>, les neuf jobs sont verts, l'image est publiée et signée, et ZAP ne remonte plus aucune alerte High (une seule alerte Low, informative).</p>
-  <figure><img src="../preuves/corrvulnecicd/captures/86-ci-develop-tout-vert-web.png"><figcaption>Figure 15 — Pipeline de <code>develop</code> après fusion des corrections&nbsp;: 9 jobs sur 9 verts, publication et signature exécutées (preuves 85-86).</figcaption></figure>
-  <div class="duo">
-    <figure><img src="../preuves/corrvulnecicd/captures/84-ci-dast-zap-tout-vert.png"><figcaption>Figure 16 — ZAP authentifié&nbsp;: aucune alerte High (preuve 84).</figcaption></figure>
-    <figure><img src="../preuves/corrvulnecicd/captures/80-ci-integration-tout-vert.png"><figcaption>Figure 17 — Synthèse des jobs, tous verts (preuve 80).</figcaption></figure>
-  </div>
-  <div class="box green"><p><b>Bilan.</b> Avant&nbsp;: 7 contrôles rouges, publication bloquée. Après&nbsp;: 9 contrôles verts, image publiée, signée et vérifiable. Chaque transition est tracée par une Pull Request relue et un run de pipeline consultable sur GitHub.</p></div>
-</section>
-
-<!-- ========================= 7. SUPPLY CHAIN ========================= -->
-<section class="chapter">
-  <h1>7. Chaîne d'approvisionnement&nbsp;: image, SBOM, signature</h1>
-  <p>Le job <code>publish</code> ne s'exécute que sur <code>develop</code> ou <code>main</code>, et seulement si les sept contrôles précédents sont verts. Il&nbsp;:</p>
+  <div class="chapter-head"><div class="num">Chapitre 6</div><h1 id="c6">Chaîne d'approvisionnement logicielle</h1></div>
+  <p class="intro">Le cluster doit pouvoir vérifier que l'image qu'il exécute est bien celle que le pipeline a contrôlée. Le job <code>publish</code> le permet&nbsp;; il ne s'exécute que si les sept contrôles précédents sont verts.</p>
+  <h2><span class="n">6.1</span>Étapes de publication</h2>
   <ol>
-    <li>pousse l'image sur GHCR avec pour tag le <b>SHA du commit</b>, puis récupère son <b>digest</b> immuable&nbsp;;</li>
-    <li>la <b>signe avec Cosign sans clé</b>&nbsp;: le certificat de signature est émis pour l'identité OIDC du workflow GitHub (<code>…/ci.yml@refs/heads/develop</code>) et la signature est inscrite dans le journal de transparence public <b>Rekor</b>&nbsp;;</li>
-    <li>attache la <b>SBOM</b> SPDX produite par Syft en attestation signée&nbsp;;</li>
-    <li><b>vérifie</b> la signature avant de terminer.</li>
+    <li><b>Publication</b> sur GHCR avec pour tag le SHA du commit, puis lecture du <b>digest</b> immuable de l'image.</li>
+    <li><b>Signature sans clé</b> par Cosign&nbsp;: le certificat est émis pour l'identité OIDC du workflow (<code>…/ci.yml@refs/heads/develop</code>) et la signature est inscrite dans le journal de transparence public <b>Rekor</b>.</li>
+    <li><b>Attestation de la SBOM</b> SPDX produite par Syft (101 composants pour l'image finale, preuve 83).</li>
+    <li><b>Vérification</b> de la signature avant la fin du job.</li>
   </ol>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/81-ci-publish-ghcr-cosign-apres.png"></div><figcaption>Figure 18 — Publication sur GHCR, signature Cosign keyless, entrées Rekor et vérification (preuve 81).</figcaption></figure>
-  <p>Aucune clé privée n'est à protéger&nbsp;: l'identité de signature est celle du pipeline lui-même. C'est cette identité que Kyverno exige à l'admission dans le cluster (section&nbsp;8)&nbsp;: une image construite à la main, ou signée depuis une autre branche, est refusée. La SBOM (101 paquets pour l'image finale, preuve 83) permet de savoir en quelques secondes si une nouvelle CVE concerne l'image déployée.</p>
+  <figure class="h100"><div class="frame"><img src="../preuves/corrvulnecicd/captures/81-ci-publish-ghcr-cosign-apres.png"></div><figcaption><b>Figure 14</b> — Publication sur GHCR, signature Cosign, entrées Rekor et vérification (preuve 81).</figcaption></figure>
+  <h2><span class="n">6.2</span>Intérêt</h2>
+  <p>Aucune clé privée n'est à protéger&nbsp;: l'identité de signature est celle du pipeline lui-même. C'est cette identité que Kyverno exige à l'admission (chapitre 7)&nbsp;: une image construite à la main, ou signée depuis une autre branche, est refusée. La SBOM permet, à l'annonce d'une nouvelle CVE, de savoir immédiatement si l'image déployée est concernée.</p>
 </section>
 
-<!-- ========================= 8. K3S ========================= -->
 <section class="chapter">
-  <h1>8. Déploiement sécurisé sur k3s et faille V5</h1>
-  <h2>Défense en profondeur à l'exécution</h2>
+  <div class="chapter-head"><div class="num">Chapitre 7</div><h1 id="c7">Déploiement sécurisé sur Kubernetes</h1></div>
+  <p class="intro">L'application tourne sur un cluster k3s local. Quatre couches de protection se complètent&nbsp;; la cinquième faille volontaire (V5) y a été introduite puis corrigée.</p>
+  <h2><span class="n">7.1</span>Défense en profondeur</h2>
   <table>
-    <tr><th style="width:28%">Couche</th><th>Mesure</th></tr>
-    <tr><td>Pod Security Admission</td><td>Namespace <code>edugrade</code> en <b>restricted</b>&nbsp;: non-root, pas d'escalade, capacités retirées, seccomp obligatoire.</td></tr>
-    <tr><td>Manifestes (<code>k8s/</code>)</td><td>UID fixes (10001, 101, 70), <code>readOnlyRootFilesystem</code>, <code>drop: [ALL]</code>, seccomp <code>RuntimeDefault</code>, pas de jeton de compte de service, limites mémoire, sondes de santé, image backend désignée par <b>digest</b>.</td></tr>
-    <tr><td>Kyverno 1.20 (CEL)</td><td><code>ImageValidatingPolicy</code>&nbsp;: signature Cosign du pipeline exigée (develop/main, Rekor). <code>ValidatingPolicy</code>&nbsp;: registres autorisés, tag obligatoire, <code>latest</code> interdit, non-root, pas de <code>privileged</code>.</td></tr>
-    <tr><td>NetworkPolicies</td><td><code>default-deny</code> en entrée et en sortie, puis uniquement&nbsp;: DNS, Traefik → frontend:8080, frontend → backend:8000, backend → db:5432.</td></tr>
+    <tr><th style="width:24%">Couche</th><th>Mesures</th></tr>
+    <tr><td>Pod Security Admission</td><td>Namespace en <b>restricted</b>&nbsp;: non-root, pas d'escalade de privilèges, capacités retirées, seccomp obligatoire.</td></tr>
+    <tr><td>Manifestes (<code>k8s/</code>)</td><td>UID fixes, système de fichiers en lecture seule, <code>drop: [ALL]</code>, pas de jeton de compte de service, limites mémoire, sondes de santé, image backend désignée par son <b>digest</b>.</td></tr>
+    <tr><td>Kyverno 1.20</td><td>Signature Cosign du pipeline exigée&nbsp;; registres autorisés, tag obligatoire, <code>latest</code> interdit, non-root, pas de conteneur <code>privileged</code>.</td></tr>
+    <tr><td>NetworkPolicies</td><td>Tout est interdit par défaut, puis seuls sont ouverts&nbsp;: DNS, Traefik → frontend, frontend → backend, backend → base.</td></tr>
   </table>
-  <h2>V5&nbsp;: une sortie Internet ouverte pour le backend</h2>
-  <p>La NetworkPolicy <code>backend</code> contenait volontairement un bloc <code>egress</code> vers <code>0.0.0.0/0</code>, « pour les mises à jour ». Un backend compromis (V2, V3) aurait pu exfiltrer la base. Le job <code>iac</code> l'a détecté (Trivy, règle KUBE-0002, HIGH)&nbsp;: sur la PR d'introduction du cluster, <b>seul ce contrôle était rouge</b> (preuve 93). Le test de segmentation exécuté sur le cluster réel l'a confirmé&nbsp;: <i>backend → 1.1.1.1:443 autorisé</i> (preuve 94).</p>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/93-ci-iac-v5-avant.png"></div><figcaption>Figure 19 — V5 détectée par Trivy config dans la CI&nbsp;: KUBE-0002 sur <code>network.tf:129</code> (preuve 93).</figcaption></figure>
-  <p>Correction (PR #20)&nbsp;: suppression du bloc permissif&nbsp;; les mises à jour passent par une nouvelle image signée, jamais par le pod. Après <code>terraform apply</code>, le test complet est conforme.</p>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/97-k3s-segmentation-v5-apres.png"></div><figcaption>Figure 20 — Après correction&nbsp;: 12 tests sur 12 conformes. 5 tests réseau (exfiltration bloquée) et 7 tests d'admission&nbsp;: image signée acceptée&nbsp;; image d'une autre branche, image non signée, registre non autorisé, <code>latest</code>, root et <code>privileged</code> refusés (preuve 97).</figcaption></figure>
+  <h2><span class="n">7.2</span>Faille V5 et sa correction</h2>
+  <p>La NetworkPolicy du backend autorisait volontairement la sortie vers <code>0.0.0.0/0</code>. Le contrôle IaC du pipeline l'a détectée (règle Trivy KUBE-0002, HIGH)&nbsp;: sur la Pull Request d'introduction du cluster, <b>seul ce contrôle était rouge</b> (preuve 93). Le test exécuté sur le cluster réel l'a confirmé&nbsp;: le backend joignait Internet (preuve 94). La correction (PR&nbsp;#20) supprime cette ouverture&nbsp;; les mises à jour passent par une nouvelle image signée, jamais par le pod.</p>
+  <figure class="h70"><div class="frame"><img src="../preuves/corrvulnecicd/captures/93-ci-iac-v5-avant.png"></div><figcaption><b>Figure 15</b> — V5 détectée par le pipeline&nbsp;: KUBE-0002 sur <code>network.tf:129</code> (preuve 93).</figcaption></figure>
+  <h2><span class="n">7.3</span>Vérification&nbsp;: tests de segmentation et d'admission</h2>
+  <p>Le script <code>scripts/k8s_segmentation_test.sh</code> tente réellement chaque flux interdit et chaque déploiement non conforme.</p>
+  <figure class="h100"><div class="frame"><img src="../preuves/corrvulnecicd/captures/97-k3s-segmentation-v5-apres.png"></div><figcaption><b>Figure 16</b> — 12 tests sur 12 conformes&nbsp;: flux autorisés fonctionnels, exfiltration bloquée&nbsp;; image signée acceptée, et refus d'une image signée par une autre branche, d'une image non signée, d'un registre non autorisé, de <code>latest</code>, d'un pod root et d'un conteneur privilégié (preuve 97).</figcaption></figure>
 </section>
 
-<!-- ========================= 9. OBSERVABILITE ========================= -->
 <section class="chapter">
-  <h1>9. Observabilité et détection d'une attaque</h1>
-  <p>Les journaux JSON du backend sont collectés par <b>Grafana Alloy</b> via l'API Kubernetes (sans accès à l'hôte), enrichis des labels <code>event</code> et <code>level</code>, puis stockés dans <b>Loki</b>. Grafana exploite ces données dans le tableau de bord <b>« Sécurité EduGrade »</b> et dans trois règles d'alerte, toutes provisionnées par Terraform&nbsp;:</p>
+  <div class="chapter-head"><div class="num">Chapitre 8</div><h1 id="c8">Observabilité et réponse à incident</h1></div>
+  <p class="intro">Une protection peut échouer&nbsp;: il faut donc voir les attaques et savoir y répondre.</p>
+  <h2><span class="n">8.1</span>Collecte et alertes</h2>
+  <p>Les journaux JSON du backend sont collectés par Grafana Alloy, indexés dans Loki, puis exploités par le tableau de bord <b>« Sécurité EduGrade »</b> et trois alertes, toutes déclarées dans Terraform.</p>
   <table>
-    <tr><th>Alerte</th><th>Condition (5 minutes)</th><th>Gravité</th></tr>
-    <tr><td>Force brute sur la connexion</td><td>plus de 5 <code>login_failed</code></td><td><span class="tag ko">critique</span></td></tr>
-    <tr><td>Tentative d'injection (SQLi / XSS)</td><td>au moins un <code>suspicious_input</code></td><td><span class="tag ko">critique</span></td></tr>
-    <tr><td>Accès non autorisé (IDOR)</td><td>plus de 3 <code>access_denied</code></td><td><span class="tag warn">avertissement</span></td></tr>
+    <tr><th>Alerte</th><th>Déclenchement (sur 5 minutes)</th><th style="width:17%">Gravité</th></tr>
+    <tr><td>Force brute sur la connexion</td><td>plus de 5 connexions échouées</td><td><span class="tag ko">critique</span></td></tr>
+    <tr><td>Tentative d'injection (SQLi / XSS)</td><td>au moins une entrée suspecte</td><td><span class="tag ko">critique</span></td></tr>
+    <tr><td>Accès non autorisé (IDOR)</td><td>plus de 3 accès refusés</td><td><span class="tag warn">avertissement</span></td></tr>
   </table>
-  <h2>Scénario d'attaque fictive</h2>
-  <p><code>scripts/attack_scenario.sh</code> enchaîne, contre l'application déployée&nbsp;: 12 essais de mots de passe, une connexion réussie, quatre injections SQL/XSS et l'énumération des notes de six étudiants. <b>Toutes les attaques échouent</b> (401, aucune ligne ni hachage renvoyé, 403) et <b>toutes sont détectées</b>.</p>
-  <figure><img src="../preuves/corrvulnecicd/captures/100-grafana-tableau-de-bord.png"><figcaption>Figure 21 — Tableau de bord « Sécurité EduGrade » pendant l'attaque&nbsp;: 12 connexions échouées, 6 accès refusés, 4 entrées suspectes, histogramme des vagues d'attaque et journal détaillé (preuve 100).</figcaption></figure>
-  <div class="duo">
-    <figure><img src="../preuves/corrvulnecicd/captures/100-grafana-alertes.png"><figcaption>Figure 22 — Les trois règles d'alerte en état <i>firing</i> (preuve 100).</figcaption></figure>
-    <figure><img src="../preuves/corrvulnecicd/captures/98-k3s-scenario-attaque.png"><figcaption>Figure 23 — Le scénario&nbsp;: toutes les attaques sont bloquées (preuve 98).</figcaption></figure>
-  </div>
-</section>
-
-<!-- ========================= 10. STRIDE ========================= -->
-<section class="chapter">
-  <h1>10. Modèle de menaces STRIDE</h1>
-  <p>Le modèle complet (<code>docs/STRIDE.md</code>) identifie les actifs (notes, comptes et hachages, <code>SECRET_KEY</code>, mot de passe de la base, image, journaux) et cinq frontières de confiance&nbsp;: Internet → cluster, proxy → application, application → base, code → pipeline, registre → cluster. Synthèse&nbsp;:</p>
+  <h2><span class="n">8.2</span>Scénario d'attaque fictive</h2>
+  <p>Le script <code>scripts/attack_scenario.sh</code> enchaîne 12 essais de mots de passe, une connexion réussie, quatre injections SQL et XSS, puis l'énumération des notes de six étudiants. <b>Toutes les attaques échouent</b> (401, aucune donnée renvoyée, 403) et <b>toutes sont détectées</b>.</p>
+  <figure><img src="../preuves/corrvulnecicd/captures/100-grafana-tableau-de-bord.png"><figcaption><b>Figure 17</b> — Tableau de bord pendant l'attaque&nbsp;: 12 connexions échouées, 6 accès refusés, 4 entrées suspectes, vagues d'attaque et journal détaillé (preuve 100).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/100-grafana-alertes.png"></div><figcaption><b>Figure 18</b> — Les trois règles d'alerte déclenchées (preuve 100).</figcaption></figure>
+  <h2><span class="n">8.3</span>Plan de réponse à incident</h2>
+  <p>Le plan (<code>docs/PLAN_REPONSE_INCIDENT.md</code>) suit les phases du NIST SP 800-61&nbsp;:</p>
   <table>
-    <tr><th style="width:17%">Catégorie</th><th style="width:38%">Menace principale</th><th>Mesures en place</th></tr>
-    <tr><td><b>S</b>poofing</td><td>Cookie de session forgé (V3)&nbsp;; force brute&nbsp;; image usurpant celle du pipeline</td><td>Secrets hors code + rotation&nbsp;; scrypt + alerte&nbsp;; Cosign keyless vérifié par Kyverno</td></tr>
-    <tr><td><b>T</b>ampering</td><td>Injection SQL (V2)&nbsp;; XSS (B2)&nbsp;; YAML malveillant (V4)&nbsp;; image modifiée</td><td>Requêtes paramétrées, échappement, CSP, <code>safe_load</code>&nbsp;; image par digest signée&nbsp;; <code>main</code> protégée</td></tr>
-    <tr><td><b>R</b>epudiation</td><td>Nier une action ou une tentative</td><td>Journaux JSON (utilisateur, rôle, route, IP, statut) centralisés dans Loki&nbsp;; historique des PR&nbsp;; Rekor</td></tr>
-    <tr><td><b>I</b>nformation disclosure</td><td>IDOR (V1)&nbsp;; exfiltration (V5)&nbsp;; secrets dans les journaux CI</td><td>Contrôle d'appartenance&nbsp;; <code>default-deny</code>&nbsp;; sorties d'outils masquées</td></tr>
-    <tr><td><b>D</b>enial of service</td><td>Épuisement de ressources&nbsp;; indisponibilité non vue</td><td>Limites mémoire, taille de requête, délais&nbsp;; sondes&nbsp;; Prometheus/Alertmanager</td></tr>
-    <tr><td><b>E</b>levation of privilege</td><td>Étudiant → enseignant&nbsp;; évasion de conteneur&nbsp;; pod privilégié</td><td>Rôles côté serveur&nbsp;; non-root, lecture seule, <code>drop: [ALL]</code>&nbsp;; PSA + Kyverno</td></tr>
-  </table>
-  <h2>Risques résiduels acceptés</h2>
-  <table>
-    <tr><th style="width:38%">Risque</th><th>Décision et justification</th></tr>
-    <tr><td>Dépôt public (GIT-0001)</td><td>Accepté jusqu'au 30/06/2027&nbsp;: protection de branche gratuite, données fictives.</td></tr>
-    <tr><td>Commits non signés (GIT-0004)</td><td>Accepté jusqu'au 30/06/2027&nbsp;: compensé par PR, approbation et CI obligatoires.</td></tr>
-    <tr><td>Anciennes valeurs V3 dans l'historique</td><td>Valeurs révoquées (rotation prouvée)&nbsp;; <code>main</code> interdit la réécriture de l'historique.</td></tr>
-    <tr><td>Pas de limitation de débit sur <code>/login</code></td><td>À traiter (middleware Traefik <code>rateLimit</code>)&nbsp;; atténué par l'alerte et le blocage d'IP.</td></tr>
+    <tr><th style="width:21%">Phase</th><th>Actions principales</th></tr>
+    <tr><td>Préparation</td><td>Journaux centralisés, tableau de bord, alertes, inventaire de l'image déployée (digest, SBOM, signature).</td></tr>
+    <tr><td>Détection et analyse</td><td>Qualification en 15 minutes&nbsp;: comptes et routes visés, requêtes Loki prêtes à l'emploi, classement de gravité.</td></tr>
+    <tr><td>Confinement</td><td>Blocage d'adresse à l'entrée, invalidation de toutes les sessions par rotation de la clé, retour à la dernière image saine signée.</td></tr>
+    <tr><td>Éradication</td><td>Correction soumise à tout le pipeline, test de non-régression reproduisant l'attaque, rotation des secrets exposés.</td></tr>
+    <tr><td>Rétablissement</td><td>Déploiement de l'image corrigée et signée, nouvelle exécution des tests de segmentation et du scénario d'attaque.</td></tr>
+    <tr><td>Retour d'expérience</td><td>Note sous cinq jours, actions correctives datées, mise à jour du plan.</td></tr>
   </table>
 </section>
 
-<!-- ========================= 11. DIFFICULTES ========================= -->
 <section class="chapter">
-  <h1>11. Difficultés rencontrées et enseignements</h1>
-  <p>Plusieurs problèmes réels sont apparus pendant la mise en œuvre. Nous les avons traités comme des constats de sécurité à part entière&nbsp;: chacun est documenté et prouvé.</p>
+  <div class="chapter-head"><div class="num">Chapitre 9</div><h1 id="c9">Analyse des risques (STRIDE)</h1></div>
+  <p class="intro">Le modèle complet (<code>docs/STRIDE.md</code>) recense les actifs (notes, comptes, clé de session, mot de passe de la base, image, journaux) et cinq frontières de confiance&nbsp;: Internet → cluster, proxy → application, application → base, code → pipeline, registre → cluster.</p>
+  <h2><span class="n">9.1</span>Menaces et mesures</h2>
   <table>
-    <tr><th style="width:27%">Constat</th><th>Cause et résolution</th><th style="width:10%">Preuves</th></tr>
-    <tr><td>Secrets affichés par Bandit dans un journal public</td><td>Format texte par défaut citant la valeur des mots de passe en dur&nbsp;; sortie personnalisée sans valeur.</td><td>48, 51, 52</td></tr>
-    <tr><td>Règles Kyverno ignorées</td><td>Kyverno 1.20 n'exécute plus les <code>ClusterPolicy kyverno.io/v1</code>&nbsp;; migration vers <code>ValidatingPolicy</code> / <code>ImageValidatingPolicy</code> (CEL). Sans test d'admission, l'absence de protection serait passée inaperçue.</td><td>91, 97</td></tr>
-    <tr><td>NetworkPolicies non appliquées</td><td><code>iptables-nft</code> 1.8.11 d'Ubuntu 26.04 incompatible avec le contrôleur de NetworkPolicies de k3s (« Aborting sync »)&nbsp;: le frontend joignait la base. Une première correction (binaires iptables embarqués) cassait les Services après redémarrage&nbsp;; solution définitive&nbsp;: <code>iptables-legacy</code> pour tout le système.</td><td>92, 95, 105</td></tr>
-    <tr><td>Limite d'un outil d'analyse</td><td>La règle Trivy KUBE-0002 n'examine que le <b>premier</b> bloc <code>egress</code>&nbsp;: placé en second, le même défaut passe inaperçu. Compensé par le test de segmentation sur le cluster réel.</td><td>93, 97</td></tr>
-    <tr><td>IP de l'attaquant introuvable</td><td>Dans k3s, l'IP journalisée était celle de Traefik (deux proxys, un seul de confiance)&nbsp;: paramètre <code>TRUSTED_PROXY_COUNT</code> (2 en k3s), testé contre l'en-tête forgé. Sur le poste de démonstration, le répartiteur ServiceLB masque encore l'IP externe&nbsp;; un répartiteur qui la conserve (MetalLB, cloud) la transmet.</td><td>102-104</td></tr>
-    <tr><td>Image de base vulnérable</td><td>zlib vulnérable dans <code>python:3.12-slim</code> alors qu'un correctif Debian existait&nbsp;: correctifs appliqués à chaque build.</td><td>45, 73, 74</td></tr>
-    <tr><td>Environnement contraint</td><td>Connexion lente (registres d'images, dépôts Helm) et mémoire WSL limitée&nbsp;: charts en cache local, délais Helm et sondes Grafana adaptés, WSL porté à 10 Go.</td><td>90, 105</td></tr>
+    <tr><th style="width:18%">Catégorie</th><th style="width:37%">Menace principale</th><th>Mesures en place</th></tr>
+    <tr><td><b>S</b>poofing</td><td>Cookie de session forgé (V3), force brute, image usurpant celle du pipeline</td><td>Secrets hors du code et rotation&nbsp;; scrypt et alerte&nbsp;; signature vérifiée par Kyverno</td></tr>
+    <tr><td><b>T</b>ampering</td><td>Injection SQL (V2), XSS (B2), YAML malveillant (V4), image modifiée</td><td>Requêtes paramétrées, échappement, CSP, <code>safe_load</code>&nbsp;; image par digest signée&nbsp;; <code>main</code> protégée</td></tr>
+    <tr><td><b>R</b>epudiation</td><td>Nier une action ou une tentative</td><td>Journaux centralisés (utilisateur, rôle, route, statut)&nbsp;; historique des PR&nbsp;; Rekor</td></tr>
+    <tr><td><b>I</b>nformation disclosure</td><td>IDOR (V1), exfiltration (V5), secrets dans les journaux CI</td><td>Contrôle d'appartenance&nbsp;; interdiction réseau par défaut&nbsp;; sorties d'outils masquées</td></tr>
+    <tr><td><b>D</b>enial of service</td><td>Épuisement des ressources, indisponibilité non détectée</td><td>Limites mémoire et taille de requête&nbsp;; sondes de santé&nbsp;; Prometheus</td></tr>
+    <tr><td><b>E</b>levation of privilege</td><td>Étudiant → enseignant, évasion de conteneur, pod privilégié</td><td>Rôles côté serveur&nbsp;; non-root et lecture seule&nbsp;; Pod Security et Kyverno</td></tr>
+  </table>
+  <h2><span class="n">9.2</span>Risques résiduels acceptés</h2>
+  <table>
+    <tr><th style="width:36%">Risque</th><th>Décision</th></tr>
+    <tr><td>Dépôt public</td><td>Accepté jusqu'au 30/06/2027&nbsp;: protection de branche gratuite, données fictives.</td></tr>
+    <tr><td>Commits non signés</td><td>Accepté jusqu'au 30/06/2027&nbsp;: compensé par PR, approbation et CI obligatoires.</td></tr>
+    <tr><td>Anciennes valeurs V3 dans l'historique</td><td>Valeurs révoquées (rotation prouvée)&nbsp;; la réécriture de l'historique de <code>main</code> est interdite.</td></tr>
+    <tr><td>Pas de limitation de débit sur <code>/login</code></td><td>À traiter (middleware Traefik)&nbsp;; atténué par l'alerte de force brute.</td></tr>
+  </table>
+</section>
+
+<section class="chapter">
+  <div class="chapter-head"><div class="num">Chapitre 10</div><h1 id="c10">Difficultés rencontrées et enseignements</h1></div>
+  <p class="intro">Plusieurs problèmes réels sont apparus pendant la mise en œuvre. Nous les avons traités comme des constats de sécurité&nbsp;: chacun est documenté et prouvé.</p>
+  <table>
+    <tr><th style="width:25%">Constat</th><th>Cause et résolution</th><th style="width:11%">Preuves</th></tr>
+    <tr><td>Secrets affichés par un outil de sécurité</td><td>Bandit citait la valeur des mots de passe dans un journal public&nbsp;; sortie reconfigurée sans valeur.</td><td>48, 51, 52</td></tr>
+    <tr><td>Règles d'admission ignorées</td><td>Kyverno 1.20 n'exécute plus l'ancien format de règles&nbsp;; migration vers le nouveau format (CEL). Sans test d'admission, l'absence de protection serait passée inaperçue.</td><td>91, 97</td></tr>
+    <tr><td>NetworkPolicies non appliquées</td><td>Incompatibilité entre l'iptables d'Ubuntu 26.04 et le contrôleur réseau de k3s&nbsp;: le frontend joignait la base. Solution définitive&nbsp;: mode <code>iptables-legacy</code> pour tout le système, validé après redémarrage.</td><td>92, 95, 105</td></tr>
+    <tr><td>Limite d'un outil d'analyse</td><td>La règle Trivy KUBE-0002 n'examine que la première règle de sortie&nbsp;: placée en second, la même erreur passe inaperçue. Compensé par le test sur le cluster réel.</td><td>93, 97</td></tr>
+    <tr><td>Adresse de l'attaquant introuvable</td><td>L'adresse journalisée était celle du proxy interne&nbsp;; paramètre du nombre de proxys de confiance, testé contre un en-tête falsifié.</td><td>102-104</td></tr>
+    <tr><td>Image de base vulnérable</td><td>zlib vulnérable alors qu'un correctif existait&nbsp;: correctifs appliqués à chaque construction.</td><td>45, 73, 74</td></tr>
+    <tr><td>Environnement contraint</td><td>Réseau lent et mémoire limitée&nbsp;: charts en cache local, délais adaptés, mémoire WSL portée à 10 Go.</td><td>90, 105</td></tr>
   </table>
   <div class="box">
-    <p><b>Enseignement principal.</b> Un contrôle de sécurité qui n'est pas testé n'existe pas&nbsp;: deux de nos protections (Kyverno et les NetworkPolicies) étaient déclarées, installées et «&nbsp;vertes&nbsp;», mais inopérantes. Seuls des tests de comportement (tentatives réelles de connexion et d'admission) l'ont révélé. C'est pourquoi chaque mesure du projet est accompagnée d'un test qui essaie de la contourner.</p>
+    <span class="t">Enseignement principal</span>
+    <p>Un contrôle de sécurité qui n'est pas testé n'existe pas. Deux de nos protections — Kyverno et les NetworkPolicies — étaient déclarées, installées et affichées comme opérationnelles, mais inopérantes. Seuls des tests de comportement, qui tentent réellement de les contourner, l'ont révélé. C'est pourquoi chaque mesure du projet est accompagnée d'un tel test.</p>
   </div>
 </section>
 
-<!-- ========================= 12. INCIDENT ========================= -->
 <section class="chapter">
-  <h1>12. Plan de réponse à incident</h1>
-  <p>Le plan (<code>docs/PLAN_REPONSE_INCIDENT.md</code>) suit les phases du NIST SP 800-61 et s'appuie sur les alertes réellement configurées.</p>
-  <table>
-    <tr><th style="width:20%">Phase</th><th>Actions clés</th></tr>
-    <tr><td>Préparation</td><td>Journaux centralisés, tableau de bord, alertes, accès Grafana, inventaire de l'image déployée (digest, SBOM, signature), rôles de l'équipe.</td></tr>
-    <tr><td>Détection et analyse</td><td>Qualification en 15 minutes&nbsp;: IP et comptes visés, requêtes LogQL prêtes à l'emploi, connexion réussie après échecs = compte compromis&nbsp;; classement P1 à P3.</td></tr>
-    <tr><td>Confinement</td><td>Blocage d'IP à l'entrée (Traefik)&nbsp;; invalidation de toutes les sessions par rotation de <code>SECRET_KEY</code> (<code>terraform apply -replace</code>)&nbsp;; isolement réseau&nbsp;; retour à la dernière image saine signée&nbsp;; conservation des preuves.</td></tr>
-    <tr><td>Éradication</td><td>Correction dans une branche <code>fix/*</code> soumise à tout le pipeline, test de non-régression reproduisant l'attaque, rotation des secrets exposés.</td></tr>
-    <tr><td>Rétablissement</td><td>Publication et signature par le pipeline, mise à jour du digest, déploiement (signature vérifiée par Kyverno), nouvelle exécution des tests de segmentation et du scénario d'attaque.</td></tr>
-    <tr><td>Retour d'expérience</td><td>Note sous 5 jours&nbsp;: chronologie, cause racine, actions correctives datées&nbsp;; mise à jour du plan et de la politique de blocage.</td></tr>
-  </table>
-  <p>Le scénario d'attaque de la section&nbsp;9 a servi d'exercice&nbsp;: détection, identification des comptes et des routes visés, et vérification que les contrôles ont bloqué chaque tentative.</p>
-</section>
-
-<!-- ========================= 13. IA ========================= -->
-<section class="chapter">
-  <h1>13. Déclaration d'usage de l'intelligence artificielle</h1>
-  <p>Conformément au cahier des charges, nous déclarons avoir utilisé un assistant d'intelligence artificielle, <b>Claude Code</b> (Anthropic), pendant le projet.</p>
-  <table>
-    <tr><th style="width:30%">Usage</th><th>Détail</th></tr>
-    <tr><td>Rédaction de code et de configuration</td><td>Proposition du workflow CI/CD, des scripts (ZAP, captures, tests de segmentation, scénario d'attaque), du Terraform du cluster, des règles Kyverno et des corrections des failles.</td></tr>
-    <tr><td>Diagnostic</td><td>Analyse des journaux d'échec (Kyverno 1.20, iptables, sondes Grafana) et proposition de corrections.</td></tr>
-    <tr><td>Documentation</td><td>Aide à la rédaction de la politique de blocage, du modèle STRIDE, du plan de réponse à incident et du présent rapport.</td></tr>
-  </table>
-  <p><b>Contrôle humain.</b> Toutes les propositions ont été relues&nbsp;; chaque modification est passée par une Pull Request dont la fusion a été décidée par un membre de l'équipe (l'assistant n'avait pas le droit de fusionner). Les résultats présentés ne reposent pas sur les affirmations de l'assistant mais sur les sorties des outils&nbsp;: chaque preuve contient la commande exécutée, sa sortie et son code de retour, et chaque run de pipeline est consultable sur GitHub. Aucune donnée personnelle réelle ni aucun secret réel n'a été fourni à l'assistant.</p>
-</section>
-
-<!-- ========================= 14. CONCLUSION ========================= -->
-<section class="chapter">
-  <h1>14. Conclusion et perspectives</h1>
-  <p>EduGrade démontre une chaîne DevSecOps complète et vérifiable. Les sept failles volontaires ont toutes été <b>détectées automatiquement</b>, ont <b>bloqué la livraison</b>, puis ont été <b>corrigées et vérifiées</b>. Ce qui est déployé est exactement ce qui a été scanné&nbsp;: une image signée par le pipeline, décrite par une SBOM, refusée par le cluster si elle ne l'est pas. À l'exécution, les conteneurs sont non-root et isolés par des NetworkPolicies. Une attaque fictive a été bloquée, visible en quelques secondes dans Grafana et signalée par trois alertes.</p>
-  <p>Au-delà des outils, le projet nous a appris que la sécurité se prouve&nbsp;: plusieurs protections installées et apparemment fonctionnelles étaient inopérantes, et seuls des tests qui tentent réellement de les contourner l'ont montré.</p>
+  <div class="chapter-head"><div class="num">Conclusion générale</div><h1 id="concl">Conclusion et perspectives</h1></div>
+  <p>EduGrade démontre une chaîne DevSecOps complète et vérifiable. Les sept failles volontaires ont toutes été <b>détectées automatiquement</b>, ont <b>bloqué la livraison</b>, puis ont été <b>corrigées et vérifiées</b>. L'image déployée est exactement celle qui a été contrôlée&nbsp;: signée par le pipeline, décrite par une SBOM et refusée par le cluster si elle ne l'est pas. À l'exécution, les conteneurs sont non-root et isolés&nbsp;; une attaque fictive a été bloquée, rendue visible dans Grafana et signalée par trois alertes.</p>
+  <p>Au-delà des outils, ce projet nous a appris que la sécurité se prouve&nbsp;: plusieurs protections apparemment fonctionnelles étaient inopérantes, et seuls des tests de contournement l'ont montré.</p>
   <h2>Perspectives</h2>
   <ul>
-    <li>Limitation de débit sur <code>/login</code> (middleware Traefik) et verrouillage temporaire de compte.</li>
-    <li>Répartiteur conservant l'IP source (MetalLB) et TLS avec HSTS à l'Ingress.</li>
-    <li>Signature des commits (GPG/SSH) pour lever l'exception GIT-0004, et réécriture contrôlée de l'historique pour V3.</li>
-    <li>Épinglage des actions GitHub par SHA (recommandation Semgrep <code>github-actions-mutable-action-tag</code>).</li>
-    <li>Détection à l'exécution (Falco) et notifications d'alertes (Alertmanager vers messagerie).</li>
-    <li>Base de données gérée avec sauvegardes chiffrées et métriques applicatives exposées à Prometheus.</li>
+    <li>Limitation de débit sur la page de connexion et verrouillage temporaire de compte.</li>
+    <li>Répartiteur de charge conservant l'adresse du client (MetalLB) et chiffrement TLS avec HSTS.</li>
+    <li>Signature des commits, et réécriture contrôlée de l'historique pour supprimer les anciens secrets.</li>
+    <li>Épinglage des actions GitHub par empreinte et notifications d'alertes vers une messagerie.</li>
+    <li>Détection à l'exécution (Falco) et base de données gérée avec sauvegardes chiffrées.</li>
   </ul>
 </section>
 
-<!-- ========================= ANNEXES ========================= -->
-<section class="chapter newpage">
-  <h1>Annexe A — Index des preuves</h1>
+<section class="chapter">
+  <div class="chapter-head"><div class="num">Déclaration</div><h1 id="ia">Usage de l'intelligence artificielle</h1></div>
+  <p>Conformément au cahier des charges, nous déclarons avoir utilisé un assistant d'intelligence artificielle, <b>Claude Code</b> (Anthropic), au cours du projet.</p>
   <table>
-    <tr><th style="width:14%">N°</th><th>Contenu</th></tr>
-    <tr><td>00-06</td><td>Prérequis, Terraform du dépôt GitHub (init, fmt, validate, plan, apply), historique git</td></tr>
-    <tr><td>07-12</td><td>Détections locales de la Partie 1 (Gitleaks, Trivy, Semgrep, Bandit, pytest)</td></tr>
-    <tr><td>13-18</td><td>Docker Compose, conteneurs non-root, Trivy image, journaux JSON</td></tr>
-    <tr><td>20-34</td><td>Application et démonstration des failles avant correction</td></tr>
-    <tr><td>40-49</td><td>Premier run du pipeline sur la version vulnérable</td></tr>
-    <tr><td>48, 51-52</td><td>Erreur du pipeline (Bandit) et sa correction</td></tr>
-    <tr><td>60-76</td><td>Correction de chaque faille&nbsp;: diff et run de la PR</td></tr>
-    <tr><td>80-86</td><td>Pipeline entièrement vert, publication, signature, SBOM, DAST</td></tr>
-    <tr><td>90-97, 101</td><td>Cluster k3s, NetworkPolicies, V5 avant/après (CI et cluster), tests d'admission</td></tr>
-    <tr><td>98-100</td><td>Scénario d'attaque, détection dans Loki, alertes et tableau de bord Grafana</td></tr>
-    <tr><td>102-105</td><td>IP client avant/après, déploiement de la version finale, configuration iptables définitive</td></tr>
+    <tr><th style="width:30%">Usage</th><th>Détail</th></tr>
+    <tr><td>Code et configuration</td><td>Propositions pour le workflow CI/CD, les scripts (ZAP, captures, tests de segmentation, scénario d'attaque), le Terraform du cluster, les règles Kyverno et les corrections des failles.</td></tr>
+    <tr><td>Diagnostic</td><td>Analyse des journaux d'échec et propositions de corrections.</td></tr>
+    <tr><td>Documentation</td><td>Aide à la rédaction de la politique de blocage, du modèle STRIDE, du plan de réponse à incident et du présent rapport.</td></tr>
   </table>
-  <p style="text-align:left">Index détaillé&nbsp;: <code>docs/PREUVES_PARTIE1.md</code>, <code>docs/preuves/INDEX.md</code> et <code>docs/preuves/corrvulnecicd/INDEX.md</code>. Documents de référence&nbsp;: <code>docs/VULNERABILITES.md</code>, <code>docs/POLITIQUE_BLOCAGE.md</code>, <code>docs/STRIDE.md</code>, <code>docs/PLAN_REPONSE_INCIDENT.md</code>.</p>
+  <div class="box">
+    <span class="t">Contrôle humain</span>
+    <p>Toutes les propositions ont été relues. Chaque modification est passée par une Pull Request dont la fusion a été décidée par un membre de l'équipe&nbsp;; l'assistant n'avait pas le droit de fusionner. Les résultats présentés reposent sur les sorties des outils et non sur les affirmations de l'assistant&nbsp;: chaque preuve contient la commande exécutée, sa sortie et son code de retour, et chaque run du pipeline est consultable sur GitHub. Aucune donnée personnelle réelle ni aucun secret réel n'a été transmis à l'assistant.</p>
+  </div>
+</section>
 
-  <h1 style="margin-top:9mm">Annexe B — Captures complémentaires</h1>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/43-ci-secrets-gitleaks-v3-avant.png"></div><figcaption>Figure B1 — Gitleaks détecte V3 sur tout l'historique, valeurs masquées (preuve 43).</figcaption></figure>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/45-ci-image-trivy-v4-zlib-avant.png"></div><figcaption>Figure B2 — Trivy image&nbsp;: PyYAML et zlib (preuve 45).</figcaption></figure>
-
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/94-k3s-segmentation-v5-avant.png"></div><figcaption>Figure B3 — V5 sur le cluster&nbsp;: le backend joint Internet (preuve 94).</figcaption></figure>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/99-k3s-detection-loki-alertes.png"></div><figcaption>Figure B4 — Événements de l'attaque retrouvés dans Loki et alertes déclenchées (preuve 99).</figcaption></figure>
-  <figure class="crop"><div class="frame"><img src="../preuves/corrvulnecicd/captures/103-k3s-deploiement-v1.0-secure.png"></div><figcaption>Figure B5 — Déploiement de la version finale&nbsp;: image signée acceptée par Kyverno (preuve 103).</figcaption></figure>
+<section class="chapter">
+  <div class="chapter-head"><div class="num">Annexes</div><h1 id="annexes">Index des preuves et captures complémentaires</h1></div>
+  <h2>Annexe A — Index des preuves</h2>
+  <table>
+    <tr><th style="width:16%">Preuves</th><th>Contenu</th></tr>
+    <tr><td>00 – 06</td><td>Prérequis, Terraform du dépôt GitHub, historique git</td></tr>
+    <tr><td>07 – 18</td><td>Détections locales de la Partie 1, Docker Compose, conteneurs non-root, journaux JSON</td></tr>
+    <tr><td>20 – 34</td><td>Application et démonstration des failles avant correction</td></tr>
+    <tr><td>40 – 52</td><td>Premier run du pipeline et correction de l'erreur Bandit</td></tr>
+    <tr><td>60 – 76</td><td>Correction de chaque faille&nbsp;: diff et run de la Pull Request</td></tr>
+    <tr><td>80 – 86</td><td>Pipeline entièrement vert, publication, signature, SBOM, DAST</td></tr>
+    <tr><td>90 – 97, 101</td><td>Cluster k3s, V5 avant et après (CI et cluster), tests d'admission</td></tr>
+    <tr><td>98 – 100</td><td>Scénario d'attaque, détection dans Loki, alertes et tableau de bord</td></tr>
+    <tr><td>102 – 105</td><td>Adresse du client, déploiement de la version finale, configuration réseau définitive</td></tr>
+  </table>
+  <p style="text-align:left">Index détaillés&nbsp;: <code>docs/PREUVES_PARTIE1.md</code>, <code>docs/preuves/corrvulnecicd/INDEX.md</code>. Documents de référence&nbsp;: <code>docs/VULNERABILITES.md</code>, <code>docs/POLITIQUE_BLOCAGE.md</code>, <code>docs/STRIDE.md</code>, <code>docs/PLAN_REPONSE_INCIDENT.md</code>.</p>
+  <h2>Annexe B — Captures complémentaires</h2>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/41-ci-security-tests-v1-v2-avant.png"></div><figcaption><b>Figure B1</b> — Tests de sécurité en échec sur la version vulnérable (preuve 41).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/43-ci-secrets-gitleaks-v3-avant.png"></div><figcaption><b>Figure B2</b> — Gitleaks détecte V3 sur tout l'historique, valeurs masquées (preuve 43).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/94-k3s-segmentation-v5-avant.png"></div><figcaption><b>Figure B3</b> — V5 sur le cluster&nbsp;: le backend joint Internet avant correction (preuve 94).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/99-k3s-detection-loki-alertes.png"></div><figcaption><b>Figure B4</b> — Événements de l'attaque retrouvés dans Loki et alertes déclenchées (preuve 99).</figcaption></figure>
+  <figure class="h85"><div class="frame"><img src="../preuves/corrvulnecicd/captures/103-k3s-deploiement-v1.0-secure.png"></div><figcaption><b>Figure B5</b> — Déploiement de la version finale&nbsp;: image signée acceptée par Kyverno (preuve 103).</figcaption></figure>
 </section>
 
 </body>
