@@ -42,8 +42,8 @@
 <section class="card">
   {% if q %}
   <div class="card-head">
-    {# VULN-B2 (volontaire, voir docs/VULNERABILITES.md) #}
-    <h2 id="search-title" class="results-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
+    {# Correctif Bonus 2 (XSS) : plus de |safe, le terme est échappé par Jinja. #}
+    <h2 id="search-title" class="results-title">Résultats pour « {{ q }} » ({{ students|length }})</h2>
   </div>
   {% else %}
   <div class="card-head"><h2>Tous les étudiants</h2></div>
