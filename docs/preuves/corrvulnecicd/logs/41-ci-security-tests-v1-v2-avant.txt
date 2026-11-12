@@ -1,0 +1,26 @@
+# Preuve : 41-ci-security-tests-v1-v2-avant
+# Date   : 2026-11-12 19:19:12 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 security-tests 'PASSED|FAILED|failed|passed|Error|##\[error\]'
+Job : security-tests (IDOR, SQLi) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385359203
+------------------------------------------------------------
+tests/security/test_idor.py::test_student_cannot_read_another_student_grades FAILED [ 25%]
+tests/security/test_idor.py::test_idor_attempt_is_logged FAILED          [ 50%]
+tests/security/test_sqli.py::test_tautology_does_not_return_all_students FAILED [ 75%]
+tests/security/test_sqli.py::test_union_does_not_leak_password_hashes FAILED [100%]
+E       AssertionError: IDOR : notes de Youssef Trabelsi accessibles (HTTP 200)
+tests/security/test_idor.py:21: AssertionError
+E       AssertionError: aucun événement access_denied journalisé pour la tentative d'IDOR
+tests/security/test_idor.py:31: AssertionError
+E       AssertionError: injection SQL : 6 étudiants renvoyés pour une tautologie
+tests/security/test_sqli.py:18: AssertionError
+E       AssertionError: injection SQL : hachages de mots de passe divulgués
+tests/security/test_sqli.py:25: AssertionError
+FAILED tests/security/test_idor.py::test_student_cannot_read_another_student_grades - AssertionError: IDOR : notes de Youssef Trabelsi accessibles (HTTP 200)
+FAILED tests/security/test_idor.py::test_idor_attempt_is_logged - AssertionError: aucun événement access_denied journalisé pour la tentative d'IDOR
+FAILED tests/security/test_sqli.py::test_tautology_does_not_return_all_students - AssertionError: injection SQL : 6 étudiants renvoyés pour une tautologie
+FAILED tests/security/test_sqli.py::test_union_does_not_leak_password_hashes - AssertionError: injection SQL : hachages de mots de passe divulgués
+======================= 4 failed, 44 deselected in 1.70s =======================
+##[error]Process completed with exit code 1.
+[code de retour : 0]
