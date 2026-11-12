@@ -1,35 +1,49 @@
 # L'image applicative doit être signée par Cosign sans clé (OIDC GitHub)
-# depuis le workflow ci.yml, sur develop ou main uniquement, et l'entrée doit
-# figurer dans le journal de transparence Rekor. Une image non signée, ou signée
-# depuis une autre branche, est refusée à l'admission.
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# depuis le workflow ci.yml, sur develop ou main uniquement, avec une entrée
+# dans le journal de transparence Rekor. Une image non signée, ou signée depuis
+# une autre branche, est refusée à l'admission (Kyverno 1.20, type CEL).
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
 metadata:
   name: edugrade-verify-image-signature
   annotations:
     policies.kyverno.io/title: Image EduGrade signée par le pipeline
     policies.kyverno.io/severity: high
 spec:
-  webhookTimeoutSeconds: 30
-  background: false
-  rules:
-    - name: signature-cosign-keyless
-      match:
-        any:
-          - resources:
-              kinds: [Pod]
-              namespaces: [edugrade]
-      verifyImages:
-        - imageReferences:
-            - "ghcr.io/emirghdiri/edugrade-*"
-          failureAction: Enforce
-          mutateDigest: true
-          verifyDigest: true
-          required: true
-          attestors:
-            - entries:
-                - keyless:
-                    subjectRegExp: "^https://github.com/emirghdiri/edugrade-devsecops/.github/workflows/ci.yml@refs/heads/(develop|main)$"
-                    issuer: "https://token.actions.githubusercontent.com"
-                    rekor:
-                      url: https://rekor.sigstore.dev
+  validationActions: [Deny]
+  failurePolicy: Fail
+  webhookConfiguration:
+    timeoutSeconds: 30
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: edugrade
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchImageReferences:
+    - glob: "ghcr.io/emirghdiri/edugrade-*"
+  validationConfigurations:
+    required: false
+    mutateDigest: false
+    verifyDigest: true
+  attestors:
+    - name: pipeline
+      cosign:
+        keyless:
+          identities:
+            - subjectRegExp: "^https://github.com/emirghdiri/edugrade-devsecops/.github/workflows/ci.yml@refs/heads/(develop|main)$"
+              issuer: "https://token.actions.githubusercontent.com"
+        ctlog:
+          url: https://rekor.sigstore.dev
+  validations:
+    - expression: >-
+        images.containers
+          .filter(i, i.startsWith('ghcr.io/emirghdiri/edugrade-'))
+          .all(i, verifyImageSignatures(i, [attestors.pipeline]) > 0)
+      message: "Image EduGrade refusée : aucune signature Cosign du pipeline (ci.yml sur develop/main) n'a été vérifiée."
