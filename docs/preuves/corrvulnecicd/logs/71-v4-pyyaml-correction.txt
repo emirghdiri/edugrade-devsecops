@@ -1,0 +1,41 @@
+# Preuve : 71-v4-pyyaml-correction
+# Date   : 2026-11-12 19:36:47 WAT
+# Dossier: .
+$ git show fix/pyyaml --format='commit %h — %s%n%n%b' --stat && git show fix/pyyaml --format= -- requirements.txt app/config.py
+commit 469c854 — fix(V4): PyYAML 6.0.3 et yaml.safe_load (CVE-2020-14343)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ app/config.py          | 3 ++-
+ docs/VULNERABILITES.md | 4 ++--
+ requirements.txt       | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+diff --git a/app/config.py b/app/config.py
+index 292437f..fe61883 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -13,8 +13,9 @@ SETTINGS_PATH = Path(__file__).with_name("settings.yaml")
+ 
+ def load_settings(path: Path = SETTINGS_PATH) -> dict:
+     """Charge les paramètres fonctionnels (matières, barème) depuis le fichier YAML."""
++    # Correctif V4 : safe_load ne construit jamais d'objet Python arbitraire.
+     with open(path, encoding="utf-8") as fh:
+-        return yaml.full_load(fh) or {}
++        return yaml.safe_load(fh) or {}
+ 
+ 
+ SETTINGS = load_settings()
+diff --git a/requirements.txt b/requirements.txt
+index 6fc8c12..9c4778e 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -2,5 +2,5 @@ Flask==3.1.3
+ Werkzeug==3.1.9
+ psycopg[binary]==3.3.8
+ gunicorn==27.0.0
+-# VULN-V4 (volontaire, voir docs/VULNERABILITES.md)
+-PyYAML==5.3.1
++# Correctif V4 : PyYAML 6.x (CVE-2020-14343 corrigée en 5.4) ; chargement via yaml.safe_load
++PyYAML==6.0.3
+[code de retour : 0]

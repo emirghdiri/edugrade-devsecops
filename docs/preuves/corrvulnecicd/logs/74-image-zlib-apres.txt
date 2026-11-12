@@ -1,0 +1,10 @@
+# Preuve : 74-image-zlib-apres
+# Date   : 2026-11-12 19:55:22 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281407572 image 'Total|│ (PyYAML|zlib)' --all
+Job : image (build, trivy image, sbom) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281407572/job/131403818303
+------------------------------------------------------------
+Total: 1 (HIGH: 0, CRITICAL: 1)
+│ PyYAML (METADATA) │ CVE-2020-14343 │ CRITICAL │ fixed  │ 5.3.1             │ 5.4           │ PyYAML: incomplete fix for CVE-2020-1747   │
+[code de retour : 0]
