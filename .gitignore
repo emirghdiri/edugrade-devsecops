@@ -52,3 +52,6 @@ reports/
 *.swp
 .DS_Store
 Thumbs.db
+
+# ---------- Charts Helm téléchargés (scripts/fetch_charts.sh) ----------
+terraform/cluster/charts/

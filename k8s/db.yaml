@@ -1,0 +1,84 @@
+# PostgreSQL 16 (image officielle alpine, utilisateur postgres UID 70).
+# Accessible uniquement par le backend (NetworkPolicy « db », Terraform).
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels: { app.kubernetes.io/name: db, app.kubernetes.io/part-of: edugrade }
+spec:
+  type: ClusterIP
+  selector: { app.kubernetes.io/name: db }
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  labels: { app.kubernetes.io/name: db, app.kubernetes.io/part-of: edugrade }
+spec:
+  serviceName: db
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: db }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: db, app.kubernetes.io/part-of: edugrade }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: edugrade
+            - name: POSTGRES_USER
+              value: edugrade
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: edugrade-db, key: POSTGRES_PASSWORD }
+            # Sous-dossier : le point de montage du volume n'appartient pas à l'UID 70.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "edugrade", "-d", "edugrade"] }
+            periodSeconds: 5
+          livenessProbe:
+            exec: { command: ["pg_isready", "-U", "edugrade", "-d", "edugrade"] }
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: run, mountPath: /var/run/postgresql }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - { name: run, emptyDir: {} }
+        - { name: tmp, emptyDir: {} }
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests: { storage: 1Gi }
