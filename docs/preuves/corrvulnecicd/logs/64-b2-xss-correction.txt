@@ -1,0 +1,51 @@
+# Preuve : 64-b2-xss-correction
+# Date   : 2026-11-12 19:36:45 WAT
+# Dossier: .
+$ git show fix/xss --format='commit %h — %s%n%n%b' --stat && git show fix/xss --format= -- app/ tests/
+commit a568619 — fix(B2): échappe le terme recherché (suppression de |safe) + test XSS
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ app/templates/teacher/students.html |  4 ++--
+ docs/VULNERABILITES.md              |  6 +++---
+ tests/security/test_xss.py          | 16 ++++++++++++++++
+ 3 files changed, 21 insertions(+), 5 deletions(-)
+diff --git a/app/templates/teacher/students.html b/app/templates/teacher/students.html
+index 2332af7..54836a1 100644
+--- a/app/templates/teacher/students.html
++++ b/app/templates/teacher/students.html
+@@ -42,8 +42,8 @@
+ <section class="card">
+   {% if q %}
+   <div class="card-head">
+-    {# VULN-B2 (volontaire, voir docs/VULNERABILITES.md) #}
+-    <h2 id="search-title" class="results-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
++    {# Correctif Bonus 2 (XSS) : plus de |safe, le terme est échappé par Jinja. #}
++    <h2 id="search-title" class="results-title">Résultats pour « {{ q }} » ({{ students|length }})</h2>
+   </div>
+   {% else %}
+   <div class="card-head"><h2>Tous les étudiants</h2></div>
+diff --git a/tests/security/test_xss.py b/tests/security/test_xss.py
+new file mode 100644
+index 0000000..38cec54
+--- /dev/null
++++ b/tests/security/test_xss.py
+@@ -0,0 +1,16 @@
++"""Bonus 2 — XSS réfléchi : le terme recherché doit être échappé à l'affichage."""
++
++import pytest
++
++from ..conftest import TEACHER, login
++
++pytestmark = pytest.mark.security
++
++PAYLOAD = "<script>alert(1)</script>"
++
++
++def test_search_term_is_escaped(client):
++    login(client, TEACHER)
++    html = client.get("/teacher/students", query_string={"q": PAYLOAD}).get_data(as_text=True)
++    assert PAYLOAD not in html, "XSS : le script recherché est renvoyé sans échappement"
++    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+[code de retour : 0]

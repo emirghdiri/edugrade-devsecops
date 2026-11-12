@@ -1,0 +1,24 @@
+# Preuve : 42-ci-sast-semgrep-v2-b2-avant
+# Date   : 2026-11-12 19:19:18 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 sast 'app/|constat|##\[error\]'
+Job : sast (semgrep, bandit) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385359367
+------------------------------------------------------------
+print(f"\n{len(res)} constat(s), dont {len(blocking)} ERROR (bloquant)")
+WARNING  formatted-sql-query                      app/teacher.py:22
+ERROR    sqlalchemy-execute-raw-query             app/teacher.py:22
+WARNING  django-no-csrf-token                     app/templates/base.html:36
+WARNING  django-no-csrf-token                     app/templates/confirm_delete.html:18
+WARNING  django-no-csrf-token                     app/templates/login.html:32
+WARNING  template-unescaped-with-safe             app/templates/teacher/students.html:46
+WARNING  django-no-csrf-token                     app/templates/teacher/subject_form.html:18
+WARNING  django-no-csrf-token                     app/templates/teacher/subjects.html:14
+28 constat(s), dont 1 ERROR (bloquant)
+##[error]Process completed with exit code 1.
+   Location: app/config.py:23:13
+   Location: app/config.py:24:14
+   Location: app/seed.py:73:18
+   Location: app/teacher.py:22:22
+##[error]Process completed with exit code 1.
+[code de retour : 0]

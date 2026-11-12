@@ -1,0 +1,38 @@
+# Preuve : 62-v2-sqli-correction
+# Date   : 2026-11-12 19:36:44 WAT
+# Dossier: .
+$ git show fix/sqli --format='commit %h — %s%n%n%b' --stat && git show fix/sqli --format= -- app/
+commit 1e6fbd4 — fix(V2): requête paramétrée pour la recherche d'étudiants
+
+Le terme saisi est passé en paramètre lié (ILIKE %s) au lieu d'être inséré
+par f-string ; les jokers LIKE sont échappés.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ app/teacher.py         | 10 ++++++++--
+ docs/VULNERABILITES.md |  5 ++---
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+diff --git a/app/teacher.py b/app/teacher.py
+index 75f55ae..b4776bc 100644
+--- a/app/teacher.py
++++ b/app/teacher.py
+@@ -17,9 +17,15 @@ bp = Blueprint("teacher", __name__, url_prefix="/teacher")
+ 
+ 
+ def search_students(term: str) -> list[dict]:
+-    # VULN-V2 (volontaire, voir docs/VULNERABILITES.md)
++    # Correctif V2 (injection SQL) : le terme est un paramètre lié, jamais
++    # concaténé à la requête. Les jokers LIKE saisis (%, _) sont échappés pour
++    # être cherchés tels quels.
++    escaped = term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+     with get_db().cursor() as cur:
+-        cur.execute(f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE '%{term}%' ORDER BY name")
++        cur.execute(
++            "SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE %s ORDER BY name",
++            (f"%{escaped}%",),
++        )
+         return cur.fetchall()
+ 
+ 
+[code de retour : 0]

@@ -1,0 +1,10 @@
+# Preuve : 83-ci-sbom-syft-apres
+# Date   : 2026-11-12 19:56:01 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281516275 image 'paquets dans la SBOM|Total:' --all
+Job : image (build, trivy image, sbom) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281516275/job/131404131541
+------------------------------------------------------------
+python3 -c "import json;d=json.load(open('reports/sbom.spdx.json'));print(len(d['packages']),'paquets dans la SBOM')"
+101 paquets dans la SBOM
+[code de retour : 0]

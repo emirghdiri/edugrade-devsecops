@@ -1,0 +1,32 @@
+# Preuve : 51-ci-erreur-pipeline-bandit-correction
+# Date   : 2026-11-12 19:32:32 WAT
+# Dossier: .
+$ git show 123420d --stat --format='%h %s%n%n%b' && git show 123420d --format= -- .github/workflows/ci.yml | sed -n '/Bandit/,/aucun constat/p'
+123420d fix(ci): Bandit ne bloque que sur HIGH et n'affiche plus les secrets ; upload-artifact v6 (Node 24)
+
+Bandit -f txt sortait en code 1 sur des constats LOW/MEDIUM et citait la valeur
+des mots de passe en dur (B105) dans le journal public de GitHub Actions.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ .github/workflows/ci.yml | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
++      # Format « custom » sans {msg} ni extrait de code : Bandit cite sinon la
++      # valeur des mots de passe en dur (B105) dans un journal public.
+       - name: Bandit (HIGH bloquant, tout est rapporté)
+         if: ${{ !cancelled() }}
++        env:
++          FMT: "{relpath}:{line} {test_id} {severity}/{confidence}"
+         run: |
+           pip install bandit==1.9.4
+-          bandit -r app -f json -o reports/bandit.json --exit-zero
+-          bandit -r app -f txt
+-          bandit -r app --severity-level high --confidence-level medium -q
+-      - uses: actions/upload-artifact@v5
++          echo "== Tous les constats (rapportés) =="
++          bandit -r app -q -f custom --msg-template "$FMT" --exit-zero | tee reports/bandit.txt
++          echo "== Constats bloquants (HIGH, confiance >= MEDIUM) =="
++          bandit -r app -q -f custom --msg-template "$FMT" --severity-level high --confidence-level medium
++          echo "aucun constat bloquant"
+[code de retour : 0]
