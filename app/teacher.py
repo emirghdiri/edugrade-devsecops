@@ -40,8 +40,13 @@ def students():
             log_event("db_error", status=500, level=logging.ERROR, context="student_search")
             rows, error, status = [], "La recherche a échoué.", 500
     else:
-        rows = query_all("SELECT id, name, email FROM users WHERE role = 'student' ORDER BY name")
-    return render_template("teacher/students.html", students=rows, q=q, error=error), status
+        rows = query_all(
+            "SELECT u.id, u.name, u.email, count(g.id) AS grade_count, avg(g.value) AS average "
+            "FROM users u LEFT JOIN grades g ON g.student_id = u.id "
+            "WHERE u.role = 'student' GROUP BY u.id ORDER BY u.name"
+        )
+    overview = query_one("SELECT count(*) AS grades, avg(value) AS average FROM grades") if not q else None
+    return render_template("teacher/students.html", students=rows, q=q, error=error, overview=overview), status
 
 
 def _student_or_404(student_id: int | None) -> dict:
