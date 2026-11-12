@@ -1,4 +1,13 @@
 # Kyverno : une réplique par contrôleur (cluster mono-nœud de démonstration).
+
+# Kyverno 1.20 n'exécute plus les anciennes ClusterPolicy (kyverno.io/v1) :
+# les règles EduGrade utilisent les types policies.kyverno.io (ValidatingPolicy,
+# ImageValidatingPolicy, CEL). Le cluster ne contient aucune ancienne règle :
+# le job de vérification préalable (image kyverno-cli) est inutile.
+upgrade:
+  legacyPolicyCheck:
+    enabled: false
+
 admissionController:
   replicas: 1
   container:
