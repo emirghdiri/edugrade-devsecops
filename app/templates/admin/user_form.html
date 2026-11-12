@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% set title = ("Ajouter un " ~ roles[user.role]|lower) if mode == "new" else "Modifier un compte" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('admin.users') }}">{{ ui.icon("back", 16) }} Retour aux utilisateurs</a>
+
+<section class="card card-narrow">
+  <div class="card-head">
+    <div class="person">
+      {% if mode == "edit" %}{{ ui.avatar(user.name, user.id) }}{% else %}<span class="stat-icon">{{ ui.icon("users") }}</span>{% endif %}
+      <div>
+        <h2>{{ title }}</h2>
+        <div class="person-mail">
+          {%- if mode == "edit" %}{{ roles[user.role] }} · {{ user.email }}{% else %}Le compte pourra se connecter immédiatement.{% endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="post" class="form"
+          action="{{ url_for('admin.new_user') if mode == 'new' else url_for('admin.edit_user', user_id=user.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      {% if mode == "new" %}
+      <div class="field">
+        <label for="role">Rôle</label>
+        <select id="role" name="role" required>
+          {% for key, label in roles.items() %}
+            <option value="{{ key }}"{% if key == user.role %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="field">
+        <label for="name">Nom complet</label>
+        <input id="name" name="name" type="text" value="{{ user.name }}" placeholder="Prénom Nom" minlength="3" maxlength="80" required>
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail</label>
+        <div class="input-wrap">
+          {{ ui.icon("mail") }}
+          <input id="email" name="email" type="email" value="{{ user.email }}" placeholder="prenom.nom@edugrade.test" maxlength="120" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">{{ "Mot de passe initial" if mode == "new" else "Nouveau mot de passe" }}</label>
+        <div class="input-wrap">
+          {{ ui.icon("lock") }}
+          <input id="password" name="password" type="password" minlength="8" autocomplete="new-password"{% if mode == "new" %} required{% endif %}>
+        </div>
+        <span class="hint">
+          {%- if mode == "new" %}Au moins 8 caractères, stocké uniquement sous forme hachée ; à communiquer à l'utilisateur.
+          {%- else %}Laisser vide pour conserver le mot de passe actuel.{% endif -%}
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ ui.icon("check") }} {{ "Créer le compte" if mode == "new" else "Enregistrer" }}</button>
+        <a class="btn" href="{{ url_for('admin.users') }}">Annuler</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

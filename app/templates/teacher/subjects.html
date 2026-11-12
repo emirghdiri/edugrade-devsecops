@@ -30,7 +30,7 @@
   <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>Matière</th><th class="num">Notes</th><th>Moyenne</th></tr>
+        <tr><th>Matière</th><th class="num">Notes</th><th>Moyenne</th><th><span class="sr-only">Actions</span></th></tr>
       </thead>
       <tbody>
         {% for s in subjects %}
@@ -38,9 +38,15 @@
           <td>{{ ui.subject(s.name) }}</td>
           <td class="num">{{ s.grade_count }}</td>
           <td>{% if s.average is not none %}{{ ui.grade(s.average) }}{% else %}<span class="muted">—</span>{% endif %}</td>
+          <td>
+            <div class="actions">
+              <a class="btn btn-sm" href="{{ url_for('manage.edit_subject', subject_id=s.id) }}">{{ ui.icon("edit", 15) }}<span>Modifier</span></a>
+              <a class="btn btn-sm btn-danger" href="{{ url_for('manage.delete_subject', subject_id=s.id) }}">{{ ui.icon("trash", 15) }}<span>Supprimer</span></a>
+            </div>
+          </td>
         </tr>
         {% else %}
-        <tr><td colspan="3" class="empty">{{ ui.icon("book", 40) }}<div>Aucune matière.</div></td></tr>
+        <tr><td colspan="4" class="empty">{{ ui.icon("book", 40) }}<div>Aucune matière.</div></td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -4,6 +4,8 @@
 {% block content %}
 {% if session.role == 'teacher' %}
   <a class="back" href="{{ url_for('teacher.students') }}">{{ ui.icon("back", 16) }} Retour aux étudiants</a>
+{% elif session.role == 'admin' %}
+  <a class="back" href="{{ url_for('admin.users') }}">{{ ui.icon("back", 16) }} Retour aux utilisateurs</a>
 {% endif %}
 
 <div class="page-head">
@@ -64,7 +66,10 @@
           <td class="hide-sm muted">{{ ui.mention(g.value) }}</td>
           <td>{{ g.date.strftime('%d/%m/%Y') }}</td>
           {% if session.role == 'teacher' %}
-          <td><div class="actions"><a class="btn btn-sm" href="{{ url_for('teacher.edit_grade', grade_id=g.id) }}">{{ ui.icon("edit", 15) }}<span>Modifier</span></a></div></td>
+          <td><div class="actions">
+            <a class="btn btn-sm" href="{{ url_for('teacher.edit_grade', grade_id=g.id) }}">{{ ui.icon("edit", 15) }}<span>Modifier</span></a>
+            <a class="btn btn-sm btn-danger" href="{{ url_for('teacher.delete_grade', grade_id=g.id) }}" data-testid="delete-grade">{{ ui.icon("trash", 15) }}<span>Supprimer</span></a>
+          </div></td>
           {% endif %}
         </tr>
         {% else %}

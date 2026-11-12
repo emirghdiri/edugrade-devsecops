@@ -61,3 +61,4 @@ def login(client, name: str, password: str | None = None):
 STUDENT = "Lina Ben Salah"
 OTHER_STUDENT = "Youssef Trabelsi"
 TEACHER = "Claire Dubois"
+ADMIN = "Nadia Mansour"

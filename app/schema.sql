@@ -5,8 +5,12 @@ CREATE TABLE IF NOT EXISTS users (
     name          TEXT NOT NULL,
     email         TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    role          TEXT NOT NULL CHECK (role IN ('student', 'teacher'))
+    role          TEXT NOT NULL
 );
+
+-- Rôles autorisés (contrainte recréée pour migrer les bases existantes).
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('student', 'teacher', 'admin'));
 
 CREATE TABLE IF NOT EXISTS grades (
     id         SERIAL PRIMARY KEY,

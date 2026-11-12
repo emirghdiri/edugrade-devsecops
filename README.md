@@ -1,8 +1,8 @@
 # EduGrade — Portail de notes sécurisé (DevSecOps)
 
-EduGrade est un portail web de gestion de notes universitaires : les enseignants
-gèrent les étudiants, les matières et les évaluations ; chaque étudiant consulte
-ses propres résultats. Le projet sert de support au module **DevSecOps
+EduGrade est un portail web de gestion de notes universitaires : l'administrateur
+gère les comptes enseignants et étudiants, les enseignants gèrent les matières et
+les évaluations, chaque étudiant consulte ses propres résultats. Le projet sert de support au module **DevSecOps
 (ING-5-SSIR)** : l'application est **volontairement vulnérable**, puis chaque faille
 est **détectée** par une chaîne d'outils automatisée et **corrigée**, preuves
 avant/après à l'appui.
@@ -24,7 +24,7 @@ Le cycle suit six étapes : **écrire → construire → tester → livrer → d
 
 | Bloc | Rôle | Technologies |
 |------|------|--------------|
-| **1. Utilisateurs** | Étudiants (consultation de leurs notes) et enseignants (gestion des étudiants, matières et notes), avec des données fictives | Navigateur |
+| **1. Utilisateurs** | Administrateur (comptes), enseignants (matières et notes) et étudiants (consultation de leurs notes), avec des données fictives | Navigateur |
 | **2. Code et infrastructure** | Le code vit sur GitHub (branches `feature/*`, Pull Requests relues). Le dépôt lui-même (branches, protection de `main`, collaboratrice, secrets) et la configuration du cluster sont créés par **Terraform** | Git, GitHub, Terraform |
 | **3. Pipeline CI/CD bloquant** | Chaque Pull Request passe par des contrôles successifs ; **une faille détectée bloque la livraison** | GitHub Actions, pytest, Semgrep, Bandit, Gitleaks, Trivy, Checkov, Docker, Syft, Cosign, OWASP ZAP |
 | **4. Registre** | Les images publiées portent le SHA du commit, une SBOM et une signature vérifiable | GitHub Container Registry |
@@ -47,8 +47,9 @@ Navigateur ──HTTP:8080──▶ frontend : Nginx (reverse proxy, non-root)
 
 | Rôle | Fonctionnalités |
 |------|-----------------|
-| Étudiant | Tableau de bord (moyenne, mention, meilleure note, notes récentes) ; consultation de ses notes par matière |
-| Enseignant | Liste et recherche des étudiants avec leur moyenne ; ajout et modification de notes ; création de comptes étudiants ; gestion des matières ; statistiques de la promotion |
+| Administrateur | **CRUD des comptes** enseignants et étudiants : création (mot de passe initial haché), liste filtrable par rôle, modification (nom, e-mail, mot de passe), suppression avec confirmation (les notes d'un étudiant supprimé sont supprimées aussi) |
+| Enseignant | **CRUD des notes** (ajout, modification, suppression avec confirmation) ; **CRUD des matières** (le renommage met à jour les notes, la suppression d'une matière utilisée est refusée) ; liste et recherche des étudiants avec leur moyenne ; statistiques de la promotion |
+| Étudiant | Lecture seule : tableau de bord (moyenne, mention, meilleure note, notes récentes) et consultation de ses notes par matière |
 
 Sécurité applicative :
 - rôles contrôlés **côté serveur** ;
@@ -60,7 +61,8 @@ Sécurité applicative :
 Journaux applicatifs **JSON** sur la sortie standard, une ligne par événement
 (`timestamp`, `level`, `event`, `user_id`, `role`, `route`, `ip`, `status`) :
 `login_success`, `login_failed`, `access_denied`, `suspicious_input`,
-`grade_created`, `grade_updated`, `student_created`, `subject_created`.
+`grade_created`, `grade_updated`, `grade_deleted`, `subject_created`,
+`subject_updated`, `subject_deleted`, `user_created`, `user_updated`, `user_deleted`.
 Jamais de mot de passe, de secret ni de valeur de note.
 
 ## Vulnérabilités volontaires
@@ -110,6 +112,7 @@ de `2026`** (exemple : `lina2026`).
 
 | Rôle | E-mail |
 |------|--------|
+| Administratrice | `nadia.mansour@edugrade.test` |
 | Enseignante | `claire.dubois@edugrade.test` |
 | Enseignant | `karim.haddad@edugrade.test` |
 | Étudiante | `lina.bensalah@edugrade.test` |
@@ -182,7 +185,7 @@ edugrade-devsecops/
 | Élément | État |
 |---------|------|
 | Dépôt GitHub provisionné par Terraform | ✅ |
-| Application Flask + PostgreSQL, deux rôles, gestion des étudiants et matières | ✅ |
+| Application Flask + PostgreSQL, trois rôles (administrateur, enseignant, étudiant), CRUD des comptes, notes et matières | ✅ |
 | Failles volontaires V1–V4, Bonus 1 et 2, documentées et prouvées | ✅ |
 | Docker multi-stage non-root, Nginx, Docker Compose | ✅ |
 | Tests fonctionnels et de sécurité | ✅ |

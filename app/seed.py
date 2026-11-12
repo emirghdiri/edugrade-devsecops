@@ -25,6 +25,7 @@ from .config import Config, build_database_url
 from .db import connect, init_schema
 from .logging_setup import LOGGER_NAME, configure_logging
 
+ADMINS = ["Nadia Mansour"]
 TEACHERS = ["Claire Dubois", "Karim Haddad"]
 STUDENTS = ["Lina Ben Salah", "Youssef Trabelsi", "Sarah Martin", "Omar Jaziri", "Emma Lefèvre", "Mehdi Gharbi"]
 
@@ -55,31 +56,36 @@ def seed_database(conn: psycopg.Connection, subjects: list[str], reset: bool = F
         # Matières par défaut (settings.yaml) : ajoutées si absentes, même sur une base existante.
         for name in subjects:
             cur.execute("INSERT INTO subjects (name) VALUES (%s) ON CONFLICT DO NOTHING", (name,))
-        if cur.execute("SELECT count(*) FROM users").fetchone()[0]:
-            return False
+        populated = cur.execute("SELECT count(*) FROM users").fetchone()[0] > 0
 
-        def add_user(name: str, role: str) -> int:
+        def add_user(name: str, role: str) -> int | None:
             row = cur.execute(
-                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s) RETURNING id",
+                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s) "
+                "ON CONFLICT (email) DO NOTHING RETURNING id",
                 (name, email_for(name), generate_password_hash(demo_password(name)), role),
             ).fetchone()
-            return row[0]
+            return row[0] if row else None
 
-        for name in TEACHERS:
-            add_user(name, "teacher")
+        if not populated:
+            for name in TEACHERS:
+                add_user(name, "teacher")
 
-        rng = random.Random(2026)  # jeu de données reproductible
-        start = date(2026, 9, 15)
-        for name in STUDENTS:
-            student_id = add_user(name, "student")
-            for subject in rng.sample(subjects, rng.choice([4, 5])):
-                value = round(rng.uniform(6, 19) * 4) / 4
-                when = start + timedelta(days=rng.randint(0, 55))
-                cur.execute(
-                    "INSERT INTO grades (student_id, subject, value, date) VALUES (%s, %s, %s, %s)",
-                    (student_id, subject, value, when),
-                )
-    return True
+            rng = random.Random(2026)  # jeu de données reproductible
+            start = date(2026, 9, 15)
+            for name in STUDENTS:
+                student_id = add_user(name, "student")
+                for subject in rng.sample(subjects, rng.choice([4, 5])):
+                    value = round(rng.uniform(6, 19) * 4) / 4
+                    when = start + timedelta(days=rng.randint(0, 55))
+                    cur.execute(
+                        "INSERT INTO grades (student_id, subject, value, date) VALUES (%s, %s, %s, %s)",
+                        (student_id, subject, value, when),
+                    )
+
+        # Compte administrateur (ajouté aussi sur une base existante s'il manque).
+        for name in ADMINS:
+            add_user(name, "admin")
+    return not populated
 
 
 def main(argv: list[str] | None = None) -> int:
