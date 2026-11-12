@@ -7,6 +7,7 @@
     <h1>Étudiants</h1>
     <p class="muted">Consultez les résultats et saisissez de nouvelles évaluations.</p>
   </div>
+  <a class="btn btn-primary" href="{{ url_for('manage.new_student') }}">{{ ui.icon("plus") }} Ajouter un étudiant</a>
 </div>
 
 {% if overview %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Ajouter un étudiant{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('teacher.students') }}">{{ ui.icon("back", 16) }} Retour aux étudiants</a>
+
+<section class="card card-narrow">
+  <div class="card-head">
+    <div class="person">
+      <span class="stat-icon">{{ ui.icon("users") }}</span>
+      <div>
+        <h2>Ajouter un étudiant</h2>
+        <div class="person-mail">Le compte pourra se connecter immédiatement.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="post" class="form" action="{{ url_for('manage.new_student') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="field">
+        <label for="name">Nom complet</label>
+        <input id="name" name="name" type="text" value="{{ form.name }}" placeholder="Prénom Nom" minlength="3" maxlength="80" required autofocus>
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail</label>
+        <div class="input-wrap">
+          {{ ui.icon("mail") }}
+          <input id="email" name="email" type="email" value="{{ form.email }}" placeholder="prenom.nom@edugrade.test" maxlength="120" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="password">Mot de passe initial</label>
+        <div class="input-wrap">
+          {{ ui.icon("lock") }}
+          <input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required>
+        </div>
+        <span class="hint">Au moins 8 caractères. Stocké uniquement sous forme hachée ; à communiquer à l'étudiant.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ ui.icon("plus") }} Créer le compte</button>
+        <a class="btn" href="{{ url_for('teacher.students') }}">Annuler</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

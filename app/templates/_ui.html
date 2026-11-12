@@ -47,5 +47,5 @@
 {%- endmacro %}
 
 {% macro subject(name) -%}
-<span class="subject s{{ config.SUBJECTS.index(name) % 5 if name in config.SUBJECTS else 0 }}">{{ name }}</span>
+<span class="subject s{{ name|subject_color }}">{{ name }}</span>
 {%- endmacro %}
