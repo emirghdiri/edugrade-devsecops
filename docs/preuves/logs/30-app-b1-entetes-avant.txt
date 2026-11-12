@@ -1,8 +1,8 @@
 # Bonus 1 — en-têtes de GET http://localhost:8080/login (HTTP 200)
 connection: keep-alive
-content-length: 1249
+content-length: 4106
 content-type: text/html; charset=utf-8
-date: Wed, 11 Nov 2026 17:11:47 GMT
+date: Thu, 12 Nov 2026 00:08:12 GMT
 server: nginx
 vary: Cookie
 

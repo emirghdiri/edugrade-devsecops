@@ -1,44 +1,90 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
 {% block title %}Étudiants{% endblock %}
 {% block content %}
 <div class="page-head">
   <div>
     <h1>Étudiants</h1>
-    <p class="muted">Consultez les notes et ajoutez des évaluations</p>
+    <p class="muted">Consultez les résultats et saisissez de nouvelles évaluations.</p>
   </div>
 </div>
 
+{% if overview %}
+<div class="stats">
+  <div class="stat">
+    <div class="stat-top">Étudiants <span class="stat-icon">{{ ui.icon("users") }}</span></div>
+    <div class="stat-value">{{ students|length }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Notes saisies <span class="stat-icon green">{{ ui.icon("book") }}</span></div>
+    <div class="stat-value">{{ overview.grades }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Moyenne de la promotion <span class="stat-icon amber">{{ ui.icon("chart") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(overview.average) if overview.average is not none else "—" }}<small> / 20</small></div>
+    {% if overview.average is not none %}<progress class="bar" value="{{ overview.average }}" max="20"></progress>{% endif %}
+  </div>
+</div>
+{% endif %}
+
 <form method="get" action="{{ url_for('teacher.students') }}" class="search" role="search">
-  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher un étudiant par nom…" aria-label="Rechercher par nom">
+  <div class="input-wrap">
+    {{ ui.icon("search") }}
+    <input type="search" name="q" value="{{ q }}" placeholder="Rechercher un étudiant par nom…" aria-label="Rechercher par nom">
+  </div>
   <button type="submit" class="btn btn-primary">Rechercher</button>
   {% if q %}<a class="btn" href="{{ url_for('teacher.students') }}">Réinitialiser</a>{% endif %}
 </form>
 
-{% if q %}
-  {# VULN-B2 (volontaire, voir docs/VULNERABILITES.md) #}
-  <h2 id="search-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
-{% endif %}
-{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+{% if error %}<div class="alert alert-error">{{ ui.icon("alert") }}<span>{{ error }}</span></div>{% endif %}
 
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr><th>Nom</th><th>E-mail</th><th></th></tr>
-    </thead>
-    <tbody>
-      {% for s in students %}
-      <tr data-testid="student-row">
-        <td>{{ s.name }}</td>
-        <td>{{ s.email }}</td>
-        <td class="actions">
-          <a class="btn btn-small" href="{{ url_for('student.grades', student_id=s.id) }}">Voir les notes</a>
-          <a class="btn btn-small btn-primary" href="{{ url_for('teacher.new_grade', student_id=s.id) }}">Ajouter une note</a>
-        </td>
-      </tr>
-      {% else %}
-      <tr><td colspan="3" class="empty">Aucun étudiant trouvé.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+<section class="card">
+  {% if q %}
+  <div class="card-head">
+    {# VULN-B2 (volontaire, voir docs/VULNERABILITES.md) #}
+    <h2 id="search-title" class="results-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
+  </div>
+  {% else %}
+  <div class="card-head"><h2>Tous les étudiants</h2></div>
+  {% endif %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th class="num hide-sm">Notes</th>
+          <th class="hide-sm">Moyenne</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr data-testid="student-row">
+          <td>
+            <div class="person">
+              {{ ui.avatar(s.name, s.id, "sm") }}
+              <div>
+                <div class="person-name" data-testid="student-name">{{ s.name }}</div>
+                <div class="person-mail">{{ s.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="num hide-sm">{{ s.grade_count if s.grade_count is defined else "—" }}</td>
+          <td class="hide-sm">
+            {%- if s.average is defined and s.average is not none %}{{ ui.grade(s.average) }}{% else %}<span class="muted">—</span>{% endif -%}
+          </td>
+          <td>
+            <div class="actions">
+              <a class="btn btn-sm" href="{{ url_for('student.grades', student_id=s.id) }}">{{ ui.icon("eye", 15) }}<span>Voir les notes</span></a>
+              <a class="btn btn-sm btn-primary" href="{{ url_for('teacher.new_grade', student_id=s.id) }}">{{ ui.icon("plus", 15) }}<span>Ajouter une note</span></a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">{{ ui.icon("search", 40) }}<div>Aucun étudiant trouvé.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}

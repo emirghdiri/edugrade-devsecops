@@ -1,22 +1,60 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
 {% block title %}Tableau de bord{% endblock %}
 {% block content %}
-<div class="page-head">
+<section class="hero">
   <div>
-    <h1>Bonjour {{ session.name }}</h1>
-    <p class="muted">Votre espace étudiant</p>
+    <h1>Bonjour {{ session.name.split()[0] }}</h1>
+    <p>Voici un aperçu de vos résultats du semestre.</p>
   </div>
-  <a class="btn btn-primary" href="{{ url_for('student.grades', student_id=session.user_id) }}">Voir mes notes</a>
-</div>
+  <a class="btn" href="{{ url_for('student.grades', student_id=session.user_id) }}">{{ ui.icon("book") }} Voir toutes mes notes</a>
+</section>
 
 <div class="stats">
   <div class="stat">
-    <div class="stat-label">Notes enregistrées</div>
-    <div class="stat-value">{{ count }}</div>
+    <div class="stat-top">Moyenne générale <span class="stat-icon">{{ ui.icon("chart") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small> / 20</small></div>
+    {% if average is not none %}
+      <div class="stat-sub">{{ ui.mention(average) }}</div>
+      <progress class="bar" value="{{ average }}" max="20">{{ "%.2f"|format(average) }} / 20</progress>
+    {% endif %}
   </div>
   <div class="stat">
-    <div class="stat-label">Moyenne générale</div>
-    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small class="muted"> / 20</small></div>
+    <div class="stat-top">Notes enregistrées <span class="stat-icon green">{{ ui.icon("book") }}</span></div>
+    <div class="stat-value">{{ count }}</div>
+    <div class="stat-sub">sur l'ensemble des matières</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Meilleure note <span class="stat-icon amber">{{ ui.icon("award") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(best.value) if best else "—" }}<small> / 20</small></div>
+    <div class="stat-sub">{{ best.subject if best else "Aucune note" }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Dernière évaluation <span class="stat-icon">{{ ui.icon("calendar") }}</span></div>
+    <div class="stat-value">{{ recent[0].date.strftime('%d/%m') if recent else "—" }}</div>
+    <div class="stat-sub">{{ recent[0].subject if recent else "Aucune note" }}</div>
   </div>
 </div>
+
+<section class="card">
+  <div class="card-head">
+    <h2>Notes récentes</h2>
+    <a class="btn btn-sm" href="{{ url_for('student.grades', student_id=session.user_id) }}">Tout voir</a>
+  </div>
+  {% if recent %}
+  <ul class="recent">
+    {% for g in recent %}
+    <li>
+      <div>
+        {{ ui.subject(g.subject) }}
+        <div class="date">{{ g.date.strftime('%d/%m/%Y') }}</div>
+      </div>
+      <div>{{ ui.grade(g.value) }}<span class="mention hide-sm">{{ ui.mention(g.value) }}</span></div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty">{{ ui.icon("book", 40) }}<div>Aucune note pour le moment.</div></div>
+  {% endif %}
+</section>
 {% endblock %}
