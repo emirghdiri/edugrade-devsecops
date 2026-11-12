@@ -1,0 +1,12 @@
+# Exceptions Gitleaks — justification : docs/POLITIQUE_BLOCAGE.md (section Exceptions)
+# et docs/VULNERABILITES.md (V3).
+#
+# V3 corrigée : les deux valeurs factices ajoutées en dur par le commit f78fd00
+# ne sont plus lues par l'application (SECRET_KEY et POSTGRES_PASSWORD viennent
+# uniquement de l'environnement) : elles sont révoquées par rotation.
+# L'historique n'est pas réécrit : main est protégée contre le force push et la
+# réécriture casserait les clones existants. L'exception ne vise QUE ces deux
+# empreintes exactes (commit:fichier:règle:ligne) : toute nouvelle fuite, même
+# identique, dans un autre commit reste bloquante.
+f78fd006d264ae3feb09585813ffaf312df0a8db:app/config.py:generic-api-key:10
+f78fd006d264ae3feb09585813ffaf312df0a8db:app/config.py:generic-api-key:11
