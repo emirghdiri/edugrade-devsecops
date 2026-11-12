@@ -1,0 +1,34 @@
+# Preuve : 105-k3s-iptables-legacy-segmentation
+# Date   : 2026-11-12 23:53:21 WAT
+# Dossier: .
+$ echo 'k3s config :'; cat /etc/rancher/k3s/config.yaml; iptables --version; echo; echo 'Erreurs Aborting sync (10 min) :'; journalctl -u k3s --no-pager --since '-10min' | grep -c 'Aborting sync'; echo; scripts/k8s_segmentation_test.sh
+k3s config :
+iptables v1.8.11 (legacy)
+
+Erreurs Aborting sync (10 min) :
+0
+
+=== Segmentation réseau (NetworkPolicies) ===
+frontend -> backend:8000 (flux applicatif)                 attendu: autorisé obtenu: autorisé OK
+backend  -> db:5432 (flux applicatif)                      attendu: autorisé obtenu: autorisé OK
+frontend -> db:5432 (contournement du backend)             attendu: bloqué   obtenu: bloqué   OK
+frontend -> Internet 1.1.1.1:443                           attendu: bloqué   obtenu: bloqué   OK
+backend  -> Internet 1.1.1.1:443 (exfiltration, V5)        attendu: bloqué   obtenu: bloqué   OK
+
+=== Admission (Kyverno + Pod Security « restricted ») — dry-run serveur ===
+image EduGrade signée par develop (déployée)            attendu: accepté  obtenu: accepté  OK
+image EduGrade signée par une autre branche               attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-verify-image-signature" denied the request: Policy edugrade-verify-image-signature failed: Image EduG
+image EduGrade non signée (tag local)                     attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-verify-image-signature" denied the request: Policy edugrade-verify-image-signature failed: image ghcr
+image d'un registre non autorisé (busybox)                attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-pod-security failed: Image refusée : seules l'image EduGrade (ghcr.io/emirghdiri/edugrade-*), postgre
+tag latest                                                 attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-pod-security failed: Image refusée : seules l'image EduGrade (ghcr.io/emirghdiri/edugrade-*), postgre
+pod sans runAsNonRoot (root possible)                      attendu: refusé   obtenu: refusé   OK
+    motif : violates PodSecurity "restricted:latest": runAsNonRoot != true (pod and container "c" must not set securityCon
+conteneur privileged                                       attendu: refusé   obtenu: refusé   OK
+    motif : 
+
+RÉSULTAT : tous les tests sont conformes.
+[code de retour : 0]

@@ -1,0 +1,21 @@
+# Preuve : 104-ip-client-apres
+# Date   : 2026-11-12 23:59:17 WAT
+# Dossier: .
+$ /tmp/ip_report.sh; echo; scripts/observability_check.sh 2>&1 | sed -n '/Grafana/,$p'
+Chaîne : client -> ServiceLB (svclb) -> Traefik -> Nginx (frontend) -> Flask (backend)
+backend-7b6dd56d5d-cj69p                                10.42.0.118
+frontend-59774ffb88-hgtzg                               10.42.0.117
+svclb-traefik-8e0ee49d-dhzp8                            10.42.0.123
+traefik-68df944ff7-5cc7k                                10.42.0.111
+
+Backend : sha256:9992e9c40578…  TRUSTED_PROXY_COUNT=2
+
+IP journalisées pendant le scénario d'attaque (avant correction : 190 × IP de Traefik) :
+      2 "ip": "10.42.0.121"
+     63 "ip": "10.42.0.123"
+
+=== Grafana : règles d'alerte EduGrade ===
+firing    EduGrade - Force brute sur la connexion
+firing    EduGrade - Tentative d'injection (SQLi / XSS)
+firing    EduGrade - Tentatives d'accès non autorisé (IDOR)
+[code de retour : 0]

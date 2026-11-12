@@ -1,0 +1,40 @@
+# Preuve : 103-k3s-deploiement-v1.0-secure
+# Date   : 2026-11-12 23:08:04 WAT
+# Dossier: .
+$ git diff -- k8s/backend.yaml; scripts/k8s_deploy.sh 2>&1 | grep -vE '^Waiting'; echo; kubectl -n edugrade get deploy backend -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'; kubectl -n edugrade exec deploy/backend -- printenv TRUSTED_PROXY_COUNT
+diff --git a/k8s/backend.yaml b/k8s/backend.yaml
+index ea6100f..f207241 100644
+--- a/k8s/backend.yaml
++++ b/k8s/backend.yaml
+@@ -34,8 +34,8 @@ spec:
+         seccompProfile: { type: RuntimeDefault }
+       containers:
+         - name: backend
+-          # Image du commit a4511f2 (develop), signée par ci.yml@refs/heads/develop.
+-          image: ghcr.io/emirghdiri/edugrade-backend@sha256:d3707f8d8e3c6083f6c12f9701997ff3fd688bf58a9d0ddf23a7c6b0e42b69db
++          # Image du commit 82c0eaa (develop), signée par ci.yml@refs/heads/develop.
++          image: ghcr.io/emirghdiri/edugrade-backend@sha256:9992e9c40578b042a0256fbbda1951e3f0b9582744d522972644ed8eb2c7e9b0
+           imagePullPolicy: IfNotPresent
+           ports:
+             - containerPort: 8000
+configmap/nginx-conf unchanged
+service/backend unchanged
+service/db unchanged
+service/frontend unchanged
+deployment.apps/backend configured
+deployment.apps/frontend unchanged
+statefulset.apps/db configured
+ingress.networking.k8s.io/edugrade unchanged
+partitioned roll out complete: 1 new pods have been updated...
+deployment "backend" successfully rolled out
+deployment "frontend" successfully rolled out
+NAME                        READY   STATUS        RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+backend-64cc9b6d5-s2z9r     1/1     Terminating   0          61m   10.42.0.35   desktop-nga3akd   <none>           <none>
+backend-7b6dd56d5d-cj69p    1/1     Running       0          18s   10.42.0.40   desktop-nga3akd   <none>           <none>
+db-0                        1/1     Running       0          61m   10.42.0.38   desktop-nga3akd   <none>           <none>
+frontend-59774ffb88-hgtzg   1/1     Running       0          61m   10.42.0.36   desktop-nga3akd   <none>           <none>
+Application : http://edugrade.localhost
+
+ghcr.io/emirghdiri/edugrade-backend@sha256:9992e9c40578b042a0256fbbda1951e3f0b9582744d522972644ed8eb2c7e9b0
+2
+[code de retour : 0]
