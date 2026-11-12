@@ -1,0 +1,39 @@
+# Preuve : 96-k3s-v5-correction-apply
+# Date   : 2026-11-12 22:13:59 WAT
+# Dossier: .
+$ git show fix/v5-egress --format='commit %h — %s' -- terraform/cluster/network.tf | head -30; terraform -chdir=terraform/cluster apply -no-color -input=false -auto-approve -target=kubernetes_network_policy.backend | grep -E 'update in-place|ip_block|cidr|Apply complete|# '
+commit 2a6c9ac — fix(V5): supprime la sortie Internet (0.0.0.0/0) de la NetworkPolicy backend
+
+diff --git a/terraform/cluster/network.tf b/terraform/cluster/network.tf
+index 561e4c4..39f52bf 100644
+--- a/terraform/cluster/network.tf
++++ b/terraform/cluster/network.tf
+@@ -120,16 +120,9 @@ resource "kubernetes_network_policy" "backend" {
+         port     = "8000"
+       }
+     }
+-    # VULN-V5 (volontaire, voir docs/VULNERABILITES.md) : sortie vers tout
+-    # Internet ouverte « pour les mises à jour ». Un backend compromis (V2, V3)
+-    # peut exfiltrer la base vers n'importe quelle adresse.
+-    egress {
+-      to {
+-        ip_block {
+-          cidr = "0.0.0.0/0"
+-        }
+-      }
+-    }
++    # Correctif V5 : plus de sortie vers 0.0.0.0/0. Le backend ne joint que la
++    # base (et le DNS, policy allow-dns) ; les mises à jour passent par une
++    # nouvelle image construite et signée par le pipeline, jamais par le pod.
+     egress {
+       to {
+         pod_selector {
+  ~ update in-place
+  # kubernetes_network_policy.backend will be updated in-place
+            # (1 unchanged attribute hidden)
+                  - ip_block {
+                      - cidr   = "0.0.0.0/0" -> null
+            # (2 unchanged blocks hidden)
+        # (1 unchanged block hidden)
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+[code de retour : 0]
