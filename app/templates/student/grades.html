@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Notes de {{ student.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Notes de {{ student.name }}</h1>
+    <p class="muted">{{ student.email }}</p>
+  </div>
+  {% if session.role == 'teacher' %}
+    <a class="btn btn-primary" href="{{ url_for('teacher.new_grade', student_id=student.id) }}">Ajouter une note</a>
+  {% endif %}
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-label">Nombre de notes</div>
+    <div class="stat-value">{{ grades|length }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Moyenne</div>
+    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small class="muted"> / 20</small></div>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Matière</th>
+        <th class="num">Note</th>
+        <th>Date</th>
+        {% if session.role == 'teacher' %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in grades %}
+      <tr data-testid="grade-row">
+        <td>{{ g.subject }}</td>
+        <td class="num {{ 'grade-good' if g.value >= 10 else 'grade-bad' }}">{{ "%.2f"|format(g.value) }}</td>
+        <td>{{ g.date.strftime('%d/%m/%Y') }}</td>
+        {% if session.role == 'teacher' %}
+        <td class="actions"><a class="btn btn-small" href="{{ url_for('teacher.edit_grade', grade_id=g.id) }}">Modifier</a></td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">Aucune note pour le moment.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

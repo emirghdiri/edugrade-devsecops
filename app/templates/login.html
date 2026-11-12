@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<section class="card card-narrow">
+  <h1>Connexion</h1>
+  <p class="muted">Portail de gestion des notes</p>
+  <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" value="{{ email or '' }}" autocomplete="username" required autofocus>
+    <label for="password">Mot de passe</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit" class="btn btn-primary">Se connecter</button>
+  </form>
+</section>
+{% endblock %}

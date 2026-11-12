@@ -1,0 +1,28 @@
+# Preuve : 08-trivy-fs
+# Date   : 2026-11-11 17:35:23 CET
+# Dossier: .
+$ trivy fs --quiet --scanners vuln --severity HIGH,CRITICAL .
+
+Report Summary
+
+┌──────────────────┬──────┬─────────────────┐
+│      Target      │ Type │ Vulnerabilities │
+├──────────────────┼──────┼─────────────────┤
+│ requirements.txt │ pip  │        1        │
+└──────────────────┴──────┴─────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+requirements.txt (pip)
+======================
+Total: 1 (HIGH: 0, CRITICAL: 1)
+
+┌─────────┬────────────────┬──────────┬────────┬───────────────────┬───────────────┬────────────────────────────────────────────┐
+│ Library │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                   Title                    │
+├─────────┼────────────────┼──────────┼────────┼───────────────────┼───────────────┼────────────────────────────────────────────┤
+│ PyYAML  │ CVE-2020-14343 │ CRITICAL │ fixed  │ 5.3.1             │ 5.4           │ PyYAML: incomplete fix for CVE-2020-1747   │
+│         │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2020-14343 │
+└─────────┴────────────────┴──────────┴────────┴───────────────────┴───────────────┴────────────────────────────────────────────┘
+[code de retour : 0]

@@ -23,6 +23,19 @@ déposer sous le nom indiqué. Aucune valeur de secret ni jeton ne figure ici.
 | 05 | `terraform apply` : 8 ressources créées, sorties sans secret | [logs/05-terraform-apply.txt](logs/05-terraform-apply.txt) | [captures/05-terraform-apply.png](captures/05-terraform-apply.png) |
 | 06 | `git log --oneline --graph` : commits atomiques de la branche `feature/terraform-github` | [logs/06-git-log-terraform.txt](logs/06-git-log-terraform.txt) | [captures/06-git-log-terraform.png](captures/06-git-log-terraform.png) |
 
+## Phases 3-4 — Application et failles volontaires (version vulnérable)
+
+Les valeurs factices de V3 sont masquées (`****MASQUÉ****`) dans tous les journaux.
+
+| N° | Ce que la preuve montre | Journal | Capture |
+|----|-------------------------|---------|---------|
+| 07 | Gitleaks détecte V3 : 2 secrets (`generic-api-key`) dans `app/config.py` | [logs/07-gitleaks-detect.txt](logs/07-gitleaks-detect.txt) | [captures/07-gitleaks-detect.png](captures/07-gitleaks-detect.png) |
+| 08 | Trivy fs détecte V4 : PyYAML 5.3.1, CVE-2020-14343 (CRITICAL, corrigée en 5.4) | [logs/08-trivy-fs.txt](logs/08-trivy-fs.txt) | [captures/08-trivy-fs.png](captures/08-trivy-fs.png) |
+| 09 | Semgrep détecte V2 (`formatted-sql-query`, `sqlalchemy-execute-raw-query`) et Bonus 2 (`template-unescaped-with-safe`) | [logs/09-semgrep.txt](logs/09-semgrep.txt) | [captures/09-semgrep.png](captures/09-semgrep.png) |
+| 10 | Bandit : V2 (B608) et V3 (B105) | [logs/10-bandit.txt](logs/10-bandit.txt) | [captures/10-bandit.png](captures/10-bandit.png) |
+| 11 | pytest : 29 tests fonctionnels verts (connexion, rôles, notes, journaux, /healthz) | [logs/11-pytest-fonctionnels.txt](logs/11-pytest-fonctionnels.txt) | [captures/11-pytest-fonctionnels.png](captures/11-pytest-fonctionnels.png) |
+| 12 | pytest `-m security` : 4 échecs attendus (V1 IDOR, V2 injection SQL) | [logs/12-pytest-securite-echec-attendu.txt](logs/12-pytest-securite-echec-attendu.txt) | [captures/12-pytest-securite-echec-attendu.png](captures/12-pytest-securite-echec-attendu.png) |
+
 ### Captures manuelles (navigateur)
 
 | N° | URL | Ce qu'il faut montrer | Fichier attendu |

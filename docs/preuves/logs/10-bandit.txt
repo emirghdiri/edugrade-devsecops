@@ -1,0 +1,66 @@
+# Preuve : 10-bandit
+# Date   : 2026-11-11 17:35:31 CET
+# Dossier: .
+$ bandit -r app -q
+Run started:2026-11-11 16:35:31.487850+00:00
+
+Test results:
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '****MASQUÉ****'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/config.py:23:13
+22	# VULN-V3 (volontaire, voir docs/VULNERABILITES.md) : valeurs factices écrites en dur
+23	SECRET_KEY = "****MASQUÉ****"
+24	DB_PASSWORD = "****MASQUÉ****"
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '****MASQUÉ****'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/config.py:24:14
+23	SECRET_KEY = "****MASQUÉ****"
+24	DB_PASSWORD = "****MASQUÉ****"
+25	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: app/seed.py:68:14
+67	
+68	        rng = random.Random(2026)  # jeu de données reproductible
+69	        start = date(2026, 9, 15)
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/teacher.py:22:22
+21	    with get_db().cursor() as cur:
+22	        cur.execute(f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE '%{term}%' ORDER BY name")
+23	        return cur.fetchall()
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 494
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 3
+		Medium: 1
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 3
+		High: 1
+Files skipped (0):
+[code de retour : 1]
