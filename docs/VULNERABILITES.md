@@ -139,9 +139,8 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
   Anti-clickjacking Header », « X-Content-Type-Options Header Missing »).
 - **Preuve avant** : [30-app-b1-entetes-avant.png](preuves/captures/30-app-b1-entetes-avant.png),
   [logs/30-app-b1-entetes-avant.txt](preuves/logs/30-app-b1-entetes-avant.txt).
-- **Correctif** : _à venir (branche `fix/security-headers`)_ — en-têtes ajoutés dans
-  Nginx (`add_header ... always`).
-- **Preuve après** : _à venir_.
+- **Correctif** : fait (branche `fix/security-headers`) — `docker/nginx.conf` : `add_header ... always` pour Content-Security-Policy stricte (pas de script, pas de style en ligne, `frame-ancestors 'none'`), X-Frame-Options `DENY`, X-Content-Type-Options `nosniff`, Referrer-Policy `no-referrer`, Permissions-Policy, Cross-Origin-Opener/Resource/Embedder-Policy. Vérifié sans violation CSP dans Chromium. HSTS sera posé là où TLS est terminé (Ingress k3s).
+- **Preuve après** : job CI `dast` : plus d'alerte ZAP « CSP Header Not Set », « Missing Anti-clickjacking Header », « X-Content-Type-Options Header Missing » ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## Bonus 2 — XSS réfléchi dans la recherche
 
