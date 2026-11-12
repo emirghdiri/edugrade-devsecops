@@ -96,10 +96,8 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 - **Détection** : Gitleaks (bloquant dans le pipeline), Bandit (B105).
 - **Preuve avant** : [07-gitleaks-detect.png](preuves/captures/07-gitleaks-detect.png),
   [10-bandit.png](preuves/captures/10-bandit.png).
-- **Correctif** : relève de la Partie 2 — remplacer la valeur (rotation), lire
-  `SECRET_KEY` depuis l'environnement (GitHub Secret `APP_SECRET_KEY`, Secret
-  Kubernetes), purger l'historique (`git filter-repo`) puis vérifier que Gitleaks
-  ne détecte plus rien.
+- **Correctif** : fait (branche `fix/secrets`) — `app/config.py` ne contient plus aucun secret : `SECRET_KEY` et `POSTGRES_PASSWORD` viennent uniquement de l'environnement (`.env`, GitHub Secrets `APP_SECRET_KEY` / `POSTGRES_PASSWORD`, Secret Kubernetes) et l'application refuse de démarrer sans `SECRET_KEY`. **Rotation** : les anciennes valeurs ne sont plus utilisées nulle part ; un cookie forgé avec l'ancienne clé est refusé (preuve 70). **Historique** : non réécrit (`main` interdit le force push) ; exception Gitleaks limitée aux deux empreintes exactes du commit `f78fd00` (`.gitleaksignore`), justifiée dans `docs/POLITIQUE_BLOCAGE.md`.
+- **Preuve après** : job CI `secrets` (Gitleaks) vert ; preuve 70 : cookie forgé avec l'ancienne clé → HTTP 302 vers `/login` ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## V4 — Dépendance ancienne et vulnérable : PyYAML 5.3.1
 
