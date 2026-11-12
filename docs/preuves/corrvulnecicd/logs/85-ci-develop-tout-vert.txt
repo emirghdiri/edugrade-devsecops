@@ -1,0 +1,22 @@
+# Preuve : 85-ci-develop-tout-vert
+# Date   : 2026-11-12 20:31:41 WAT
+# Dossier: .
+$ gh run view 43288343488 --json headSha,event,conclusion -q '"develop \(.headSha[:7]) (\(.event)) : \(.conclusion)"'; gh run view 43288343488 --json jobs -q '.jobs[] | "\(.conclusion)\t\(.name)"'; scripts/ci_log.sh 43288343488 publish 'image publiée|signature vérifiée' --all
+develop a4511f2 (push) : success
+success	build-test
+success	image (build, trivy image, sbom)
+success	iac (trivy config, checkov)
+success	secrets (gitleaks)
+success	dependencies (trivy fs)
+success	sast (semgrep, bandit)
+success	security-tests (IDOR, SQLi)
+success	publish (ghcr, cosign)
+success	dast (compose, zap)
+Job : publish (ghcr, cosign) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43288343488/job/131428560410
+------------------------------------------------------------
+echo "image publiée : $DIGEST"
+image publiée : ghcr.io/emirghdiri/edugrade-backend@sha256:d3707f8d8e3c6083f6c12f9701997ff3fd688bf58a9d0ddf23a7c6b0e42b69db
+echo "signature vérifiée pour $DIGEST"
+signature vérifiée pour ghcr.io/emirghdiri/edugrade-backend@sha256:d3707f8d8e3c6083f6c12f9701997ff3fd688bf58a9d0ddf23a7c6b0e42b69db
+[code de retour : 0]
