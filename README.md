@@ -153,6 +153,12 @@ tableau de bord « Sécurité EduGrade ».
 | Manifestes durcis (UID fixe, lecture seule, `drop: [ALL]`, seccomp, pas de jeton de service) | `k8s/` |
 | Journaux → Alloy → Loki → Grafana, alertes (force brute, injection, IDOR) | `terraform/cluster/values/`, `terraform/cluster/grafana/` |
 
+## Modèle de menaces
+
+Modèle STRIDE final (actifs, frontières de confiance, menaces par catégorie,
+mesures, preuves, risques résiduels) : [`docs/STRIDE.md`](docs/STRIDE.md).
+Plan de réponse à incident : [`docs/PLAN_REPONSE_INCIDENT.md`](docs/PLAN_REPONSE_INCIDENT.md).
+
 ## Développement et tests
 
 ```bash
@@ -218,7 +224,7 @@ edugrade-devsecops/
 | Docker multi-stage non-root, Nginx, Docker Compose | ✅ |
 | Tests fonctionnels et de sécurité | ✅ |
 | Pipeline CI/CD bloquant (9 jobs), SBOM, signature Cosign — [`docs/POLITIQUE_BLOCAGE.md`](docs/POLITIQUE_BLOCAGE.md) | ✅ |
-| Terraform cluster, k3s, Kyverno, NetworkPolicies (V5) | ✅ (V5 : voir `fix/v5-egress`) |
+| Terraform cluster, k3s, Kyverno, NetworkPolicies ; V5 détectée puis corrigée | ✅ |
 | DAST (ZAP), observabilité (Prometheus, Grafana, Loki), réponse à incident — [`docs/PLAN_REPONSE_INCIDENT.md`](docs/PLAN_REPONSE_INCIDENT.md) | ✅ |
 | Corrections V1-V4, Bonus 1-2 (`fix/*`, preuves [`corrvulnecicd`](docs/preuves/corrvulnecicd/INDEX.md)) ; tag `v1.0-secure` | ✅ / 🔜 tag |
 
