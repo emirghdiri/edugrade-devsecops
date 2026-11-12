@@ -42,8 +42,16 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   resources:
-    requests: { cpu: 50m, memory: 128Mi }
-    limits: { memory: 384Mi }
+    requests: { cpu: 50m, memory: 192Mi }
+    limits: { memory: 512Mi }
+  # Grafana 13 met plusieurs minutes à démarrer après un redémarrage de WSL
+  # (migrations SQLite) : sans délai, la sonde de vie le tue en boucle.
+  livenessProbe:
+    httpGet: { path: /api/health, port: 3000 }
+    initialDelaySeconds: 120
+    timeoutSeconds: 10
+    periodSeconds: 20
+    failureThreshold: 10
   grafana.ini:
     analytics:
       reporting_enabled: false
