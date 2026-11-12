@@ -1,0 +1,35 @@
+# L'image applicative doit être signée par Cosign sans clé (OIDC GitHub)
+# depuis le workflow ci.yml, sur develop ou main uniquement, et l'entrée doit
+# figurer dans le journal de transparence Rekor. Une image non signée, ou signée
+# depuis une autre branche, est refusée à l'admission.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: edugrade-verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Image EduGrade signée par le pipeline
+    policies.kyverno.io/severity: high
+spec:
+  webhookTimeoutSeconds: 30
+  background: false
+  rules:
+    - name: signature-cosign-keyless
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/emirghdiri/edugrade-*"
+          failureAction: Enforce
+          mutateDigest: true
+          verifyDigest: true
+          required: true
+          attestors:
+            - entries:
+                - keyless:
+                    subjectRegExp: "^https://github.com/emirghdiri/edugrade-devsecops/.github/workflows/ci.yml@refs/heads/(develop|main)$"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev
