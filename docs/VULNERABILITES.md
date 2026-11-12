@@ -144,9 +144,8 @@ La faille V5 (mauvaise configuration IaC du cluster) est introduite en Partie 2,
   en second, le même bloc passe inaperçu. D'où la défense en profondeur (test de
   segmentation exécuté sur le cluster réel).
 - **Preuve avant** : voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md), section k3s.
-- **Correctif** : _à venir (branche `fix/v5-egress`)_ — suppression du bloc
-  `0.0.0.0/0` : le backend ne sort plus que vers la base (et le DNS).
-- **Preuve après** : _à venir_.
+- **Correctif** : fait (branche `fix/v5-egress`) — suppression du bloc `egress` vers `0.0.0.0/0` dans `terraform/cluster/network.tf` : le backend ne sort plus que vers `db:5432` (et le DNS via `allow-dns`).
+- **Preuve après** : job CI `iac` vert (plus de KUBE-0002) ; test de segmentation : backend → 1.1.1.1:443 **bloqué** ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## Bonus 1 — En-têtes de sécurité HTTP absents
 
