@@ -1,0 +1,52 @@
+# Preuve : 63-v2-sqli-apres
+# Date   : 2026-11-12 19:53:47 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281364009 security-tests 'test_sqli|test_idor|passed|failed' --all | grep -v '^FAILED'; scripts/ci_log.sh 43281364009 sast 'app/|constat' --all; scripts/ci_log.sh 43281364009 dast 'Synthèse|^(High|Medium|Low) |ÉCHEC|OK : aucune|^  - ' --all
+Job : security-tests (IDOR, SQLi) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281364009/job/131403692077
+------------------------------------------------------------
+tests/security/test_idor.py::test_student_cannot_read_another_student_grades FAILED [ 25%]
+tests/security/test_idor.py::test_idor_attempt_is_logged FAILED          [ 50%]
+tests/security/test_sqli.py::test_tautology_does_not_return_all_students PASSED [ 75%]
+tests/security/test_sqli.py::test_union_does_not_leak_password_hashes PASSED [100%]
+tests/security/test_idor.py:21: AssertionError
+_________________________ test_idor_attempt_is_logged __________________________
+    def test_idor_attempt_is_logged(client, user_ids, caplog):
+tests/security/test_idor.py:31: AssertionError
+================== 2 failed, 2 passed, 44 deselected in 1.50s ==================
+Job : sast (semgrep, bandit) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281364009/job/131403692209
+------------------------------------------------------------
+print(f"\n{len(res)} constat(s), dont {len(blocking)} ERROR (bloquant)")
+WARNING  django-no-csrf-token                     app/templates/base.html:36
+WARNING  django-no-csrf-token                     app/templates/confirm_delete.html:18
+WARNING  django-no-csrf-token                     app/templates/login.html:32
+WARNING  template-unescaped-with-safe             app/templates/teacher/students.html:46
+WARNING  django-no-csrf-token                     app/templates/teacher/subject_form.html:18
+WARNING  django-no-csrf-token                     app/templates/teacher/subjects.html:14
+26 constat(s), dont 0 ERROR (bloquant)
+echo "== Tous les constats (rapportés) =="
+echo "aucun constat bloquant"
+== Tous les constats (rapportés) ==
+app/config.py:23 B105 LOW/MEDIUM
+app/config.py:24 B105 LOW/MEDIUM
+app/seed.py:73 B311 LOW/HIGH
+aucun constat bloquant
+Job : dast (compose, zap) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281364009/job/131404297408
+------------------------------------------------------------
+=== Synthèse ZAP (risque | alerte | occurrences) ===
+High   | Cross Site Scripting (DOM Based) | 1
+High   | Cross Site Scripting (Reflected) | 1
+Medium | Content Security Policy (CSP) Header Not Set | 5
+Medium | Missing Anti-clickjacking Header | 5
+Low    | Cookie Slack Detector | 2
+Low    | Cross-Origin-Embedder-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Opener-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Resource-Policy Header Missing or Invalid | 5
+Low    | Permissions Policy Header Not Set | 5
+Low    | X-Content-Type-Options Header Missing | 5
+ÉCHEC : 2 alerte(s) High -> la livraison est bloquée.
+  - Cross Site Scripting (DOM Based): GET http://localhost:8080/teacher/students?q=%3Cscript%3Ealert(5397)%3C/script%3E param=q
+  - Cross Site Scripting (Reflected): GET http://localhost:8080/teacher/students?q=%3C%2Fh2%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch2%3E param=q
+[code de retour : 0]
