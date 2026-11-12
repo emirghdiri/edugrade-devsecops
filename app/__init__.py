@@ -29,12 +29,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     db.init_app(app)
     security.init_app(app)
 
-    from . import auth, management, student, teacher
+    from . import admin, auth, management, student, teacher
 
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(student.bp)
-    app.register_blueprint(teacher.bp)
-    app.register_blueprint(management.bp)
+    for module in (auth, student, teacher, management, admin):
+        app.register_blueprint(module.bp)
 
     @app.get("/healthz")
     def healthz():

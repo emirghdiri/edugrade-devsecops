@@ -19,8 +19,8 @@ def _average(grades: list[dict]) -> float | None:
 @bp.route("/")
 @login_required
 def index():
-    if session.get("role") == "teacher":
-        return redirect(url_for("teacher.students"))
+    if session.get("role") in ("teacher", "admin"):
+        return redirect(url_for("teacher.students" if session["role"] == "teacher" else "admin.users"))
     return redirect(url_for("student.dashboard"))
 
 

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Utilisateurs{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Utilisateurs</h1>
+    <p class="muted">Gérez les comptes enseignants et étudiants.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn" href="{{ url_for('admin.new_user', role='teacher') }}">{{ ui.icon("plus") }} Ajouter un enseignant</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.new_user', role='student') }}">{{ ui.icon("plus") }} Ajouter un étudiant</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-top">Enseignants <span class="stat-icon">{{ ui.icon("users") }}</span></div>
+    <div class="stat-value">{{ stats.teachers }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Étudiants <span class="stat-icon green">{{ ui.icon("cap") }}</span></div>
+    <div class="stat-value">{{ stats.students }}</div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Notes enregistrées <span class="stat-icon amber">{{ ui.icon("book") }}</span></div>
+    <div class="stat-value">{{ stats.grades }}</div>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Filtrer par rôle">
+  <a href="{{ url_for('admin.users') }}" class="{{ 'active' if not role }}">Tous</a>
+  <a href="{{ url_for('admin.users', role='teacher') }}" class="{{ 'active' if role == 'teacher' }}">Enseignants</a>
+  <a href="{{ url_for('admin.users', role='student') }}" class="{{ 'active' if role == 'student' }}">Étudiants</a>
+</nav>
+
+<section class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Rôle</th>
+          <th class="num hide-sm">Notes</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr data-testid="user-row">
+          <td>
+            <div class="person">
+              {{ ui.avatar(u.name, u.id, "sm") }}
+              <div>
+                <div class="person-name" data-testid="user-name">{{ u.name }}</div>
+                <div class="person-mail">{{ u.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-{{ u.role }}">{{ roles[u.role] }}</span></td>
+          <td class="num hide-sm">{{ u.grade_count if u.role == 'student' else "—" }}</td>
+          <td>
+            <div class="actions">
+              {% if u.role == 'student' %}
+              <a class="btn btn-sm" href="{{ url_for('student.grades', student_id=u.id) }}" title="Voir les notes">{{ ui.icon("eye", 15) }}<span>Notes</span></a>
+              {% endif %}
+              <a class="btn btn-sm" href="{{ url_for('admin.edit_user', user_id=u.id) }}">{{ ui.icon("edit", 15) }}<span>Modifier</span></a>
+              <a class="btn btn-sm btn-danger" href="{{ url_for('admin.delete_user', user_id=u.id) }}">{{ ui.icon("trash", 15) }}<span>Supprimer</span></a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">{{ ui.icon("users", 40) }}<div>Aucun utilisateur.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

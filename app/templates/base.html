@@ -17,9 +17,11 @@
       </a>
       {% if session.user_id %}
       <nav class="nav" aria-label="Navigation principale">
-        {% if session.role == 'teacher' %}
-          <a href="{{ url_for('teacher.students') }}" class="{{ 'active' if request.blueprint == 'teacher' or request.endpoint in ('student.grades', 'manage.new_student') }}">{{ ui.icon("users") }}<span>Étudiants</span></a>
-          <a href="{{ url_for('manage.subjects') }}" class="{{ 'active' if request.endpoint == 'manage.subjects' }}">{{ ui.icon("book") }}<span>Matières</span></a>
+        {% if session.role == 'admin' %}
+          <a href="{{ url_for('admin.users') }}" class="{{ 'active' if request.blueprint == 'admin' or request.endpoint == 'student.grades' }}">{{ ui.icon("users") }}<span>Utilisateurs</span></a>
+        {% elif session.role == 'teacher' %}
+          <a href="{{ url_for('teacher.students') }}" class="{{ 'active' if request.blueprint == 'teacher' or request.endpoint == 'student.grades' }}">{{ ui.icon("users") }}<span>Étudiants</span></a>
+          <a href="{{ url_for('manage.subjects') }}" class="{{ 'active' if request.blueprint == 'manage' }}">{{ ui.icon("book") }}<span>Matières</span></a>
         {% else %}
           <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint == 'student.dashboard' }}">{{ ui.icon("grid") }}<span>Tableau de bord</span></a>
           <a href="{{ url_for('student.grades', student_id=session.user_id) }}" class="{{ 'active' if request.endpoint == 'student.grades' }}">{{ ui.icon("book") }}<span>Mes notes</span></a>
@@ -28,7 +30,7 @@
       <div class="user">
         <div class="user-text">
           <span class="user-name">{{ session.name }}</span>
-          <span class="badge badge-{{ session.role }}">{{ 'Enseignant' if session.role == 'teacher' else 'Étudiant' }}</span>
+          <span class="badge badge-{{ session.role }}">{{ {'admin': 'Administrateur', 'teacher': 'Enseignant'}.get(session.role, 'Étudiant') }}</span>
         </div>
         {{ ui.avatar(session.name, session.user_id) }}
         <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
