@@ -34,8 +34,8 @@ spec:
         seccompProfile: { type: RuntimeDefault }
       containers:
         - name: backend
-          # Image du commit a4511f2 (develop), signée par ci.yml@refs/heads/develop.
-          image: ghcr.io/emirghdiri/edugrade-backend@sha256:d3707f8d8e3c6083f6c12f9701997ff3fd688bf58a9d0ddf23a7c6b0e42b69db
+          # Image du commit 82c0eaa (develop), signée par ci.yml@refs/heads/develop.
+          image: ghcr.io/emirghdiri/edugrade-backend@sha256:9992e9c40578b042a0256fbbda1951e3f0b9582744d522972644ed8eb2c7e9b0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
