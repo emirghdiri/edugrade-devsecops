@@ -26,9 +26,15 @@ ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# Correctifs de sécurité Debian appliqués à chaque build : l'image de base
+# peut avoir du retard sur les paquets corrigés (ex. zlib, CVE-2026-76844 /
+# CVE-2026-85091 relevées par Trivy image). Cache apt supprimé ensuite.
 # Utilisateur applicatif sans privilège, UID/GID fixes (10001) pour pouvoir
 # l'imposer côté Kubernetes (runAsUser) et dans les politiques Kyverno.
-RUN groupadd --system --gid 10001 app \
+RUN apt-get update \
+ && apt-get upgrade -y --no-install-recommends \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system --gid 10001 app \
  && useradd --system --uid 10001 --gid 10001 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin app \
  && python -m pip uninstall -y pip \
  && rm -rf /usr/local/lib/python3.12/ensurepip
