@@ -163,6 +163,6 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 - **Preuve avant** : [29-app-b2-xss-avant.png](preuves/captures/29-app-b2-xss-avant.png),
   [logs/29-app-b2-xss-avant.txt](preuves/logs/29-app-b2-xss-avant.txt),
   [09-semgrep.png](preuves/captures/09-semgrep.png).
-- **Correctif** : _à venir (branche `fix/xss`)_ — supprimer `|safe` (échappement
-  Jinja par défaut).
-- **Preuve après** : _à venir_.
+- **Correctif** : fait (branche `fix/xss`) — suppression du filtre `|safe` dans `app/templates/teacher/students.html` : l'échappement automatique de Jinja s'applique ; test de non-régression `tests/security/test_xss.py`.
+- **Preuve après** : jobs CI `dast` (plus d'alerte ZAP « Cross Site Scripting »), `sast` (plus de `template-unescaped-with-safe`) et `security-tests` ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
+
