@@ -12,12 +12,12 @@ ici ni dans les preuves (masquées `****MASQUÉ****`).
 
 | ID | Faille | Emplacement | OWASP Top 10 2021 | Détectée par | Preuve « avant » |
 |----|--------|-------------|-------------------|--------------|------------------|
-| V1 | IDOR sur les notes | `app/student.py:36-37` | A01 Broken Access Control | test pytest `tests/security/test_idor.py`, journaux | [26](preuves/captures/26-app-v1-idor-avant.png), [12](preuves/captures/12-pytest-securite-echec-attendu.png) |
+| V1 | IDOR sur les notes | `app/student.py:42-43` | A01 Broken Access Control | test pytest `tests/security/test_idor.py`, journaux | [26](preuves/captures/26-app-v1-idor-avant.png), [12](preuves/captures/12-pytest-securite-echec-attendu.png) |
 | V2 | Injection SQL (recherche) | `app/teacher.py:20-22` | A03 Injection | Semgrep, Bandit, ZAP, test pytest `tests/security/test_sqli.py` | [27](preuves/captures/27-app-v2-sqli-tautologie-avant.png), [28](preuves/captures/28-app-v2-sqli-union-avant.png), [09](preuves/captures/09-semgrep.png), [10](preuves/captures/10-bandit.png) |
 | V3 | Secrets écrits en dur | `app/config.py:22-24` | A07 Identification and Authentication Failures (CWE-798) | Gitleaks, Bandit | [07](preuves/captures/07-gitleaks-detect.png) |
 | V4 | Dépendance vulnérable (PyYAML 5.3.1) | `requirements.txt:5-6`, utilisée dans `app/config.py:14-17` | A06 Vulnerable and Outdated Components | Trivy fs, Trivy image | [08](preuves/captures/08-trivy-fs.png), [17](preuves/captures/17-trivy-image.png) |
 | Bonus 1 | En-têtes de sécurité absents | `docker/nginx.conf:4`, `app/__init__.py:65` | A05 Security Misconfiguration | ZAP baseline | [30](preuves/captures/30-app-b1-entetes-avant.png) |
-| Bonus 2 | XSS réfléchi | `app/templates/teacher/students.html:18-19` | A03 Injection (CWE-79) | Semgrep, ZAP | [29](preuves/captures/29-app-b2-xss-avant.png), [09](preuves/captures/09-semgrep.png) |
+| Bonus 2 | XSS réfléchi | `app/templates/teacher/students.html:44-45` | A03 Injection (CWE-79) | Semgrep, ZAP | [29](preuves/captures/29-app-b2-xss-avant.png), [09](preuves/captures/09-semgrep.png) |
 
 La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
@@ -25,7 +25,7 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
 ## V1 — IDOR (Insecure Direct Object Reference)
 
-- **Emplacement** : `app/student.py:36-37`, route `GET /grades/<student_id>`.
+- **Emplacement** : `app/student.py:42-43`, route `GET /grades/<student_id>`.
 - **Cause** : la route est protégée par `@login_required` uniquement. Elle ne vérifie
   pas que l'étudiant connecté est le propriétaire des notes demandées
   (`session["user_id"] == student_id`). L'identifiant est un entier séquentiel,
@@ -147,7 +147,7 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
 ## Bonus 2 — XSS réfléchi dans la recherche
 
-- **Emplacement** : `app/templates/teacher/students.html:18-19`.
+- **Emplacement** : `app/templates/teacher/students.html:44-45`.
 - **Cause** : le terme recherché est réaffiché avec le filtre Jinja `|safe`, qui
   désactive l'échappement automatique.
 - **Impact** : un lien piégé (`/teacher/students?q=<script>…</script>`) envoyé à un
