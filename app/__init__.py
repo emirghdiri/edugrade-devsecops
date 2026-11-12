@@ -61,8 +61,8 @@ def _register_error_handlers(app: Flask) -> None:
 
 
 def _register_request_log(app: Flask) -> None:
-    # VULN-B1 (volontaire, voir docs/VULNERABILITES.md) : aucune réponse ne reçoit
-    # d'en-tête de sécurité (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy).
+    # Les en-têtes de sécurité (Bonus 1) sont posés par le reverse proxy Nginx
+    # (docker/nginx.conf), point d'entrée unique de l'application.
     @app.after_request
     def log_request(response):
         if not request.path.startswith("/static") and request.path != "/healthz":
