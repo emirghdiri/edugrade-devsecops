@@ -27,7 +27,9 @@ def main() -> None:
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         page = browser.new_page(viewport={"width": 1440, "height": 900}, locale="fr-FR", color_scheme="light")
-        page.goto(args.url, wait_until="networkidle", timeout=60_000)
+        # « load » puis attente fixe : certaines pages (GitHub) gardent des
+        # connexions ouvertes et n'atteignent jamais « networkidle ».
+        page.goto(args.url, wait_until="load", timeout=120_000)
         page.wait_for_timeout(args.wait)
         if args.selector:
             page.locator(args.selector).first.screenshot(path=args.out)

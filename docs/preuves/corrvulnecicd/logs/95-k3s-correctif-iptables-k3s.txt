@@ -1,0 +1,9 @@
+# Preuve : 95-k3s-correctif-iptables-k3s
+# Date   : 2026-11-12 22:13:22 WAT
+# Dossier: .
+$ cat /etc/rancher/k3s/config.yaml; echo; echo 'Erreurs « Aborting sync » de kube-router (5 dernières minutes) :'; journalctl -u k3s --no-pager --since '-5min' | grep -c 'Aborting sync'
+prefer-bundled-bin: true
+
+Erreurs « Aborting sync » de kube-router (5 dernières minutes) :
+0
+[code de retour : 1]
