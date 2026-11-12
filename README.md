@@ -14,11 +14,15 @@ pipeline de sécurité bloquant, Kubernetes (k3s) durci, DAST et détection.
 | Rôle | Fonctionnalités |
 |------|-----------------|
 | Étudiant | Connexion ; consultation de ses notes (matière, note, date) |
-| Enseignant | Connexion ; liste des étudiants ; recherche par nom ; ajout et modification de notes |
+| Enseignant | Connexion ; liste des étudiants ; recherche par nom ; ajout et modification de notes ; création de comptes étudiants ; gestion des matières |
 
 Les rôles sont contrôlés côté serveur. Les journaux applicatifs sont émis en JSON
 sur la sortie standard (`login_success`, `login_failed`, `access_denied`,
-`suspicious_input`, `grade_created`, `grade_updated`).
+`suspicious_input`, `grade_created`, `grade_updated`, `student_created`,
+`subject_created`).
+
+Les matières par défaut sont lues dans `app/settings.yaml` au démarrage, puis
+gérées en base (table `subjects`) depuis la page « Matières ».
 
 ## Architecture
 

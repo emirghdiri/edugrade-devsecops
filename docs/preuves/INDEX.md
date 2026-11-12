@@ -64,6 +64,9 @@ Générées par `scripts/capture_app.py --phase avant` sur l'instance Docker Com
 | 28 | **V2 injection SQL** : `UNION` exfiltre les hachages de mots de passe | [captures/28-app-v2-sqli-union-avant.png](captures/28-app-v2-sqli-union-avant.png) | [logs/27-app-v2-sqli-avant.txt](logs/27-app-v2-sqli-avant.txt) |
 | 29 | **Bonus 2 XSS** : script injecté exécuté (bannière rouge) | [captures/29-app-b2-xss-avant.png](captures/29-app-b2-xss-avant.png) | [logs/29-app-b2-xss-avant.txt](logs/29-app-b2-xss-avant.txt) |
 | 30 | **Bonus 1** : en-têtes de sécurité absents (cookie masqué) | [captures/30-app-b1-entetes-avant.png](captures/30-app-b1-entetes-avant.png) | [logs/30-app-b1-entetes-avant.txt](logs/30-app-b1-entetes-avant.txt) |
+| 31 | Enseignante : formulaire de création d'un compte étudiant | [captures/31-app-ajout-etudiant-formulaire-avant.png](captures/31-app-ajout-etudiant-formulaire-avant.png) | |
+| 32 | Compte étudiant créé (page de ses notes, vide) | [captures/32-app-ajout-etudiant-resultat-avant.png](captures/32-app-ajout-etudiant-resultat-avant.png) | |
+| 33 | Gestion des matières : ajout d'une matière, nombre de notes et moyenne par matière | [captures/33-app-matieres-avant.png](captures/33-app-matieres-avant.png) | |
 
 ### Captures manuelles (navigateur)
 

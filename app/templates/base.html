@@ -18,7 +18,8 @@
       {% if session.user_id %}
       <nav class="nav" aria-label="Navigation principale">
         {% if session.role == 'teacher' %}
-          <a href="{{ url_for('teacher.students') }}" class="{{ 'active' if request.blueprint == 'teacher' or request.endpoint == 'student.grades' }}">{{ ui.icon("users") }}<span>Étudiants</span></a>
+          <a href="{{ url_for('teacher.students') }}" class="{{ 'active' if request.blueprint == 'teacher' or request.endpoint in ('student.grades', 'manage.new_student') }}">{{ ui.icon("users") }}<span>Étudiants</span></a>
+          <a href="{{ url_for('manage.subjects') }}" class="{{ 'active' if request.endpoint == 'manage.subjects' }}">{{ ui.icon("book") }}<span>Matières</span></a>
         {% else %}
           <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint == 'student.dashboard' }}">{{ ui.icon("grid") }}<span>Tableau de bord</span></a>
           <a href="{{ url_for('student.grades', student_id=session.user_id) }}" class="{{ 'active' if request.endpoint == 'student.grades' }}">{{ ui.icon("book") }}<span>Mes notes</span></a>

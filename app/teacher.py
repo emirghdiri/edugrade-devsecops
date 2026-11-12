@@ -7,9 +7,9 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 
 import psycopg
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
-from .db import execute, get_db, query_all, query_one
+from .db import execute, get_db, list_subjects, query_all, query_one
 from .logging_setup import detect_suspicious, log_event
 from .security import role_required
 
@@ -60,7 +60,7 @@ def _student_or_404(student_id: int | None) -> dict:
 
 def _validate_grade(form) -> tuple[dict, list[str]]:
     errors: list[str] = []
-    subjects = current_app.config["SUBJECTS"]
+    subjects = list_subjects()
 
     subject = form.get("subject", "")
     if subject not in subjects:
@@ -95,7 +95,7 @@ def new_grade():
         if errors:
             for e in errors:
                 flash(e, "error")
-            return render_template("teacher/grade_form.html", student=student, grade=grade, mode="new"), 400
+            return _grade_form(student, grade, "new"), 400
         row = execute(
             "INSERT INTO grades (student_id, subject, value, date) VALUES (%s, %s, %s, %s) RETURNING id",
             (student["id"], grade["subject"], grade["value"], grade["date"]),
@@ -104,7 +104,7 @@ def new_grade():
         flash(f"Note ajoutée pour {student['name']}.", "success")
         return redirect(url_for("student.grades", student_id=student["id"]))
 
-    return render_template("teacher/grade_form.html", student=student, grade=grade, mode="new")
+    return _grade_form(student, grade, "new")
 
 
 @bp.route("/grades/<int:grade_id>/edit", methods=["GET", "POST"])
@@ -121,7 +121,7 @@ def edit_grade(grade_id: int):
             for e in errors:
                 flash(e, "error")
             data["id"] = grade_id
-            return render_template("teacher/grade_form.html", student=student, grade=data, mode="edit"), 400
+            return _grade_form(student, data, "edit"), 400
         execute(
             "UPDATE grades SET subject = %s, value = %s, date = %s WHERE id = %s",
             (data["subject"], data["value"], data["date"], grade_id),
@@ -130,4 +130,12 @@ def edit_grade(grade_id: int):
         flash(f"Note modifiée pour {student['name']}.", "success")
         return redirect(url_for("student.grades", student_id=student["id"]))
 
-    return render_template("teacher/grade_form.html", student=student, grade=grade, mode="edit")
+    return _grade_form(student, grade, "edit")
+
+
+def _grade_form(student: dict, grade: dict, mode: str) -> str:
+    subjects = list_subjects()
+    # Une note existante peut porter une matière qui n'est plus proposée : on la garde sélectionnable.
+    if grade.get("subject") and grade["subject"] not in subjects:
+        subjects.append(grade["subject"])
+    return render_template("teacher/grade_form.html", student=student, grade=grade, mode=mode, subjects=subjects)

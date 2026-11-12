@@ -16,8 +16,8 @@ ici ni dans les preuves (masquées `****MASQUÉ****`).
 | V2 | Injection SQL (recherche) | `app/teacher.py:20-22` | A03 Injection | Semgrep, Bandit, ZAP, test pytest `tests/security/test_sqli.py` | [27](preuves/captures/27-app-v2-sqli-tautologie-avant.png), [28](preuves/captures/28-app-v2-sqli-union-avant.png), [09](preuves/captures/09-semgrep.png), [10](preuves/captures/10-bandit.png) |
 | V3 | Secrets écrits en dur | `app/config.py:22-24` | A07 Identification and Authentication Failures (CWE-798) | Gitleaks, Bandit | [07](preuves/captures/07-gitleaks-detect.png) |
 | V4 | Dépendance vulnérable (PyYAML 5.3.1) | `requirements.txt:5-6`, utilisée dans `app/config.py:14-17` | A06 Vulnerable and Outdated Components | Trivy fs, Trivy image | [08](preuves/captures/08-trivy-fs.png), [17](preuves/captures/17-trivy-image.png) |
-| Bonus 1 | En-têtes de sécurité absents | `docker/nginx.conf:4`, `app/__init__.py:65` | A05 Security Misconfiguration | ZAP baseline | [30](preuves/captures/30-app-b1-entetes-avant.png) |
-| Bonus 2 | XSS réfléchi | `app/templates/teacher/students.html:44-45` | A03 Injection (CWE-79) | Semgrep, ZAP | [29](preuves/captures/29-app-b2-xss-avant.png), [09](preuves/captures/09-semgrep.png) |
+| Bonus 1 | En-têtes de sécurité absents | `docker/nginx.conf:4`, `app/__init__.py:66` | A05 Security Misconfiguration | ZAP baseline | [30](preuves/captures/30-app-b1-entetes-avant.png) |
+| Bonus 2 | XSS réfléchi | `app/templates/teacher/students.html:45-46` | A03 Injection (CWE-79) | Semgrep, ZAP | [29](preuves/captures/29-app-b2-xss-avant.png), [09](preuves/captures/09-semgrep.png) |
 
 La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
@@ -126,7 +126,7 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
 ## Bonus 1 — En-têtes de sécurité HTTP absents
 
-- **Emplacement** : `docker/nginx.conf:4` (reverse proxy) et `app/__init__.py:65`
+- **Emplacement** : `docker/nginx.conf:4` (reverse proxy) et `app/__init__.py:66`
   (Flask) : aucun des deux n'ajoute d'en-tête de sécurité.
 - **Cause** : configuration par défaut, sans `Content-Security-Policy`,
   `X-Frame-Options`, `X-Content-Type-Options` ni `Referrer-Policy`.
@@ -147,7 +147,7 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 
 ## Bonus 2 — XSS réfléchi dans la recherche
 
-- **Emplacement** : `app/templates/teacher/students.html:44-45`.
+- **Emplacement** : `app/templates/teacher/students.html:45-46`.
 - **Cause** : le terme recherché est réaffiché avec le filtre Jinja `|safe`, qui
   désactive l'échappement automatique.
 - **Impact** : un lien piégé (`/teacher/students?q=<script>…</script>`) envoyé à un

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Matières{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Matières</h1>
+    <p class="muted">Les matières proposées lors de la saisie des notes.</p>
+  </div>
+</div>
+
+<section class="card add-card">
+  <div class="card-body">
+    <form method="post" class="inline-form" action="{{ url_for('manage.subjects') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field grow">
+        <label for="name">Nouvelle matière</label>
+        <div class="input-wrap">
+          {{ ui.icon("book") }}
+          <input id="name" name="name" type="text" value="{{ name }}" placeholder="Ex. : Sécurité des applications" minlength="2" maxlength="60" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">{{ ui.icon("plus") }} Ajouter la matière</button>
+    </form>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>{{ subjects|length }} matière{{ 's' if subjects|length > 1 }}</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Matière</th><th class="num">Notes</th><th>Moyenne</th></tr>
+      </thead>
+      <tbody>
+        {% for s in subjects %}
+        <tr data-testid="subject-row">
+          <td>{{ ui.subject(s.name) }}</td>
+          <td class="num">{{ s.grade_count }}</td>
+          <td>{% if s.average is not none %}{{ ui.grade(s.average) }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="empty">{{ ui.icon("book", 40) }}<div>Aucune matière.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

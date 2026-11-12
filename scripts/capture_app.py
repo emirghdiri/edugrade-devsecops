@@ -218,6 +218,22 @@ def main() -> int:
                 + ["", "# En-têtes de sécurité"]
                 + [f"{h}: {'PRÉSENT' if h in headers else 'ABSENT'}" for h in SECURITY_HEADERS])
 
+        # Gestion : création d'un étudiant et d'une matière (après les démonstrations,
+        # pour ne pas modifier les chiffres des failles)
+        teacher.goto(f"{base}/teacher/students/new")
+        teacher.fill("#name", "Nour Haddad")
+        teacher.fill("#email", f"nour.haddad.{args.phase}@edugrade.test")
+        teacher.fill("#password", "nour-initial-1")
+        rec.shot(teacher, 31, "ajout-etudiant-formulaire")
+        teacher.click("main form.form button[type=submit]")
+        teacher.wait_for_load_state("networkidle")
+        rec.shot(teacher, 32, "ajout-etudiant-resultat")
+        teacher.goto(f"{base}/teacher/subjects")
+        teacher.fill("#name", "Sécurité des applications")
+        teacher.click("main form.inline-form button[type=submit]")
+        teacher.wait_for_load_state("networkidle")
+        rec.shot(teacher, 33, "matieres")
+
         browser.close()
 
     print(f"{len(rec.files)} fichiers produits")

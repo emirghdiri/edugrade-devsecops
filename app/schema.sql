@@ -17,3 +17,11 @@ CREATE TABLE IF NOT EXISTS grades (
 );
 
 CREATE INDEX IF NOT EXISTS idx_grades_student_id ON grades (student_id);
+
+-- Matières proposées dans les formulaires (gérées par les enseignants).
+CREATE TABLE IF NOT EXISTS subjects (
+    id   SERIAL PRIMARY KEY,
+    name TEXT NOT NULL CHECK (length(name) BETWEEN 2 AND 60)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_subjects_name ON subjects (lower(name));

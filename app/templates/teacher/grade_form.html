@@ -25,10 +25,11 @@
         <label for="subject">Matière</label>
         <select id="subject" name="subject" required>
           <option value="">— Choisir une matière —</option>
-          {% for s in config.SUBJECTS %}
+          {% for s in subjects %}
             <option value="{{ s }}"{% if s == grade.subject %} selected{% endif %}>{{ s }}</option>
           {% endfor %}
         </select>
+        <span class="hint">Matière absente ? <a href="{{ url_for('manage.subjects') }}">Ajouter une matière</a></span>
       </div>
 
       <div class="form-row">
