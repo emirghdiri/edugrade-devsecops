@@ -30,6 +30,7 @@ if _deps.is_dir() and str(_deps) not in os.environ.get("LD_LIBRARY_PATH", ""):
 
 from playwright.sync_api import Browser, Page, sync_playwright  # noqa: E402
 
+ADMIN = ("nadia.mansour@edugrade.test", "nadia2026")
 TEACHER = ("claire.dubois@edugrade.test", "claire2026")
 STUDENT = ("lina.bensalah@edugrade.test", "lina2026")
 VICTIM = "Youssef Trabelsi"
@@ -218,21 +219,28 @@ def main() -> int:
                 + ["", "# En-têtes de sécurité"]
                 + [f"{h}: {'PRÉSENT' if h in headers else 'ABSENT'}" for h in SECURITY_HEADERS])
 
-        # Gestion : création d'un étudiant et d'une matière (après les démonstrations,
-        # pour ne pas modifier les chiffres des failles)
-        teacher.goto(f"{base}/teacher/students/new")
-        teacher.fill("#name", "Nour Haddad")
-        teacher.fill("#email", f"nour.haddad.{args.phase}@edugrade.test")
-        teacher.fill("#password", "nour-initial-1")
-        rec.shot(teacher, 31, "ajout-etudiant-formulaire")
-        teacher.click("main form.form button[type=submit]")
-        teacher.wait_for_load_state("networkidle")
-        rec.shot(teacher, 32, "ajout-etudiant-resultat")
+        # Gestion (après les démonstrations, pour ne pas modifier les chiffres des failles)
+        # Administrateur : création d'un compte enseignant puis liste des comptes
+        admin = login(browser, base, ADMIN)
+        admin.goto(f"{base}/admin/users/new?role=teacher")
+        admin.fill("#name", "Samir Ayari")
+        admin.fill("#email", f"samir.ayari.{args.phase}@edugrade.test")
+        admin.fill("#password", "samir-initial-1")
+        rec.shot(admin, 32, "admin-ajout-utilisateur")
+        admin.click("main form.form button[type=submit]")
+        admin.wait_for_load_state("networkidle")
+        rec.shot(admin, 31, "admin-utilisateurs")
+
+        # Enseignante : ajout d'une matière, puis confirmation de suppression d'une note
         teacher.goto(f"{base}/teacher/subjects")
         teacher.fill("#name", "Sécurité des applications")
         teacher.click("main form.inline-form button[type=submit]")
         teacher.wait_for_load_state("networkidle")
         rec.shot(teacher, 33, "matieres")
+        teacher.goto(f"{base}/grades/{sarah}")
+        teacher.locator('[data-testid="delete-grade"]').first.click()
+        teacher.wait_for_load_state("networkidle")
+        rec.shot(teacher, 34, "suppression-note-confirmation")
 
         browser.close()
 
