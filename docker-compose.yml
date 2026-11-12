@@ -1,0 +1,79 @@
+# EduGrade : frontend (Nginx) -> backend (Flask/Gunicorn) -> db (PostgreSQL 16)
+# Les variables viennent du fichier .env (voir .env.example, jamais versionné).
+name: edugrade
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-edugrade}
+      POSTGRES_USER: ${POSTGRES_USER:-edugrade}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: edugrade-backend:local
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: ${POSTGRES_DB:-edugrade}
+      POSTGRES_USER: ${POSTGRES_USER:-edugrade}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+      SECRET_KEY: ${SECRET_KEY:?définir SECRET_KEY dans .env}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  frontend:
+    image: nginxinc/nginx-unprivileged:1.29-alpine
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/nginx-health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - frontend
+    restart: unless-stopped
+
+networks:
+  # Réseau interne : la base n'est joignable que par le backend et n'a pas
+  # d'accès à l'extérieur.
+  backend:
+    internal: true
+  frontend: {}
+
+volumes:
+  pgdata:
