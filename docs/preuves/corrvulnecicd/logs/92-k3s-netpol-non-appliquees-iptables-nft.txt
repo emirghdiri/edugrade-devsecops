@@ -1,0 +1,28 @@
+# Preuve : 92-k3s-segmentation-v5-avant
+# Date   : 2026-11-12 22:08:11 WAT
+# Dossier: .
+$ scripts/k8s_segmentation_test.sh
+=== Segmentation réseau (NetworkPolicies) ===
+frontend -> backend:8000 (flux applicatif)                 attendu: autorisé obtenu: autorisé OK
+backend  -> db:5432 (flux applicatif)                      attendu: autorisé obtenu: autorisé OK
+frontend -> db:5432 (contournement du backend)             attendu: bloqué   obtenu: autorisé ÉCHEC
+frontend -> Internet 1.1.1.1:443                           attendu: bloqué   obtenu: autorisé ÉCHEC
+backend  -> Internet 1.1.1.1:443 (exfiltration, V5)        attendu: bloqué   obtenu: autorisé ÉCHEC
+
+=== Admission (Kyverno + Pod Security « restricted ») — dry-run serveur ===
+image EduGrade signée par develop (déployée)            attendu: accepté  obtenu: accepté  OK
+image EduGrade signée par une autre branche               attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-verify-image-signature" denied the request: Policy edugrade-verify-image-signature failed: Image EduG
+image EduGrade non signée (tag local)                     attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-verify-image-signature" denied the request: Policy edugrade-verify-image-signature failed: image ghcr
+image d'un registre non autorisé (busybox)                attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-pod-security failed: Image refusée : seules l'image EduGrade (ghcr.io/emirghdiri/edugrade-*), postgre
+tag latest                                                 attendu: refusé   obtenu: refusé   OK
+    motif : edugrade-pod-security failed: Image refusée : seules l'image EduGrade (ghcr.io/emirghdiri/edugrade-*), postgre
+pod sans runAsNonRoot (root possible)                      attendu: refusé   obtenu: refusé   OK
+    motif : violates PodSecurity "restricted:latest": runAsNonRoot != true (pod and container "c" must not set securityCon
+conteneur privileged                                       attendu: refusé   obtenu: refusé   OK
+    motif : 
+
+RÉSULTAT : au moins un test n'est pas conforme.
+[code de retour : 1]
