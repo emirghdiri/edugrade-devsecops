@@ -1,0 +1,15 @@
+# Preuve : 52-ci-erreur-pipeline-bandit-apres
+# Date   : 2026-11-12 19:32:37 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43279459278 sast '^== |^app/|aucun constat|Bandit \(' --all | grep -v 'echo '
+Job : sast (semgrep, bandit) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43279459278/job/131397106408
+------------------------------------------------------------
+== Tous les constats (rapportés) ==
+app/config.py:23 B105 LOW/MEDIUM
+app/config.py:24 B105 LOW/MEDIUM
+app/seed.py:73 B311 LOW/HIGH
+app/teacher.py:22 B608 MEDIUM/MEDIUM
+== Constats bloquants (HIGH, confiance >= MEDIUM) ==
+aucun constat bloquant
+[code de retour : 0]
