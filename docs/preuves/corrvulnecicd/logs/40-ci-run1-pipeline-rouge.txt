@@ -1,0 +1,14 @@
+# Preuve : 40-ci-run1-pipeline-rouge
+# Date   : 2026-11-12 19:19:06 WAT
+# Dossier: .
+$ gh run view 43276134672 -R emirghdiri/edugrade-devsecops --json jobs -q '.jobs[] | "\(.conclusion)\t\(.name)"'
+success	build-test
+failure	security-tests (IDOR, SQLi)
+failure	image (build, trivy image, sbom)
+failure	secrets (gitleaks)
+failure	sast (semgrep, bandit)
+failure	iac (trivy config, checkov)
+failure	dependencies (trivy fs)
+failure	dast (compose, zap)
+skipped	publish (ghcr, cosign)
+[code de retour : 0]

@@ -1,0 +1,13 @@
+# Preuve : 61-v1-idor-apres
+# Date   : 2026-11-12 19:53:20 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281357691 security-tests 'PASSED|FAILED|passed|failed' --all | grep -v '^FAILED'
+Job : security-tests (IDOR, SQLi) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281357691/job/131403568327
+------------------------------------------------------------
+tests/security/test_idor.py::test_student_cannot_read_another_student_grades PASSED [ 25%]
+tests/security/test_idor.py::test_idor_attempt_is_logged PASSED          [ 50%]
+tests/security/test_sqli.py::test_tautology_does_not_return_all_students FAILED [ 75%]
+tests/security/test_sqli.py::test_union_does_not_leak_password_hashes FAILED [100%]
+================== 2 failed, 2 passed, 44 deselected in 1.84s ==================
+[code de retour : 0]
