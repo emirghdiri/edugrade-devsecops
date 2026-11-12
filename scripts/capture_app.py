@@ -96,7 +96,7 @@ def student_ids(page: Page, base: str) -> dict[str, int]:
     page.goto(f"{base}/teacher/students")
     ids: dict[str, int] = {}
     for row in page.locator('[data-testid="student-row"]').all():
-        name = row.locator("td").first.inner_text().strip()
+        name = row.locator('[data-testid="student-name"]').inner_text().strip()
         href = row.locator("a", has_text="Voir les notes").get_attribute("href") or ""
         ids[name] = int(re.search(r"/grades/(\d+)", href).group(1))
     return ids
@@ -162,6 +162,7 @@ def main() -> int:
         teacher.select_option("#subject", "Systèmes")
         teacher.fill("#value", "16.5")
         teacher.fill("#date", "2026-11-10")
+        teacher.locator("#date").evaluate("el => el.blur()")
         rec.shot(teacher, 24, "ajout-note-formulaire")
         teacher.click("main form.form button[type=submit]")  # pas le bouton Déconnexion de l'en-tête
         teacher.wait_for_load_state("networkidle")
@@ -169,7 +170,7 @@ def main() -> int:
 
         # Étudiante : ses notes, puis V1 (IDOR) sur les notes d'un autre étudiant
         student = login(browser, base, STUDENT)
-        student.click("text=Mes notes")
+        student.click("nav >> text=Mes notes")
         student.wait_for_load_state("networkidle")
         rec.shot(student, 21, "etudiant-mes-notes")
 
