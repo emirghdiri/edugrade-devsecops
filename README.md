@@ -125,6 +125,34 @@ de `2026`** (exemple : `lina2026`).
 Les matières par défaut sont lues dans `app/settings.yaml` au démarrage, puis
 gérées en base depuis la page « Matières ».
 
+## Déploiement sur k3s (Partie 2)
+
+Prérequis : k3s (WSL2, `systemd` actif), `kubectl`, Helm 3, Terraform. Le
+kubeconfig est copié dans `~/.kube/config`.
+
+```bash
+cp /etc/rancher/k3s/k3s.yaml ~/.kube/config && chmod 600 ~/.kube/config
+scripts/fetch_charts.sh                              # charts Helm épinglés -> terraform/cluster/charts/
+terraform -chdir=terraform/cluster init
+terraform -chdir=terraform/cluster apply             # namespaces, Secrets, NetworkPolicies, Kyverno, Prometheus/Grafana, Loki, Alloy
+scripts/k8s_deploy.sh                                # application (k8s/), image signée vérifiée par Kyverno
+scripts/k8s_segmentation_test.sh                     # flux autorisés / interdits, images refusées
+```
+
+Application : <http://edugrade.localhost> · Grafana :
+`kubectl -n monitoring port-forward svc/kps-grafana 3000:80` puis
+<http://localhost:3000> (identifiants : Secret `monitoring/grafana-admin`),
+tableau de bord « Sécurité EduGrade ».
+
+| Contrôle | Où |
+|----------|----|
+| Pod Security Admission `restricted` sur `edugrade` | `terraform/cluster/main.tf` |
+| NetworkPolicies : default-deny, Traefik → frontend → backend → db | `terraform/cluster/network.tf` |
+| Secrets Kubernetes générés par Terraform (jamais dans git) | `terraform/cluster/main.tf` |
+| Kyverno : image signée par `ci.yml` sur develop/main, registres autorisés, pas de `latest`, non-root, pas de privilège | `policies/kyverno/` |
+| Manifestes durcis (UID fixe, lecture seule, `drop: [ALL]`, seccomp, pas de jeton de service) | `k8s/` |
+| Journaux → Alloy → Loki → Grafana, alertes (force brute, injection, IDOR) | `terraform/cluster/values/`, `terraform/cluster/grafana/` |
+
 ## Développement et tests
 
 ```bash
@@ -189,10 +217,10 @@ edugrade-devsecops/
 | Failles volontaires V1–V4, Bonus 1 et 2, documentées et prouvées | ✅ |
 | Docker multi-stage non-root, Nginx, Docker Compose | ✅ |
 | Tests fonctionnels et de sécurité | ✅ |
-| Pipeline CI/CD bloquant, SBOM, signature | 🔜 Partie 2 |
-| Terraform cluster, k3s, Kyverno, NetworkPolicies (V5) | 🔜 Partie 2 |
-| DAST (ZAP), observabilité, réponse à incident | 🔜 Partie 2 |
-| Corrections des failles (`fix/*`) et tag `v1.0-secure` | 🔜 |
+| Pipeline CI/CD bloquant (9 jobs), SBOM, signature Cosign — [`docs/POLITIQUE_BLOCAGE.md`](docs/POLITIQUE_BLOCAGE.md) | ✅ |
+| Terraform cluster, k3s, Kyverno, NetworkPolicies (V5) | ✅ (V5 : voir `fix/v5-egress`) |
+| DAST (ZAP), observabilité (Prometheus, Grafana, Loki), réponse à incident — [`docs/PLAN_REPONSE_INCIDENT.md`](docs/PLAN_REPONSE_INCIDENT.md) | ✅ |
+| Corrections V1-V4, Bonus 1-2 (`fix/*`, preuves [`corrvulnecicd`](docs/preuves/corrvulnecicd/INDEX.md)) ; tag `v1.0-secure` | ✅ / 🔜 tag |
 
 ## Organisation Git
 
