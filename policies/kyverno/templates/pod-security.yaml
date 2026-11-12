@@ -1,0 +1,105 @@
+# Règles de durcissement des pods du namespace edugrade (complètent la Pod
+# Security Admission « restricted » posée sur le namespace par Terraform).
+# Kyverno les applique aussi aux Deployment/StatefulSet (règles autogen).
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: edugrade-pod-security
+  annotations:
+    policies.kyverno.io/title: Durcissement des pods EduGrade
+    policies.kyverno.io/severity: high
+spec:
+  background: true
+  rules:
+    - name: registres-autorises
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      validate:
+        failureAction: Enforce
+        message: "Image refusée : seules l'image EduGrade (ghcr.io/emirghdiri/edugrade-*), postgres:16-alpine et nginxinc/nginx-unprivileged:1.29-alpine sont autorisées."
+        pattern:
+          spec:
+            =(initContainers):
+              - image: "ghcr.io/emirghdiri/edugrade-* | postgres:16-alpine* | docker.io/library/postgres:16-alpine* | nginxinc/nginx-unprivileged:1.29-alpine* | docker.io/nginxinc/nginx-unprivileged:1.29-alpine*"
+            containers:
+              - image: "ghcr.io/emirghdiri/edugrade-* | postgres:16-alpine* | docker.io/library/postgres:16-alpine* | nginxinc/nginx-unprivileged:1.29-alpine* | docker.io/nginxinc/nginx-unprivileged:1.29-alpine*"
+
+    - name: tag-obligatoire
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      validate:
+        failureAction: Enforce
+        message: "Image refusée : un tag explicite ou un digest est obligatoire."
+        pattern:
+          spec:
+            containers:
+              - image: "*:*"
+
+    - name: pas-de-latest
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      validate:
+        failureAction: Enforce
+        message: "Image refusée : le tag « latest » est interdit (image non reproductible)."
+        pattern:
+          spec:
+            =(initContainers):
+              - image: "!*:latest"
+            containers:
+              - image: "!*:latest"
+
+    - name: non-root
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      validate:
+        failureAction: Enforce
+        message: "Pod refusé : runAsNonRoot: true est obligatoire (pod ou chaque conteneur)."
+        anyPattern:
+          - spec:
+              securityContext:
+                runAsNonRoot: true
+              =(initContainers):
+                - =(securityContext):
+                    =(runAsNonRoot): true
+              containers:
+                - =(securityContext):
+                    =(runAsNonRoot): true
+          - spec:
+              =(initContainers):
+                - securityContext:
+                    runAsNonRoot: true
+              containers:
+                - securityContext:
+                    runAsNonRoot: true
+
+    - name: pas-de-privilege
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [edugrade]
+      validate:
+        failureAction: Enforce
+        message: "Pod refusé : privileged et allowPrivilegeEscalation sont interdits."
+        pattern:
+          spec:
+            =(initContainers):
+              - securityContext:
+                  =(privileged): "false"
+                  allowPrivilegeEscalation: "false"
+            containers:
+              - securityContext:
+                  =(privileged): "false"
+                  allowPrivilegeEscalation: "false"
