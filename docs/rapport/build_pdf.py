@@ -22,7 +22,7 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE / "EduGrade_Rapport_DevSecOps.pdf"
 MARGIN = {"top": "20mm", "bottom": "20mm", "left": "18mm", "right": "18mm"}
 FONT = "font-family:'DejaVu Sans',sans-serif;font-size:7.4pt;color:#5b6475;width:100%;padding:0 18mm;display:flex;justify-content:space-between"
-HEADER = f"""<div style="{FONT}"><span>EduGrade — Rapport de projet DevSecOps</span><span>TEK-UP University · ING-5-SSIR</span></div>"""
+HEADER = f"""<div style="{FONT}"><span>EduGrade — Rapport de projet DevSecOps</span><span>TEK-UP University · 5 SSIR D</span></div>"""
 FOOTER = f"""<div style="{FONT}"><span>Sécurisation de bout en bout d'une application web</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>"""
 
 

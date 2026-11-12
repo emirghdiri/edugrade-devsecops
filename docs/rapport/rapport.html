@@ -100,7 +100,6 @@
     <li class="lvl1"><span class="t">Chapitre 9 — Analyse des risques (STRIDE)</span><span class="dots"></span><span class="pg" data-ref="c9"></span></li>
     <li class="lvl1"><span class="t">Chapitre 10 — Difficultés rencontrées et enseignements</span><span class="dots"></span><span class="pg" data-ref="c10"></span></li>
     <li class="lvl1"><span class="t">Conclusion générale et perspectives</span><span class="dots"></span><span class="pg" data-ref="concl"></span></li>
-    <li class="lvl1"><span class="t">Déclaration d'usage de l'intelligence artificielle</span><span class="dots"></span><span class="pg" data-ref="ia"></span></li>
     <li class="lvl1"><span class="t">Annexes</span><span class="dots"></span><span class="pg" data-ref="annexes"></span></li>
   </ul>
 </section>
@@ -422,21 +421,6 @@
     <li>Épinglage des actions GitHub par empreinte et notifications d'alertes vers une messagerie.</li>
     <li>Détection à l'exécution (Falco) et base de données gérée avec sauvegardes chiffrées.</li>
   </ul>
-</section>
-
-<section class="chapter">
-  <div class="chapter-head"><div class="num">Déclaration</div><h1 id="ia">Usage de l'intelligence artificielle</h1></div>
-  <p>Conformément au cahier des charges, nous déclarons avoir utilisé un assistant d'intelligence artificielle, <b>Claude Code</b> (Anthropic), au cours du projet.</p>
-  <table>
-    <tr><th style="width:30%">Usage</th><th>Détail</th></tr>
-    <tr><td>Code et configuration</td><td>Propositions pour le workflow CI/CD, les scripts (ZAP, captures, tests de segmentation, scénario d'attaque), le Terraform du cluster, les règles Kyverno et les corrections des failles.</td></tr>
-    <tr><td>Diagnostic</td><td>Analyse des journaux d'échec et propositions de corrections.</td></tr>
-    <tr><td>Documentation</td><td>Aide à la rédaction de la politique de blocage, du modèle STRIDE, du plan de réponse à incident et du présent rapport.</td></tr>
-  </table>
-  <div class="box">
-    <span class="t">Contrôle humain</span>
-    <p>Toutes les propositions ont été relues. Chaque modification est passée par une Pull Request dont la fusion a été décidée par un membre de l'équipe&nbsp;; l'assistant n'avait pas le droit de fusionner. Les résultats présentés reposent sur les sorties des outils et non sur les affirmations de l'assistant&nbsp;: chaque preuve contient la commande exécutée, sa sortie et son code de retour, et chaque run du pipeline est consultable sur GitHub. Aucune donnée personnelle réelle ni aucun secret réel n'a été transmis à l'assistant.</p>
-  </div>
 </section>
 
 <section class="chapter">
