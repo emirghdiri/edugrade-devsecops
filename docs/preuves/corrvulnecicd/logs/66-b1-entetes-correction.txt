@@ -1,0 +1,50 @@
+# Preuve : 66-b1-entetes-correction
+# Date   : 2026-11-12 19:36:45 WAT
+# Dossier: .
+$ git show fix/security-headers --format='commit %h — %s%n%n%b' --stat && git show fix/security-headers --format= -- docker/nginx.conf
+commit 196448f — fix(B1): en-têtes de sécurité HTTP dans Nginx (CSP stricte, anti-clickjacking, nosniff...)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ app/__init__.py        |  4 ++--
+ docker/nginx.conf      | 18 +++++++++++++++---
+ docs/VULNERABILITES.md |  5 ++---
+ 3 files changed, 19 insertions(+), 8 deletions(-)
+diff --git a/docker/nginx.conf b/docker/nginx.conf
+index d1b1f36..90c2a4a 100644
+--- a/docker/nginx.conf
++++ b/docker/nginx.conf
+@@ -1,9 +1,12 @@
+ # Reverse proxy Nginx devant le backend Flask (image nginxinc/nginx-unprivileged,
+ # exécutée en non-root, écoute sur 8080).
+ #
+-# VULN-B1 (volontaire, voir docs/VULNERABILITES.md) : aucun en-tête de sécurité
+-# (Content-Security-Policy, X-Frame-Options, X-Content-Type-Options,
+-# Referrer-Policy) n'est ajouté aux réponses.
++# Correctif Bonus 1 : en-têtes de sécurité ajoutés à TOUTES les réponses
++# (« always » : y compris 4xx/5xx). Ils sont déclarés au niveau server et
++# hérités par les location qui n'ont pas leur propre add_header.
++# L'interface n'a ni JavaScript, ni style en ligne, ni ressource externe :
++# la CSP peut donc être stricte. HSTS est posé là où TLS est terminé (Ingress),
++# pas sur ce port HTTP local.
+ 
+ upstream edugrade_backend {
+     server backend:8000;
+@@ -16,6 +19,15 @@ server {
+     server_tokens off;
+     client_max_body_size 1m;
+ 
++    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
++    add_header X-Frame-Options "DENY" always;
++    add_header X-Content-Type-Options "nosniff" always;
++    add_header Referrer-Policy "no-referrer" always;
++    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
++    add_header Cross-Origin-Opener-Policy "same-origin" always;
++    add_header Cross-Origin-Resource-Policy "same-origin" always;
++    add_header Cross-Origin-Embedder-Policy "require-corp" always;
++
+     location / {
+         proxy_pass http://edugrade_backend;
+         proxy_http_version 1.1;
+[code de retour : 0]

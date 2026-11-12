@@ -1,0 +1,29 @@
+# Preuve : 65-b2-xss-apres
+# Date   : 2026-11-12 19:54:01 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281373154 dast 'Synthèse|^(High|Medium|Low) |ÉCHEC|OK : aucune|^  - ' --all; scripts/ci_log.sh 43281373154 sast 'students.html|constat' --all
+Job : dast (compose, zap) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281373154/job/131405230104
+------------------------------------------------------------
+=== Synthèse ZAP (risque | alerte | occurrences) ===
+High   | SQL Injection | 1
+Medium | Content Security Policy (CSP) Header Not Set | 5
+Medium | Missing Anti-clickjacking Header | 5
+Low    | Cookie Slack Detector | 1
+Low    | Cross-Origin-Embedder-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Opener-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Resource-Policy Header Missing or Invalid | 5
+Low    | Permissions Policy Header Not Set | 5
+Low    | X-Content-Type-Options Header Missing | 5
+ÉCHEC : 1 alerte(s) High -> la livraison est bloquée.
+  - SQL Injection: GET http://localhost:8080/teacher/students?q=%27 param=q
+Job : sast (semgrep, bandit) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281373154/job/131403726233
+------------------------------------------------------------
+print(f"\n{len(res)} constat(s), dont {len(blocking)} ERROR (bloquant)")
+27 constat(s), dont 1 ERROR (bloquant)
+echo "== Tous les constats (rapportés) =="
+echo "aucun constat bloquant"
+== Tous les constats (rapportés) ==
+aucun constat bloquant
+[code de retour : 0]

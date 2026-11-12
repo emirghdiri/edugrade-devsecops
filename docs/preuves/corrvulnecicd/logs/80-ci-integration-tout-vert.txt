@@ -1,0 +1,15 @@
+# Preuve : 80-ci-integration-tout-vert
+# Date   : 2026-11-12 19:55:47 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281516275 build-test 'passed' --all | tail -1; gh run view 43281516275 --json jobs -q '.jobs[] | "\(.conclusion)\t\(.name)"'
+======================= 44 passed, 5 deselected in 5.18s =======================
+success	build-test
+success	dependencies (trivy fs)
+success	image (build, trivy image, sbom)
+success	iac (trivy config, checkov)
+success	secrets (gitleaks)
+success	security-tests (IDOR, SQLi)
+success	sast (semgrep, bandit)
+success	dast (compose, zap)
+success	publish (ghcr, cosign)
+[code de retour : 0]

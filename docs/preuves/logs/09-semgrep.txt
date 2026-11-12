@@ -1,0 +1,97 @@
+# Preuve : 09-semgrep
+# Date   : 2026-11-11 17:35:30 CET
+# Dossier: .
+$ semgrep scan --config p/default --config p/security-audit --metrics=off --disable-version-check app/
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 20 files tracked by git with 1087 Code rules:
+                                                                                                                        
+  Language      Rules   Files          Origin      Rules                                                                
+ ─────────────────────────────        ───────────────────                                                               
+  <multilang>      64      20          Community    1087                                                                
+  python          244      10                                                                                           
+  html              1       7                                                                                           
+  yaml             35       1                                                                                           
+                                                                                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 5 (5 blocking)
+ • Rules run: 343
+ • Targets scanned: 20
+ • Parsed lines: ~97.4%
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 343 rules on 20 files: 5 findings.
+                   
+                   
+┌─────────────────┐
+│ 5 Code Findings │
+└─────────────────┘
+                  
+    app/teacher.py
+    ❯❱ python.lang.security.audit.formatted-sql-query.formatted-sql-query
+          ❰❰ Blocking ❱❱
+          Detected possible formatted SQL query. Use parameterized queries instead.
+          Details: https://sg.run/EkWw                                             
+                                                                                   
+           22┆ cur.execute(f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE
+               '%{term}%' ORDER BY name")                                                           
+   
+   ❯❯❱ python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
+          ❰❰ Blocking ❱❱
+          Avoiding SQL string concatenation: untrusted input concatenated with raw SQL query can result in SQL
+          Injection. In order to execute raw query safely, prepared statement should be used. SQLAlchemy      
+          provides TextualSQL to easily used prepared statement with named parameters. For complex SQL        
+          composition, use SQL Expression Language or Schema Definition Language. In most cases, SQLAlchemy   
+          ORM will be a better option.                                                                        
+          Details: https://sg.run/2b1L                                                                        
+                                                                                                              
+           22┆ cur.execute(f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE
+               '%{term}%' ORDER BY name")                                                           
+                           
+    app/templates/base.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+           27┆ <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
+           28┆   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+           29┆   <button type="submit" class="btn btn-ghost">Déconnexion</button>
+           30┆ </form>
+                            
+    app/templates/login.html
+    ❯❱ python.django.security.django-no-csrf-token.django-no-csrf-token
+          ❰❰ Blocking ❱❱
+          Manually-created forms in django templates should specify a csrf_token to prevent CSRF attacks.
+          Details: https://sg.run/N0Bp                                                                   
+                                                                                                         
+            7┆ <form method="post" class="form">
+            8┆   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            9┆   <label for="email">E-mail</label>
+           10┆   <input id="email" name="email" type="email" value="{{ email or '' }}"
+               autocomplete="username" required autofocus>                            
+           11┆   <label for="password">Mot de passe</label>
+           12┆   <input id="password" name="password" type="password" autocomplete="current-password"
+               required>                                                                             
+           13┆   <button type="submit" class="btn btn-primary">Se connecter</button>
+           14┆ </form>
+                                       
+    app/templates/teacher/students.html
+    ❯❱ python.flask.security.xss.audit.template-unescaped-with-safe.template-unescaped-with-safe
+          ❰❰ Blocking ❱❱
+          Detected a segment of a Flask template where autoescaping is explicitly disabled with '| safe'  
+          filter. This allows rendering of raw HTML in this segment. Ensure no user data is rendered here,
+          otherwise this is a cross-site scripting (XSS) vulnerability.                                   
+          Details: https://sg.run/W8og                                                                    
+                                                                                                          
+           19┆ <h2 id="search-title">Résultats pour « {{ q|safe }} » ({{ students|length }})</h2>
+
+[code de retour : 0]

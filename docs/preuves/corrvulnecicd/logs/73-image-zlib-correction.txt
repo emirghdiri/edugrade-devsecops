@@ -1,0 +1,36 @@
+# Preuve : 73-image-zlib-correction
+# Date   : 2026-11-12 19:36:47 WAT
+# Dossier: .
+$ git show fix/image-base --format='commit %h — %s%n%n%b' --stat && git show fix/image-base --format= -- docker/Dockerfile
+commit 98d1bcd — fix(image): applique les correctifs de sécurité Debian au build (zlib CVE-2026-76844, CVE-2026-85091)
+
+Trouvaille de Trivy image hors failles volontaires : l'image python:3.12-slim
+embarquait un zlib vulnérable alors qu'un correctif Debian existe.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ docker/Dockerfile | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+diff --git a/docker/Dockerfile b/docker/Dockerfile
+index af7580c..9d005f4 100644
+--- a/docker/Dockerfile
++++ b/docker/Dockerfile
+@@ -26,9 +26,15 @@ ENV PATH="/opt/venv/bin:$PATH" \
+     PYTHONDONTWRITEBYTECODE=1 \
+     PYTHONUNBUFFERED=1
+ 
++# Correctifs de sécurité Debian appliqués à chaque build : l'image de base
++# peut avoir du retard sur les paquets corrigés (ex. zlib, CVE-2026-76844 /
++# CVE-2026-85091 relevées par Trivy image). Cache apt supprimé ensuite.
+ # Utilisateur applicatif sans privilège, UID/GID fixes (10001) pour pouvoir
+ # l'imposer côté Kubernetes (runAsUser) et dans les politiques Kyverno.
+-RUN groupadd --system --gid 10001 app \
++RUN apt-get update \
++ && apt-get upgrade -y --no-install-recommends \
++ && rm -rf /var/lib/apt/lists/* \
++ && groupadd --system --gid 10001 app \
+  && useradd --system --uid 10001 --gid 10001 --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin app \
+  && python -m pip uninstall -y pip \
+  && rm -rf /usr/local/lib/python3.12/ensurepip
+[code de retour : 0]

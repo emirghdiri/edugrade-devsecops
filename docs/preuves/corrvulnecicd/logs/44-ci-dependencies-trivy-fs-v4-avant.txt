@@ -1,0 +1,15 @@
+# Preuve : 44-ci-dependencies-trivy-fs-v4-avant
+# Date   : 2026-11-12 19:19:30 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 dependencies '│|Total|##\[error\]'
+Job : dependencies (trivy fs) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385360900
+------------------------------------------------------------
+│      Target      │ Type │ Vulnerabilities │
+│ requirements.txt │ pip  │        1        │
+Total: 1 (HIGH: 0, CRITICAL: 1)
+│ Library │ Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version │                   Title                    │
+│ PyYAML  │ CVE-2020-14343 │ CRITICAL │ fixed  │ 5.3.1             │ 5.4           │ PyYAML: incomplete fix for CVE-2020-1747   │
+│         │                │          │        │                   │               │ https://avd.aquasec.com/nvd/cve-2020-14343 │
+##[error]Process completed with exit code 1.
+[code de retour : 0]

@@ -1,0 +1,25 @@
+# Preuve : 47-ci-dast-zap-v2-b1-b2-avant
+# Date   : 2026-11-12 19:19:54 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43276134672 dast 'Synthèse|^(High|Medium|Low) |ÉCHEC|^  - |##\[error\]'
+Job : dast (compose, zap) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43276134672/job/131385932890
+------------------------------------------------------------
+=== Synthèse ZAP (risque | alerte | occurrences) ===
+High   | Cross Site Scripting (DOM Based) | 1
+High   | Cross Site Scripting (Reflected) | 1
+High   | SQL Injection | 1
+Medium | Content Security Policy (CSP) Header Not Set | 5
+Medium | Missing Anti-clickjacking Header | 5
+Low    | Cookie Slack Detector | 1
+Low    | Cross-Origin-Embedder-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Opener-Policy Header Missing or Invalid | 4
+Low    | Cross-Origin-Resource-Policy Header Missing or Invalid | 5
+Low    | Permissions Policy Header Not Set | 5
+Low    | X-Content-Type-Options Header Missing | 5
+ÉCHEC : 3 alerte(s) High -> la livraison est bloquée.
+  - Cross Site Scripting (DOM Based): GET http://localhost:8080/teacher/students?q=%3Cscript%3Ealert(5397)%3C/script%3E param=q
+  - Cross Site Scripting (Reflected): GET http://localhost:8080/teacher/students?q=%3C%2Fh2%3E%3CscrIpt%3Ealert%281%29%3B%3C%2FscRipt%3E%3Ch2%3E param=q
+  - SQL Injection: GET http://localhost:8080/teacher/students?q=%27 param=q
+##[error]Process completed with exit code 1.
+[code de retour : 0]

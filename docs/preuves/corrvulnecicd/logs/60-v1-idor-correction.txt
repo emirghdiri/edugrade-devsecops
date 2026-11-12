@@ -1,0 +1,46 @@
+# Preuve : 60-v1-idor-correction
+# Date   : 2026-11-12 19:36:44 WAT
+# Dossier: .
+$ git show fix/idor --format='commit %h — %s%n%n%b' --stat && git show fix/idor --format= -- app/
+commit 03998a3 — fix(V1): contrôle d'appartenance sur /grades/<id> (403 + access_denied)
+
+Un étudiant ne lit plus que ses propres notes ; la tentative est journalisée.
+Enseignants et administrateur conservent l'accès.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+
+ app/student.py         | 9 ++++++++-
+ docs/VULNERABILITES.md | 5 ++---
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+diff --git a/app/student.py b/app/student.py
+index cc9d477..28cbc71 100644
+--- a/app/student.py
++++ b/app/student.py
+@@ -2,9 +2,12 @@
+ 
+ from __future__ import annotations
+ 
++import logging
++
+ from flask import Blueprint, abort, redirect, render_template, session, url_for
+ 
+ from .db import query_all, query_one
++from .logging_setup import log_event
+ from .security import login_required, role_required
+ 
+ bp = Blueprint("student", __name__)
+@@ -40,7 +43,11 @@ def dashboard():
+ @bp.route("/grades/<int:student_id>")
+ @login_required
+ def grades(student_id: int):
+-    # VULN-V1 (volontaire, voir docs/VULNERABILITES.md)
++    # Correctif V1 (IDOR) : contrôle d'appartenance côté serveur. Un étudiant ne
++    # lit que ses propres notes ; enseignants et administrateur gardent l'accès.
++    if session.get("role") == "student" and session.get("user_id") != student_id:
++        log_event("access_denied", status=403, level=logging.WARNING, reason="owner", target_student_id=student_id)
++        abort(403)
+     student = query_one("SELECT id, name, email FROM users WHERE id = %s AND role = 'student'", (student_id,))
+     if student is None:
+         abort(404)
+[code de retour : 0]

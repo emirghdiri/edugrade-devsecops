@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Namespace, Secrets et NetworkPolicies : créés par Terraform (terraform/cluster).
+namespace: edugrade
+resources:
+  - db.yaml
+  - backend.yaml
+  - frontend.yaml

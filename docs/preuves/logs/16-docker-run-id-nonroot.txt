@@ -1,0 +1,8 @@
+# Preuve : 16-docker-run-id-nonroot
+# Date   : 2026-11-11 18:10:01 CET
+# Dossier: .
+$ docker run --rm --entrypoint id edugrade-backend:local && docker image inspect edugrade-backend:local --format "User={{.Config.User}}" && docker run --rm --entrypoint sh edugrade-backend:local -c "command -v pip gcc || echo aucun outil pip/gcc dans l image"
+uid=10001(app) gid=10001(app) groups=10001(app)
+User=10001:10001
+aucun outil pip/gcc dans l image
+[code de retour : 0]

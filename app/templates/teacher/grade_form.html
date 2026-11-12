@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% set title = "Ajouter une note" if mode == "new" else "Modifier une note" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('student.grades', student_id=student.id) }}">{{ ui.icon("back", 16) }} Retour aux notes de {{ student.name }}</a>
+
+<section class="card card-narrow">
+  <div class="card-head">
+    <div class="person">
+      {{ ui.avatar(student.name, student.id) }}
+      <div>
+        <h2>{{ title }}</h2>
+        <div class="person-mail">Étudiant : {{ student.name }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="post" class="form"
+          action="{{ url_for('teacher.new_grade', student_id=student.id) if mode == 'new' else url_for('teacher.edit_grade', grade_id=grade.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% if mode == "new" %}<input type="hidden" name="student_id" value="{{ student.id }}">{% endif %}
+
+      <div class="field">
+        <label for="subject">Matière</label>
+        <select id="subject" name="subject" required>
+          <option value="">— Choisir une matière —</option>
+          {% for s in subjects %}
+            <option value="{{ s }}"{% if s == grade.subject %} selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        <span class="hint">Matière absente ? <a href="{{ url_for('manage.subjects') }}">Ajouter une matière</a></span>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="value">Note</label>
+          <input id="value" name="value" type="number" min="0" max="20" step="0.25" value="{{ grade.value if grade.value is not none }}" required>
+          <span class="hint">Sur 20, par pas de 0,25</span>
+        </div>
+        <div class="field">
+          <label for="date">Date de l'évaluation</label>
+          <input id="date" name="date" type="date" value="{{ grade.date.isoformat() if grade.date else '' }}" required>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ ui.icon("check") }} Enregistrer</button>
+        <a class="btn" href="{{ url_for('student.grades', student_id=student.id) }}">Annuler</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

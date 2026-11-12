@@ -1,0 +1,9 @@
+# Preuve : 14-docker-compose-ps
+# Date   : 2026-11-11 18:09:56 CET
+# Dossier: .
+$ docker compose ps
+NAME                  IMAGE                                     COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+edugrade-backend-1    edugrade-backend:local                    "/usr/local/bin/entr…"   backend    27 seconds ago   Up 25 seconds (healthy)   8000/tcp
+edugrade-db-1         postgres:16-alpine                        "docker-entrypoint.s…"   db         2 minutes ago    Up 2 minutes (healthy)    5432/tcp
+edugrade-frontend-1   nginxinc/nginx-unprivileged:1.29-alpine   "/docker-entrypoint.…"   frontend   2 minutes ago    Up 2 minutes (healthy)    0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+[code de retour : 0]

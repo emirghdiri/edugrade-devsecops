@@ -1,0 +1,69 @@
+{
+  "uid": "edugrade-securite",
+  "title": "Sécurité EduGrade",
+  "description": "Événements de sécurité de l'application (journaux JSON du backend, collectés par Alloy dans Loki).",
+  "tags": ["edugrade", "securite"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Connexions échouées (5 min)",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "instant", "expr": "sum(count_over_time({namespace=\"edugrade\", event=\"login_failed\"}[5m])) or vector(0)" }],
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 3 }, { "color": "red", "value": 6 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "id": 2, "type": "stat", "title": "Accès refusés — IDOR / rôle (5 min)",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "instant", "expr": "sum(count_over_time({namespace=\"edugrade\", event=\"access_denied\"}[5m])) or vector(0)" }],
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 4 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "id": 3, "type": "stat", "title": "Entrées suspectes — SQLi / XSS (5 min)",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "instant", "expr": "sum(count_over_time({namespace=\"edugrade\", event=\"suspicious_input\"}[5m])) or vector(0)" }],
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "id": 4, "type": "stat", "title": "Jetons CSRF invalides (5 min)",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "instant", "expr": "sum(count_over_time({namespace=\"edugrade\", event=\"csrf_failed\"}[5m])) or vector(0)" }],
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 } ] } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" }
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Événements de sécurité par minute",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 5 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "range", "legendFormat": "{{event}}", "expr": "sum by (event) (count_over_time({namespace=\"edugrade\", event=~\"login_failed|access_denied|suspicious_input|csrf_failed\"}[1m]))" }],
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "bars", "fillOpacity": 60, "stacking": { "mode": "normal" } }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } }
+    },
+    {
+      "id": 6, "type": "table", "title": "Adresses IP à l'origine des échecs (30 min)",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 5 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "instant", "expr": "sum by (ip, event) (count_over_time({namespace=\"edugrade\", event=~\"login_failed|access_denied|suspicious_input\"} | json ip=\"ip\" [30m]))" }],
+      "transformations": [{ "id": "reduce", "options": { "reducers": ["lastNotNull"] } }],
+      "options": { "showHeader": true }
+    },
+    {
+      "id": 7, "type": "logs", "title": "Journal des événements de sécurité",
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 14 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "refId": "A", "queryType": "range", "expr": "{namespace=\"edugrade\", event=~\"login_failed|access_denied|suspicious_input|csrf_failed\"}" }],
+      "options": { "showTime": true, "wrapLogMessage": true, "sortOrder": "Descending", "prettifyLogMessage": false }
+    }
+  ]
+}

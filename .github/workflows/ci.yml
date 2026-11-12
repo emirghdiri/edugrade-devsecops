@@ -1,0 +1,297 @@
+# Pipeline CI/CD DevSecOps d'EduGrade.
+#
+# Ordre (cahier §6.2) : build -> tests -> SAST -> secrets -> dépendances -> IaC
+#   -> build image -> Trivy image -> SBOM -> push GHCR (tag = SHA) -> signature
+#   -> Docker Compose de test -> DAST (ZAP).
+# Règles de blocage et justification : docs/POLITIQUE_BLOCAGE.md.
+#
+# Principe : ce qui est scanné est ce qui est livré. L'image est construite une
+# seule fois (job image-scan), transmise en artefact, puis publiée et signée
+# (job publish) seulement si TOUS les contrôles sont verts.
+
+name: CI DevSecOps
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/edugrade-backend
+  TRIVY_IMAGE: aquasec/trivy:0.76.2
+  GITLEAKS_IMAGE: ghcr.io/gitleaks/gitleaks:v8.30.1
+  SEMGREP_IMAGE: semgrep/semgrep:1.185.0
+  SYFT_IMAGE: anchore/syft:v1.18.0
+
+jobs:
+  # 1-2. Build + tests fonctionnels. Nom imposé par la protection de main.
+  build-test:
+    name: build-test
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: edugrade
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: edugrade_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U edugrade -d edugrade_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: host=127.0.0.1 port=5432 dbname=edugrade_test user=edugrade password=${{ secrets.POSTGRES_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Build (installation des dépendances + compilation)
+        run: |
+          pip install -r requirements-dev.txt
+          python -m compileall -q app
+      - name: Tests fonctionnels (pytest -m "not security")
+        run: pytest -m "not security" --junitxml=reports/pytest.xml
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: pytest-report
+          path: reports/
+
+  # Tests de sécurité scriptés : V1 (IDOR) et V2 (injection SQL).
+  security-tests:
+    name: security-tests (IDOR, SQLi)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: edugrade
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: edugrade_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U edugrade -d edugrade_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: host=127.0.0.1 port=5432 dbname=edugrade_test user=edugrade password=${{ secrets.POSTGRES_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - name: pytest -m security
+        run: pytest -m security -v
+
+  # 3. SAST : Semgrep (bloque sur ERROR) + Bandit (bloque sur HIGH).
+  sast:
+    name: sast (semgrep, bandit)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Semgrep (p/default + p/security-audit)
+        run: |
+          mkdir -p reports
+          docker run --rm -v "$PWD:/src" -w /src "$SEMGREP_IMAGE" \
+            semgrep scan --config p/default --config p/security-audit --metrics=off \
+            --exclude tests --exclude scripts --json -o reports/semgrep.json .
+          python3 - <<'PY'
+          import json, sys
+          res = json.load(open("reports/semgrep.json"))["results"]
+          for r in res:
+              print(f'{r["extra"]["severity"]:<8} {r["check_id"].split(".")[-1]:<40} {r["path"]}:{r["start"]["line"]}')
+          blocking = [r for r in res if r["extra"]["severity"] == "ERROR"]
+          print(f"\n{len(res)} constat(s), dont {len(blocking)} ERROR (bloquant)")
+          sys.exit(1 if blocking else 0)
+          PY
+      # Format « custom » sans {msg} ni extrait de code : Bandit cite sinon la
+      # valeur des mots de passe en dur (B105) dans un journal public.
+      - name: Bandit (HIGH bloquant, tout est rapporté)
+        if: ${{ !cancelled() }}
+        env:
+          FMT: "{relpath}:{line} {test_id} {severity}/{confidence}"
+        run: |
+          pip install bandit==1.9.4
+          echo "== Tous les constats (rapportés) =="
+          bandit -r app -q -f custom --msg-template "$FMT" --exit-zero | tee reports/bandit.txt
+          echo "== Constats bloquants (HIGH, confiance >= MEDIUM) =="
+          bandit -r app -q -f custom --msg-template "$FMT" --severity-level high --confidence-level medium
+          echo "aucun constat bloquant"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: sast-reports
+          path: reports/
+
+  # 4. Secrets : Gitleaks sur TOUT l'historique git.
+  secrets:
+    name: secrets (gitleaks)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (historique complet, valeurs masquées)
+        run: |
+          mkdir -p reports
+          docker run --rm -v "$PWD:/repo" "$GITLEAKS_IMAGE" git /repo \
+            --redact --no-banner -v --exit-code 1 \
+            --report-format json --report-path /repo/reports/gitleaks.json
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: gitleaks-report
+          path: reports/
+
+  # 5. Dépendances : Trivy fs (HIGH/CRITICAL avec correctif disponible).
+  dependencies:
+    name: dependencies (trivy fs)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Trivy fs
+        run: |
+          docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" fs --scanners vuln \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 /src
+
+  # 6. IaC : Trivy config (bloquant HIGH/CRITICAL) + Checkov (rapport).
+  iac:
+    name: iac (trivy config, checkov)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Trivy config (terraform, Dockerfile, k8s)
+        run: |
+          docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" config \
+            --severity HIGH,CRITICAL --exit-code 1 --ignorefile /src/.trivyignore.yaml /src
+      - name: Checkov (rapport, non bloquant)
+        if: ${{ !cancelled() }}
+        run: |
+          pip install checkov
+          checkov -d . --framework terraform dockerfile kubernetes --compact --quiet --soft-fail
+
+  # 7-9. Build de l'image, Trivy image, SBOM (Syft).
+  image-scan:
+    name: image (build, trivy image, sbom)
+    needs: build-test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build de l'image backend (tag = SHA)
+        run: |
+          docker build -f docker/Dockerfile -t "$IMAGE_NAME:${{ github.sha }}" .
+          docker save "$IMAGE_NAME:${{ github.sha }}" -o image.tar
+      # Transmise avant les contrôles : le DAST l'utilise même si Trivy bloque ;
+      # le job publish, lui, exige que ce job soit entièrement vert.
+      - uses: actions/upload-artifact@v6
+        with:
+          name: image
+          path: image.tar
+          retention-days: 1
+      - name: SBOM (Syft, SPDX JSON)
+        run: |
+          mkdir -p reports
+          docker run --rm -v "$PWD:/w" "$SYFT_IMAGE" docker-archive:/w/image.tar \
+            -o spdx-json=/w/reports/sbom.spdx.json
+          python3 -c "import json;d=json.load(open('reports/sbom.spdx.json'));print(len(d['packages']),'paquets dans la SBOM')"
+      - name: Trivy image (HIGH/CRITICAL avec correctif)
+        run: |
+          docker run --rm -v "$PWD:/w" "$TRIVY_IMAGE" image --input /w/image.tar \
+            --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: sbom
+          path: reports/sbom.spdx.json
+
+  # 10-11. Push GHCR + signature Cosign sans clé (OIDC), seulement si tout est vert
+  #        et seulement sur develop/main (pas sur les Pull Requests).
+  publish:
+    name: publish (ghcr, cosign)
+    needs: [build-test, security-tests, sast, secrets, dependencies, iac, image-scan]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          name: image
+      - uses: actions/download-artifact@v6
+        with:
+          name: sbom
+      - uses: sigstore/cosign-installer@v3
+      - name: Push GHCR (tag = SHA du commit)
+        run: |
+          docker load -i image.tar
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE_NAME:${{ github.sha }}"
+          DIGEST="$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE_NAME:${{ github.sha }}")"
+          echo "DIGEST=$DIGEST" >> "$GITHUB_ENV"
+          echo "image publiée : $DIGEST"
+      - name: Signature + attestation SBOM (Cosign keyless)
+        run: |
+          cosign sign --yes "$DIGEST"
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "$DIGEST"
+      - name: Vérification de la signature
+        run: |
+          cosign verify "$DIGEST" \
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}/.github/workflows/ci.yml@" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com > /dev/null
+          echo "signature vérifiée pour $DIGEST"
+
+  # 12-13. Docker Compose de test + DAST OWASP ZAP (scan actif authentifié).
+  #        Lancé même si un contrôle précédent échoue, pour produire le rapport.
+  dast:
+    name: dast (compose, zap)
+    needs: [build-test, image-scan]
+    if: ${{ !cancelled() && needs.build-test.result == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v6
+        with:
+          name: image
+      - name: Docker Compose (image scannée)
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+        run: |
+          docker load -i image.tar
+          docker tag "$IMAGE_NAME:${{ github.sha }}" edugrade-backend:local
+          printf 'POSTGRES_PASSWORD=%s\nSECRET_KEY=%s\n' "$POSTGRES_PASSWORD" "$SECRET_KEY" > .env
+          docker compose up -d --no-build --wait
+          docker compose ps
+          curl -sf http://localhost:8080/healthz
+      - name: OWASP ZAP (High = bloquant)
+        run: scripts/zap_scan.sh http://localhost:8080
+      - name: Journaux applicatifs
+        if: always()
+        run: docker compose logs backend --no-log-prefix | tail -50
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: zap-report
+          path: reports/zap/

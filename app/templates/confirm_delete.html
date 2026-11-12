@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="card card-narrow danger-card">
+  <div class="card-body">
+    <div class="danger-head">
+      <span class="stat-icon red">{{ ui.icon("trash") }}</span>
+      <div>
+        <h1>{{ title }}</h1>
+        <p class="muted">{{ message }}</p>
+      </div>
+    </div>
+    <ul class="details">
+      {% for d in details %}<li>{{ d }}</li>{% endfor %}
+    </ul>
+    <div class="form-actions">
+      <form method="post" action="{{ action }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger-solid">{{ ui.icon("trash") }} Confirmer la suppression</button>
+      </form>
+      <form method="get" action="{{ cancel }}" class="inline">
+        <button type="submit" class="btn">Annuler</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

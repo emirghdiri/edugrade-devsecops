@@ -1,0 +1,33 @@
+# Preuve : 98-k3s-scenario-attaque
+# Date   : 2026-11-12 22:29:35 WAT
+# Dossier: .
+$ scripts/attack_scenario.sh
+[22:29:31] 1. Force brute sur claire.dubois@edugrade.test
+   essai 123456       -> HTTP 401
+   essai password     -> HTTP 401
+   essai azerty       -> HTTP 401
+   essai claire       -> HTTP 401
+   essai edugrade     -> HTTP 401
+   essai 2026         -> HTTP 401
+   essai Claire2026   -> HTTP 401
+   essai claire2025   -> HTTP 401
+   essai admin        -> HTTP 401
+   essai motdepasse   -> HTTP 401
+   essai qwerty       -> HTTP 401
+   essai letmein      -> HTTP 401
+[22:29:34] 2. Connexion réussie (compte de démonstration)
+   -> HTTP 302
+[22:29:34] 3. Injections dans /teacher/students?q=
+   ' OR '1'='1                                             -> HTTP 200, 0 ligne(s), hachage divulgué : non
+   %' UNION SELECT id, name, password_hash FROM users --   -> HTTP 200, 0 ligne(s), hachage divulgué : non
+   <script>alert(document.cookie)</script>                 -> HTTP 200, 0 ligne(s), hachage divulgué : non
+   '; DROP TABLE grades; --                                -> HTTP 200, 0 ligne(s), hachage divulgué : non
+[22:29:34] 4. Énumération IDOR par lina.bensalah@edugrade.test
+   GET /grades/4 -> HTTP 403
+   GET /grades/5 -> HTTP 403
+   GET /grades/6 -> HTTP 403
+   GET /grades/7 -> HTTP 403
+   GET /grades/8 -> HTTP 403
+   GET /grades/9 -> HTTP 403
+[22:29:35] Scénario terminé : vérifier Grafana « Sécurité EduGrade » et les alertes.
+[code de retour : 0]
