@@ -22,9 +22,16 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     configure_logging(app.config["LOG_LEVEL"])
 
-    # Nginx est le seul proxy devant l'application : on lui fait confiance
-    # pour l'IP cliente et le schéma d'origine.
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+    # IP cliente : on remonte X-Forwarded-For d'autant de proxys de confiance
+    # qu'il y en a réellement (Nginx seul en Compose ; Traefik + Nginx en k3s).
+    # Schéma et hôte d'origine : Nginx les réécrit (une seule valeur).
+    try:
+        proxies = int(app.config["TRUSTED_PROXY_COUNT"])
+    except (TypeError, ValueError):
+        proxies = 0
+    if not 1 <= proxies <= 3:
+        raise RuntimeError("TRUSTED_PROXY_COUNT doit être un entier entre 1 et 3.")
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=proxies, x_proto=1, x_host=1)
 
     db.init_app(app)
     security.init_app(app)

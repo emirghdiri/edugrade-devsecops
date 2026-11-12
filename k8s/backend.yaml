@@ -51,6 +51,9 @@ spec:
               valueFrom:
                 secretKeyRef: { name: edugrade-app, key: SECRET_KEY }
             - { name: LOG_LEVEL, value: INFO }
+            # Traefik (Ingress) puis Nginx (frontend) : 2 proxys de confiance
+            # pour journaliser l'IP réelle du client.
+            - { name: TRUSTED_PROXY_COUNT, value: "2" }
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
