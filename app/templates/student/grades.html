@@ -1,51 +1,77 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
 {% block title %}Notes de {{ student.name }}{% endblock %}
 {% block content %}
+{% if session.role == 'teacher' %}
+  <a class="back" href="{{ url_for('teacher.students') }}">{{ ui.icon("back", 16) }} Retour aux étudiants</a>
+{% endif %}
+
 <div class="page-head">
-  <div>
-    <h1>Notes de {{ student.name }}</h1>
-    <p class="muted">{{ student.email }}</p>
+  <div class="lead">
+    {{ ui.avatar(student.name, student.id, "lg") }}
+    <div>
+      <h1>Notes de {{ student.name }}</h1>
+      <p class="muted">{{ student.email }}</p>
+    </div>
   </div>
   {% if session.role == 'teacher' %}
-    <a class="btn btn-primary" href="{{ url_for('teacher.new_grade', student_id=student.id) }}">Ajouter une note</a>
+    <a class="btn btn-primary" href="{{ url_for('teacher.new_grade', student_id=student.id) }}">{{ ui.icon("plus") }} Ajouter une note</a>
   {% endif %}
 </div>
 
+{% set values = grades|map(attribute='value')|list %}
 <div class="stats">
   <div class="stat">
-    <div class="stat-label">Nombre de notes</div>
+    <div class="stat-top">Moyenne <span class="stat-icon">{{ ui.icon("chart") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small> / 20</small></div>
+    {% if average is not none %}
+      <div class="stat-sub">{{ ui.mention(average) }}</div>
+      <progress class="bar" value="{{ average }}" max="20">{{ "%.2f"|format(average) }} / 20</progress>
+    {% endif %}
+  </div>
+  <div class="stat">
+    <div class="stat-top">Nombre de notes <span class="stat-icon green">{{ ui.icon("book") }}</span></div>
     <div class="stat-value">{{ grades|length }}</div>
   </div>
   <div class="stat">
-    <div class="stat-label">Moyenne</div>
-    <div class="stat-value">{{ "%.2f"|format(average) if average is not none else "—" }}<small class="muted"> / 20</small></div>
+    <div class="stat-top">Note la plus haute <span class="stat-icon amber">{{ ui.icon("trend") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(values|max) if values else "—" }}<small> / 20</small></div>
+  </div>
+  <div class="stat">
+    <div class="stat-top">Note la plus basse <span class="stat-icon red">{{ ui.icon("down") }}</span></div>
+    <div class="stat-value">{{ "%.2f"|format(values|min) if values else "—" }}<small> / 20</small></div>
   </div>
 </div>
 
-<div class="table-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Matière</th>
-        <th class="num">Note</th>
-        <th>Date</th>
-        {% if session.role == 'teacher' %}<th></th>{% endif %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for g in grades %}
-      <tr data-testid="grade-row">
-        <td>{{ g.subject }}</td>
-        <td class="num {{ 'grade-good' if g.value >= 10 else 'grade-bad' }}">{{ "%.2f"|format(g.value) }}</td>
-        <td>{{ g.date.strftime('%d/%m/%Y') }}</td>
-        {% if session.role == 'teacher' %}
-        <td class="actions"><a class="btn btn-small" href="{{ url_for('teacher.edit_grade', grade_id=g.id) }}">Modifier</a></td>
-        {% endif %}
-      </tr>
-      {% else %}
-      <tr><td colspan="4" class="empty">Aucune note pour le moment.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+<section class="card">
+  <div class="card-head"><h2>Détail des évaluations</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Matière</th>
+          <th>Note</th>
+          <th class="hide-sm">Mention</th>
+          <th>Date</th>
+          {% if session.role == 'teacher' %}<th><span class="sr-only">Actions</span></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for g in grades %}
+        <tr data-testid="grade-row">
+          <td>{{ ui.subject(g.subject) }}</td>
+          <td>{{ ui.grade(g.value) }}</td>
+          <td class="hide-sm muted">{{ ui.mention(g.value) }}</td>
+          <td>{{ g.date.strftime('%d/%m/%Y') }}</td>
+          {% if session.role == 'teacher' %}
+          <td><div class="actions"><a class="btn btn-sm" href="{{ url_for('teacher.edit_grade', grade_id=g.id) }}">{{ ui.icon("edit", 15) }}<span>Modifier</span></a></div></td>
+          {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">{{ ui.icon("book", 40) }}<div>Aucune note pour le moment.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}

@@ -27,8 +27,14 @@ def index():
 @bp.route("/dashboard")
 @role_required("student")
 def dashboard():
-    grades = query_all("SELECT value FROM grades WHERE student_id = %s", (session["user_id"],))
-    return render_template("student/dashboard.html", count=len(grades), average=_average(grades))
+    rows = query_all(
+        "SELECT subject, value, date FROM grades WHERE student_id = %s ORDER BY date DESC, subject",
+        (session["user_id"],),
+    )
+    best = max(rows, key=lambda g: g["value"], default=None)
+    return render_template(
+        "student/dashboard.html", count=len(rows), average=_average(rows), best=best, recent=rows[:4]
+    )
 
 
 @bp.route("/grades/<int:student_id>")
