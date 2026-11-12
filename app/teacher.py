@@ -17,9 +17,15 @@ bp = Blueprint("teacher", __name__, url_prefix="/teacher")
 
 
 def search_students(term: str) -> list[dict]:
-    # VULN-V2 (volontaire, voir docs/VULNERABILITES.md)
+    # Correctif V2 (injection SQL) : le terme est un paramètre lié, jamais
+    # concaténé à la requête. Les jokers LIKE saisis (%, _) sont échappés pour
+    # être cherchés tels quels.
+    escaped = term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     with get_db().cursor() as cur:
-        cur.execute(f"SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE '%{term}%' ORDER BY name")
+        cur.execute(
+            "SELECT id, name, email FROM users WHERE role = 'student' AND name ILIKE %s ORDER BY name",
+            (f"%{escaped}%",),
+        )
         return cur.fetchall()
 
 
