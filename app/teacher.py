@@ -133,6 +133,34 @@ def edit_grade(grade_id: int):
     return _grade_form(student, grade, "edit")
 
 
+@bp.route("/grades/<int:grade_id>/delete", methods=["GET", "POST"])
+@role_required("teacher")
+def delete_grade(grade_id: int):
+    grade = query_one(
+        "SELECT g.id, g.student_id, g.subject, g.value, g.date, u.name AS student_name "
+        "FROM grades g JOIN users u ON u.id = g.student_id WHERE g.id = %s",
+        (grade_id,),
+    )
+    if grade is None:
+        abort(404)
+    if request.method == "POST":
+        execute("DELETE FROM grades WHERE id = %s", (grade_id,))
+        log_event("grade_deleted", status=302, grade_id=grade_id, student_id=grade["student_id"])
+        flash(f"Note supprimée pour {grade['student_name']}.", "success")
+        return redirect(url_for("student.grades", student_id=grade["student_id"]))
+    return render_template(
+        "confirm_delete.html",
+        title="Supprimer une note",
+        message="Cette action est définitive.",
+        details=[
+            f"Étudiant : {grade['student_name']}",
+            f"{grade['subject']} — {grade['value']:.2f} / 20 — {grade['date'].strftime('%d/%m/%Y')}",
+        ],
+        action=url_for("teacher.delete_grade", grade_id=grade_id),
+        cancel=url_for("student.grades", student_id=grade["student_id"]),
+    )
+
+
 def _grade_form(student: dict, grade: dict, mode: str) -> str:
     subjects = list_subjects()
     # Une note existante peut porter une matière qui n'est plus proposée : on la garde sélectionnable.
