@@ -77,9 +77,8 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
   [28-app-v2-sqli-union-avant.png](preuves/captures/28-app-v2-sqli-union-avant.png),
   [logs/27-app-v2-sqli-avant.txt](preuves/logs/27-app-v2-sqli-avant.txt),
   [09-semgrep.png](preuves/captures/09-semgrep.png), [10-bandit.png](preuves/captures/10-bandit.png).
-- **Correctif** : _à venir (branche `fix/sqli`)_ — requête paramétrée
-  (`ILIKE %s` + paramètre), le journal `suspicious_input` restant actif.
-- **Preuve après** : _à venir_.
+- **Correctif** : fait (branche `fix/sqli`) — `app/teacher.py` : requête paramétrée (`ILIKE %s` + paramètre lié), jokers LIKE échappés ; l'événement `suspicious_input` reste journalisé.
+- **Preuve après** : jobs CI `security-tests` (`tests/security/test_sqli.py` vert), `sast` (plus de constat Semgrep ERROR) et `dast` (plus d'alerte ZAP « SQL Injection ») ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## V3 — Secrets écrits en dur
 
