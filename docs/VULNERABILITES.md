@@ -18,8 +18,10 @@ ici ni dans les preuves (masquées `****MASQUÉ****`).
 | V4 | Dépendance vulnérable (PyYAML 5.3.1) | `requirements.txt:5-6`, utilisée dans `app/config.py:14-17` | A06 Vulnerable and Outdated Components | Trivy fs, Trivy image | [08](preuves/captures/08-trivy-fs.png), [17](preuves/captures/17-trivy-image.png) |
 | Bonus 1 | En-têtes de sécurité absents | `docker/nginx.conf:4`, `app/__init__.py:64` | A05 Security Misconfiguration | ZAP baseline | [30](preuves/captures/30-app-b1-entetes-avant.png) |
 | Bonus 2 | XSS réfléchi | `app/templates/teacher/students.html:45-46` | A03 Injection (CWE-79) | Semgrep, ZAP | [29](preuves/captures/29-app-b2-xss-avant.png), [09](preuves/captures/09-semgrep.png) |
+| V5 | NetworkPolicy trop permissive (sortie Internet du backend) | `terraform/cluster/network.tf` (policy `backend`) | A05 Security Misconfiguration | Trivy config (KUBE-0002), test de segmentation | [preuves 9x](preuves/corrvulnecicd/INDEX.md) |
 
-La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
+La faille V5 (mauvaise configuration IaC du cluster) est introduite en Partie 2, dans
+`terraform/cluster/`.
 
 ---
 
@@ -119,6 +121,32 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
   [17-trivy-image.png](preuves/captures/17-trivy-image.png).
 - **Correctif** : fait (branche `fix/pyyaml`) — `requirements.txt` : `PyYAML==6.0.3` ; `app/config.py` : `yaml.safe_load` au lieu de `yaml.full_load` (aucune construction d'objet Python, même si un YAML externe était chargé un jour).
 - **Preuve après** : jobs CI `dependencies` (Trivy fs) et `image` (Trivy image) : plus de CVE-2020-14343 ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
+
+## V5 — NetworkPolicy trop permissive : sortie Internet du backend
+
+- **Emplacement** : `terraform/cluster/network.tf`, ressource
+  `kubernetes_network_policy.backend`, bloc `egress` vers `ip_block 0.0.0.0/0`.
+- **Cause** : en plus du flux légitime backend → db:5432, la politique ouvre la
+  sortie du backend vers **toute adresse IP** (« pour les mises à jour »). Elle
+  annule l'effet du `default-deny-all` pour le composant le plus exposé.
+- **Impact** : un backend compromis (injection SQL V2, clé de session V3,
+  dépendance vulnérable V4) peut **exfiltrer** la base ou ouvrir un canal de
+  commande vers l'extérieur ; la segmentation ne limite plus la fuite.
+- **OWASP** : A05:2021 Security Misconfiguration (CWE-284, contrôle d'accès réseau).
+- **Reproduire** :
+  ```bash
+  trivy config --severity HIGH,CRITICAL terraform/cluster   # KUBE-0002 (HIGH)
+  scripts/k8s_segmentation_test.sh                          # backend -> 1.1.1.1:443 autorisé
+  ```
+- **Détection** : job CI `iac` (Trivy config, règle KUBE-0002 « Network policy
+  allows unrestricted egress to any IP address ») ; test de segmentation.
+  Limite constatée : la règle n'examine que le **premier** bloc `egress` ; placé
+  en second, le même bloc passe inaperçu. D'où la défense en profondeur (test de
+  segmentation exécuté sur le cluster réel).
+- **Preuve avant** : voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md), section k3s.
+- **Correctif** : _à venir (branche `fix/v5-egress`)_ — suppression du bloc
+  `0.0.0.0/0` : le backend ne sort plus que vers la base (et le DNS).
+- **Preuve après** : _à venir_.
 
 ## Bonus 1 — En-têtes de sécurité HTTP absents
 
