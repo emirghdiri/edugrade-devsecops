@@ -13,8 +13,9 @@ SETTINGS_PATH = Path(__file__).with_name("settings.yaml")
 
 def load_settings(path: Path = SETTINGS_PATH) -> dict:
     """Charge les paramètres fonctionnels (matières, barème) depuis le fichier YAML."""
+    # Correctif V4 : safe_load ne construit jamais d'objet Python arbitraire.
     with open(path, encoding="utf-8") as fh:
-        return yaml.full_load(fh) or {}
+        return yaml.safe_load(fh) or {}
 
 
 SETTINGS = load_settings()
