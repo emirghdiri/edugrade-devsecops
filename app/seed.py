@@ -49,9 +49,12 @@ def seed_database(conn: psycopg.Connection, subjects: list[str], reset: bool = F
     """Renvoie True si les données ont été insérées, False si la base était déjà peuplée."""
     with conn.transaction():
         if reset:
-            conn.execute("DROP TABLE IF EXISTS grades, users CASCADE")
+            conn.execute("DROP TABLE IF EXISTS grades, users, subjects CASCADE")
         init_schema(conn)
         cur = conn.cursor(row_factory=tuple_row)
+        # Matières par défaut (settings.yaml) : ajoutées si absentes, même sur une base existante.
+        for name in subjects:
+            cur.execute("INSERT INTO subjects (name) VALUES (%s) ON CONFLICT DO NOTHING", (name,))
         if cur.execute("SELECT count(*) FROM users").fetchone()[0]:
             return False
 

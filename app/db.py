@@ -52,6 +52,10 @@ def execute(sql: str, params: tuple | dict | None = None) -> dict[str, Any] | No
     return row
 
 
+def list_subjects() -> list[str]:
+    return [row["name"] for row in query_all("SELECT name FROM subjects ORDER BY name")]
+
+
 def init_schema(conn: psycopg.Connection) -> None:
     conn.execute(SCHEMA_PATH.read_text(encoding="utf-8"))
 
