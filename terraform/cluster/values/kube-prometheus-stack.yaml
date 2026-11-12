@@ -6,6 +6,13 @@ kubeControllerManager: { enabled: false }
 kubeScheduler: { enabled: false }
 kubeProxy: { enabled: false }
 
+# WSL2 : « / » n'est pas un montage partagé ; le montage rslave de la racine de
+# l'hôte par node-exporter échoue (CreateContainerError). Métriques du nœud
+# conservées, sans celles des systèmes de fichiers de l'hôte.
+prometheus-node-exporter:
+  hostRootFsMount:
+    enabled: false
+
 prometheus:
   prometheusSpec:
     retention: 2d

@@ -11,7 +11,7 @@ resource "helm_release" "kyverno" {
   chart            = "${path.module}/charts/kyverno-${var.chart_versions.kyverno}.tgz"
   namespace        = "kyverno"
   create_namespace = true
-  timeout          = 600
+  timeout          = 900
   values           = [file("${path.module}/values/kyverno.yaml")]
 }
 
