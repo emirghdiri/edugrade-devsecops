@@ -6,6 +6,7 @@
 #   CAPTURE_CWD=<dossier>   dossier où exécuter la commande (défaut : dossier courant)
 #   CAPTURE_TITLE=<titre>   titre affiché dans la capture (défaut : le nom)
 #   CAPTURE_MASK=<regex>    motif ERE supplémentaire à masquer dans la sortie
+#   CAPTURE_DIR=<dossier>   dossier de preuves (défaut : docs/preuves), qui reçoit logs/ et captures/
 #
 # Le code de retour de la commande est conservé et renvoyé.
 set -uo pipefail
@@ -19,8 +20,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NAME="$1"; shift
 CMD="$*"
 RUN_DIR="${CAPTURE_CWD:-$PWD}"
-LOG_DIR="$ROOT/docs/preuves/logs"
-CAP_DIR="$ROOT/docs/preuves/captures"
+PROOF_DIR="${CAPTURE_DIR:-$ROOT/docs/preuves}"
+LOG_DIR="$PROOF_DIR/logs"
+CAP_DIR="$PROOF_DIR/captures"
 PYTHON="${CAPTURE_PYTHON:-$ROOT/.venv/bin/python}"
 mkdir -p "$LOG_DIR" "$CAP_DIR"
 
