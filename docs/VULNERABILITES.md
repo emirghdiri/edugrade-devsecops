@@ -121,8 +121,8 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 - **Détection** : Trivy fs (dépendances), Trivy image (image construite).
 - **Preuve avant** : [08-trivy-fs.png](preuves/captures/08-trivy-fs.png),
   [17-trivy-image.png](preuves/captures/17-trivy-image.png).
-- **Correctif** : relève de la Partie 2 — mise à jour vers une version corrigée
-  (PyYAML ≥ 5.4, idéalement 6.x) et `yaml.safe_load`.
+- **Correctif** : fait (branche `fix/pyyaml`) — `requirements.txt` : `PyYAML==6.0.3` ; `app/config.py` : `yaml.safe_load` au lieu de `yaml.full_load` (aucune construction d'objet Python, même si un YAML externe était chargé un jour).
+- **Preuve après** : jobs CI `dependencies` (Trivy fs) et `image` (Trivy image) : plus de CVE-2020-14343 ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## Bonus 1 — En-têtes de sécurité HTTP absents
 
