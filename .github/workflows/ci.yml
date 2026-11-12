@@ -183,7 +183,7 @@ jobs:
       - name: Trivy config (terraform, Dockerfile, k8s)
         run: |
           docker run --rm -v "$PWD:/src" "$TRIVY_IMAGE" config \
-            --severity HIGH,CRITICAL --exit-code 1 --ignorefile /src/.trivyignore /src
+            --severity HIGH,CRITICAL --exit-code 1 --ignorefile /src/.trivyignore.yaml /src
       - name: Checkov (rapport, non bloquant)
         if: ${{ !cancelled() }}
         run: |
