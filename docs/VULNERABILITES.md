@@ -47,9 +47,8 @@ La faille V5 (mauvaise configuration IaC du cluster) relève de la Partie 2.
 - **Preuve avant** : [26-app-v1-idor-avant.png](preuves/captures/26-app-v1-idor-avant.png),
   [logs/26-app-v1-idor-avant.txt](preuves/logs/26-app-v1-idor-avant.txt),
   [12-pytest-securite-echec-attendu.png](preuves/captures/12-pytest-securite-echec-attendu.png).
-- **Correctif** : _à venir (branche `fix/idor`)_ — contrôle d'appartenance côté
-  serveur (403 + journal `access_denied`), l'enseignant gardant l'accès à tous.
-- **Preuve après** : _à venir_.
+- **Correctif** : fait (branche `fix/idor`) — `app/student.py` : si le rôle est étudiant et que `student_id` n'est pas le sien, réponse **403** et événement `access_denied` (`reason=owner`) ; enseignants et administrateur gardent l'accès à tous les étudiants.
+- **Preuve après** : job CI `security-tests` : `tests/security/test_idor.py` vert ; voir [corrvulnecicd](preuves/corrvulnecicd/INDEX.md).
 
 ## V2 — Injection SQL dans la recherche d'étudiants
 
