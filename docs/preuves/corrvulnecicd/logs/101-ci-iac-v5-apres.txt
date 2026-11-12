@@ -1,0 +1,19 @@
+# Preuve : 101-ci-iac-v5-apres
+# Date   : 2026-11-12 22:33:42 WAT
+# Dossier: .
+$ gh run view 43307713298 --json jobs -q '.jobs[] | "\(.conclusion)\t\(.name)"'; scripts/ci_log.sh 43307713298 iac 'network.tf|terraform/cluster|Failures:|Tests:' --all
+success	build-test
+success	iac (trivy config, checkov)
+success	security-tests (IDOR, SQLi)
+success	image (build, trivy image, sbom)
+success	dependencies (trivy fs)
+success	sast (semgrep, bandit)
+success	secrets (gitleaks)
+success	dast (compose, zap)
+skipped	publish (ghcr, cosign)
+Job : iac (trivy config, checkov) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43307713298/job/131495718137
+------------------------------------------------------------
+234.57 KiB / 234.57 KiB [------------------------------------------------------] 100.00% ? p/s 100ms2026-11-12T21:12:04Z	INFO	[terraform scanner] Scanning root module	file_path="terraform/cluster"
+│ terraform/cluster                                      │ terraform  │         0         │
+[code de retour : 0]
