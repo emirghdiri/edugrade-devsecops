@@ -1,0 +1,13 @@
+# Preuve : 102-ip-client-avant
+# Date   : 2026-11-12 22:41:53 WAT
+# Dossier: .
+$ kubectl -n edugrade exec deploy/backend -- printenv TRUSTED_PROXY_COUNT || echo 'TRUSTED_PROXY_COUNT absent (image a4511f2 : x_for=1 en dur)'; echo; echo 'IP journalisées par le backend (10 dernières requêtes) :'; kubectl -n edugrade logs deploy/backend --tail=400 | grep -o '"ip": "[^"]*"' | sort | uniq -c; echo; echo 'Pod Traefik :'; kubectl -n kube-system get pod -l app.kubernetes.io/name=traefik -o wide --no-headers | awk '{print $1, $6}'
+command terminated with exit code 1
+TRUSTED_PROXY_COUNT absent (image a4511f2 : x_for=1 en dur)
+
+IP journalisées par le backend (10 dernières requêtes) :
+    190 "ip": "10.42.0.9"
+
+Pod Traefik :
+traefik-68df944ff7-5cc7k 10.42.0.9
+[code de retour : 0]
