@@ -39,6 +39,12 @@ class Config:
 
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
+    # Nombre de reverse proxys de confiance devant l'application, pour retrouver
+    # l'IP réelle du client dans X-Forwarded-For : 1 en Docker Compose (Nginx),
+    # 2 dans k3s (Traefik puis Nginx). Une valeur trop grande permettrait à un
+    # client de choisir l'IP journalisée en forgeant l'en-tête.
+    TRUSTED_PROXY_COUNT = os.environ.get("TRUSTED_PROXY_COUNT", "1")
+
     SESSION_COOKIE_NAME = "edugrade_session"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
