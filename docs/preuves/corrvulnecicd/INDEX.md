@@ -95,7 +95,7 @@ est vert une fois les corrections réunies.
 | 90 | `terraform plan` du cluster : 20 ressources (namespaces, Secrets, 5 NetworkPolicies, Kyverno + règles, Prometheus/Grafana, Loki, Alloy, tableau de bord, alertes) | [log](logs/90-k3s-terraform-plan.txt) | [capture](captures/90-k3s-terraform-plan.png) |
 | 91 | Cluster appliqué : état Terraform, namespaces (PSA `restricted` sur `edugrade`), Secrets, NetworkPolicies, releases Helm, règles Kyverno `READY` | [log](logs/91-k3s-cluster-terraform-apply.txt) | [capture](captures/91-k3s-cluster-terraform-apply.png) |
 | 92 | **Trouvaille** : NetworkPolicies non appliquées — le frontend joint la base et Internet. Cause : `iptables-restore` v1.8.11 (nf_tables) d'Ubuntu 26.04 incompatible avec kube-router de k3s (« Aborting sync ») | [log](logs/92-k3s-netpol-non-appliquees-iptables-nft.txt) | [capture](captures/92-k3s-netpol-non-appliquees-iptables-nft.png) |
-| 95 | Correction : `prefer-bundled-bin: true` dans `/etc/rancher/k3s/config.yaml` (iptables fournis par k3s) ; plus aucune erreur de synchronisation | [log](logs/95-k3s-correctif-iptables-k3s.txt) | [capture](captures/95-k3s-correctif-iptables-k3s.png) |
+| 95 | Première correction : `prefer-bundled-bin: true` (iptables fournis par k3s) — NetworkPolicies appliquées, **mais** après un redémarrage à froid de WSL plus aucun Service ne répondait (règles de deux iptables différents). Remplacée par la preuve 105 | [log](logs/95-k3s-correctif-iptables-k3s.txt) | [capture](captures/95-k3s-correctif-iptables-k3s.png) |
 
 ### V5 — NetworkPolicy backend ouverte vers Internet
 
@@ -115,7 +115,18 @@ est vert une fois les corrections réunies.
 | 99 | Loki : événements `login_failed`, `suspicious_input`, `access_denied` retrouvés avec utilisateur, rôle, route, statut ; **3 alertes Grafana `firing`** (force brute, injection, IDOR) | [log](logs/99-k3s-detection-loki-alertes.txt) | [capture](captures/99-k3s-detection-loki-alertes.png) |
 | 100 | Grafana « Sécurité EduGrade » : 12 connexions échouées, 6 accès refusés, 4 entrées suspectes en 5 min, histogramme des vagues d'attaque, journal détaillé | — | [tableau de bord](captures/100-grafana-tableau-de-bord.png) · [alertes](captures/100-grafana-alertes.png) |
 
-Limite relevée : dans k3s, l'IP journalisée est celle de Traefik (`10.42.0.9`) et non
-celle du client, car deux proxys se succèdent (Traefik → Nginx) alors que
-`ProxyFix(x_for=1)` n'en fait confiance qu'à un. Amélioration prévue : `x_for=2`
-en environnement Kubernetes (voir `docs/PLAN_REPONSE_INCIDENT.md`).
+### Déploiement final `v1.0-secure` et IP du client
+
+| N° | Ce que la preuve montre | Journal | Capture |
+|----|-------------------------|---------|---------|
+| 102 | **Avant** : les 190 requêtes du scénario d'attaque sont journalisées avec l'IP du pod Traefik (`10.42.0.9`) — attaquant non identifiable | [log](logs/102-ip-client-avant.txt) | [capture](captures/102-ip-client-avant.png) |
+| 103 | Déploiement de l'image du commit `82c0eaa` (develop, `sha256:9992e9c4…`) : digest mis à jour dans `k8s/backend.yaml`, **signature acceptée par Kyverno**, `TRUSTED_PROXY_COUNT=2` | [log](logs/103-k3s-deploiement-v1.0-secure.txt) | [capture](captures/103-k3s-deploiement-v1.0-secure.png) |
+| 104 | **Après** : l'IP journalisée n'est plus celle de Traefik mais celle du point d'entrée du cluster (pod ServiceLB) ; 3 alertes `firing` après le scénario d'attaque | [log](logs/104-ip-client-apres.txt) | [capture](captures/104-ip-client-apres.png) |
+| 105 | Correction définitive iptables : `iptables-legacy` pour tout le système (k3s, kube-proxy, kube-router), sans binaires embarqués ; **12 tests sur 12 conformes après un redémarrage à froid de WSL** | [log](logs/105-k3s-iptables-legacy-segmentation.txt) | [capture](captures/105-k3s-iptables-legacy-segmentation.png) |
+
+Limite restante, propre au poste de démonstration : ServiceLB (klipper-lb, le
+répartiteur intégré à k3s) réécrit l'adresse source, même avec
+`externalTrafficPolicy: Local` (essayé puis retiré). Derrière un répartiteur qui
+conserve l'IP (MetalLB en mode `Local`, répartiteur cloud), l'IP réelle du client
+est journalisée ; la logique applicative est couverte par `tests/test_proxy.py`
+(2 proxys → IP client, en-tête forgé ignoré).

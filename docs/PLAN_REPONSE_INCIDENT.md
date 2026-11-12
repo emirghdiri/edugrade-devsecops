@@ -43,6 +43,9 @@ Rôles (équipe de deux) :
    `X-Forwarded-For` d'autant de proxys de confiance qu'il y en a
    (`TRUSTED_PROXY_COUNT` : 1 en Compose, 2 en k3s — Traefik puis Nginx).
    Traefik remplace l'en-tête envoyé par un client : il ne peut pas être forgé.
+   Sur le poste de démonstration (ServiceLB de k3s), l'IP vue est celle du point
+   d'entrée du cluster ; derrière un répartiteur qui conserve l'IP source
+   (MetalLB, cloud), c'est celle du client.
 3. Requêtes Loki utiles :
    ```logql
    {namespace="edugrade", event="login_failed"} | json | line_format "{{.ip}} {{.route}} {{.status}}"

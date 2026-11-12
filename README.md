@@ -130,6 +130,12 @@ gérées en base depuis la page « Matières ».
 Prérequis : k3s (WSL2, `systemd` actif), `kubectl`, Helm 3, Terraform. Le
 kubeconfig est copié dans `~/.kube/config`.
 
+> **Ubuntu 24.04+ / WSL2** : `iptables-nft` 1.8.11 est incompatible avec le
+> contrôleur de NetworkPolicies de k3s (les règles ne sont jamais appliquées).
+> Basculer le système en `iptables-legacy` avant de démarrer k3s :
+> `sudo update-alternatives --set iptables /usr/sbin/iptables-legacy` (idem
+> `ip6tables`), puis redémarrer WSL. `scripts/k8s_segmentation_test.sh` le vérifie.
+
 ```bash
 cp /etc/rancher/k3s/k3s.yaml ~/.kube/config && chmod 600 ~/.kube/config
 scripts/fetch_charts.sh                              # charts Helm épinglés -> terraform/cluster/charts/
