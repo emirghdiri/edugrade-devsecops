@@ -1,0 +1,2 @@
+# Bonus 2 XSS réfléchi — /teacher/students?q=<script>…</script>
+Script injecté exécuté dans la page : OUI

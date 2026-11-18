@@ -1,0 +1,76 @@
+# Backend Flask/Gunicorn : image publiée par le pipeline, référencée par
+# DIGEST (immuable) et signée par Cosign (vérifiée par Kyverno à l'admission).
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels: { app.kubernetes.io/name: backend, app.kubernetes.io/part-of: edugrade }
+spec:
+  type: ClusterIP
+  selector: { app.kubernetes.io/name: backend }
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels: { app.kubernetes.io/name: backend, app.kubernetes.io/part-of: edugrade }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: backend }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: backend, app.kubernetes.io/part-of: edugrade }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: backend
+          # Image du commit a4511f2 (develop), signée par ci.yml@refs/heads/develop.
+          image: ghcr.io/emirghdiri/edugrade-backend@sha256:d3707f8d8e3c6083f6c12f9701997ff3fd688bf58a9d0ddf23a7c6b0e42b69db
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - { name: POSTGRES_HOST, value: db }
+            - { name: POSTGRES_DB, value: edugrade }
+            - { name: POSTGRES_USER, value: edugrade }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: edugrade-db, key: POSTGRES_PASSWORD }
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef: { name: edugrade-app, key: SECRET_KEY }
+            - { name: LOG_LEVEL, value: INFO }
+            # Traefik (Ingress) puis Nginx (frontend) : 2 proxys de confiance
+            # pour journaliser l'IP réelle du client.
+            - { name: TRUSTED_PROXY_COUNT, value: "2" }
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 384Mi }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - { name: tmp, emptyDir: {} }

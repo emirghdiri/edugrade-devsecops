@@ -1,0 +1,16 @@
+# Preuve : 00-prerequis
+# Date   : 2026-11-11 16:54:12 CET
+# Dossier: .
+$ git --version; gh --version | head -1; terraform version | head -1; docker --version; docker compose version; python3.12 --version; gitleaks version; trivy --version | head -1; semgrep --version; bandit --version | head -1; .venv/bin/python -m playwright --version
+git version 2.43.0
+gh version 2.45.0 (2025-07-18 Ubuntu 2.45.0-1ubuntu0.3)
+Terraform v1.15.8
+Docker version 29.7.1, build e9452d6
+Docker Compose version v5.4.0
+Python 3.12.3
+8.30.1
+Version: 0.76.2
+1.185.0
+bandit 1.9.4
+Version 1.65.0
+[code de retour : 0]

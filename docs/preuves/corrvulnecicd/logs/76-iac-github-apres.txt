@@ -1,0 +1,13 @@
+# Preuve : 76-iac-github-apres
+# Date   : 2026-11-12 19:55:35 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281427223 iac 'GIT-|Tests:|Failures:|main.tf|Report Summary' --all
+Job : iac (trivy config, checkov) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281427223/job/131403827575
+------------------------------------------------------------
+Report Summary
+│ terraform/github/main.tf │ terraform  │         0         │
+	File: /terraform/github/main.tf:6-28
+	File: /terraform/github/main.tf:61-84
+	File: /terraform/github/main.tf:61-84
+[code de retour : 0]

@@ -1,0 +1,12 @@
+# Preuve : 13-docker-compose-up
+# Date   : 2026-11-11 18:09:55 CET
+# Dossier: .
+$ docker compose up -d
+ Container edugrade-backend-1 Running 
+ Container edugrade-frontend-1 Running 
+ Container edugrade-db-1 Running 
+ Container edugrade-db-1 Waiting 
+ Container edugrade-db-1 Healthy 
+ Container edugrade-backend-1 Waiting 
+ Container edugrade-backend-1 Healthy 
+[code de retour : 0]

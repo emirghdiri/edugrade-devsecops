@@ -1,0 +1,16 @@
+# Preuve : 72-v4-pyyaml-apres
+# Date   : 2026-11-12 19:54:42 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281402183 dependencies 'Total|requirements.txt|│ PyYAML|Report' --all; scripts/ci_log.sh 43281402183 image 'Total|│ (PyYAML|zlib)' --all
+Job : dependencies (trivy fs) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281402183/job/131403715890
+------------------------------------------------------------
+Report Summary
+│ requirements.txt │ pip  │        0        │
+Job : image (build, trivy image, sbom) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281402183/job/131403716107
+------------------------------------------------------------
+Total: 2 (HIGH: 2, CRITICAL: 0)
+│ zlib1g  │ CVE-2026-76844 │ HIGH     │ fixed  │ 1:1.3.dfsg+really1.3.1-1+b1 │ 1:1.3.dfsg+really1.3.1-1+deb13u1 │ zlib: zlib 1.2.11 through 1.3.2 Heap Buffer Overflow via │
+│         │ CVE-2026-85091 │          │        │                             │                                  │ zlib: zlib: Heap buffer overflow in gz_vacate() allows   │
+[code de retour : 0]

@@ -1,0 +1,7 @@
+# Preuve : 03-terraform-validate
+# Date   : 2026-11-11 16:54:14 CET
+# Dossier: terraform/github
+$ terraform validate -no-color
+Success! The configuration is valid.
+
+[code de retour : 0]

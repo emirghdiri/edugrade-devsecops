@@ -1,0 +1,81 @@
+# Preuve : 12-pytest-securite-echec-attendu
+# Date   : 2026-11-11 17:35:40 CET
+# Dossier: .
+$ pytest -m security -q --show-capture=no
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_student_cannot_read_another_student_grades ________________
+
+client = <FlaskClient <Flask 'app'>>
+user_ids = {'claire.dubois@edugrade.test': 1, 'karim.haddad@edugrade.test': 2, 'lina.bensalah@edugrade.test': 3, 'youssef.trabelsi@edugrade.test': 4, ...}
+
+    def test_student_cannot_read_another_student_grades(client, user_ids):
+        login(client, STUDENT)
+        other_id = user_ids[email_for(OTHER_STUDENT)]
+        resp = client.get(f"/grades/{other_id}")
+>       assert resp.status_code in (403, 404), f"IDOR : notes de {OTHER_STUDENT} accessibles (HTTP {resp.status_code})"
+E       AssertionError: IDOR : notes de Youssef Trabelsi accessibles (HTTP 200)
+E       assert 200 in (403, 404)
+E        +  where 200 = <WrapperTestResponse streamed [200 OK]>.status_code
+
+tests/security/test_idor.py:21: AssertionError
+_________________________ test_idor_attempt_is_logged __________________________
+
+client = <FlaskClient <Flask 'app'>>
+user_ids = {'claire.dubois@edugrade.test': 1, 'karim.haddad@edugrade.test': 2, 'lina.bensalah@edugrade.test': 3, 'youssef.trabelsi@edugrade.test': 4, ...}
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7dcdb996fec0>
+
+    def test_idor_attempt_is_logged(client, user_ids, caplog):
+        login(client, STUDENT)
+        other_id = user_ids[email_for(OTHER_STUDENT)]
+        with caplog.at_level(logging.INFO, logger="edugrade"):
+            client.get(f"/grades/{other_id}")
+        denied = [getattr(r, "fields", {}) for r in caplog.records if getattr(r, "fields", {}).get("event") == "access_denied"]
+>       assert denied, "aucun événement access_denied journalisé pour la tentative d'IDOR"
+E       AssertionError: aucun événement access_denied journalisé pour la tentative d'IDOR
+E       assert []
+
+tests/security/test_idor.py:31: AssertionError
+_________________ test_tautology_does_not_return_all_students __________________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_tautology_does_not_return_all_students(client):
+        login(client, TEACHER)
+        html = client.get("/teacher/students", query_string={"q": "' OR '1'='1"}).get_data(as_text=True)
+>       assert html.count(ROW) == 0, f"injection SQL : {html.count(ROW)} étudiants renvoyés pour une tautologie"
+E       AssertionError: injection SQL : 6 étudiants renvoyés pour une tautologie
+E       assert 6 == 0
+E        +  where 6 = <built-in method count of str object at 0x2a4d3210>('data-testid="student-row"')
+E        +    where <built-in method count of str object at 0x2a4d3210> = '<!doctype html>\n<html lang="fr">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-wi...ass="footer container">\n    EduGrade · projet pédagogique DevSecOps · données fictives\n  </footer>\n</body>\n</html>'.count
+
+tests/security/test_sqli.py:18: AssertionError
+___________________ test_union_does_not_leak_password_hashes ___________________
+
+client = <FlaskClient <Flask 'app'>>
+
+    def test_union_does_not_leak_password_hashes(client):
+        login(client, TEACHER)
+        payload = "%' UNION SELECT id, name, password_hash FROM users --"
+        html = client.get("/teacher/students", query_string={"q": payload}).get_data(as_text=True)
+>       assert "scrypt:" not in html and "pbkdf2:" not in html, "injection SQL : hachages de mots de passe divulgués"
+E       AssertionError: injection SQL : hachages de mots de passe divulgués
+E       assert ('scrypt:' not in '<!doctype h...dy>\n</html>'
+E         
+E         'scrypt:' is contained here:
+E                 <td>scrypt:32768:8:1$gTZm8vXd8ftUIl8n$e50c9f313ca59e614e25ca7e1af9d8dbe05e6296b298ecfa317c39602e7fdd1b31ce2e7670f2d03db5397c248c510834c7373fae68083a7b28c9f412a25de291</td>
+E         ?           +++++++
+E                   <td class="actions">
+E                     <a class="btn btn-small" href="/grades/8">Voir les notes</a>
+E                     <a class="btn btn-small btn-primary" href="/teacher/grades/new?student_id=8">Ajouter une note</a>...
+E         
+E         ...Full output truncated, use '-vv' to show)
+
+tests/security/test_sqli.py:25: AssertionError
+=========================== short test summary info ============================
+FAILED tests/security/test_idor.py::test_student_cannot_read_another_student_grades
+FAILED tests/security/test_idor.py::test_idor_attempt_is_logged - AssertionEr...
+FAILED tests/security/test_sqli.py::test_tautology_does_not_return_all_students
+FAILED tests/security/test_sqli.py::test_union_does_not_leak_password_hashes
+4 failed, 29 deselected in 1.60s
+[code de retour : 1]

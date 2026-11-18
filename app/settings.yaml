@@ -1,0 +1,9 @@
+# Paramètres fonctionnels d'EduGrade (aucun secret ici).
+app_name: EduGrade
+grade_scale: 20
+subjects:
+  - Mathématiques
+  - Réseaux
+  - Cryptographie
+  - Systèmes
+  - Anglais

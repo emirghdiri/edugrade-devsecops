@@ -1,0 +1,16 @@
+# Preuve : 18-journaux-json-securite
+# Date   : 2026-11-11 18:12:14 CET
+# Dossier: .
+$ docker compose logs --no-log-prefix backend | grep -E '"event": "(login_success|login_failed|access_denied|suspicious_input|grade_created|grade_updated)"' | tail -14
+{"timestamp": "2026-11-11T17:11:02.918+00:00", "level": "INFO", "logger": "edugrade", "event": "login_success", "user_id": 1, "role": "teacher", "route": "/login", "ip": "172.19.0.1", "status": 302, "method": "POST"}
+{"timestamp": "2026-11-11T17:11:05.011+00:00", "level": "INFO", "logger": "edugrade", "event": "login_success", "user_id": 3, "role": "student", "route": "/login", "ip": "172.19.0.1", "status": 302, "method": "POST"}
+{"timestamp": "2026-11-11T17:11:43.286+00:00", "level": "INFO", "logger": "edugrade", "event": "login_success", "user_id": 1, "role": "teacher", "route": "/login", "ip": "172.19.0.1", "status": 302, "method": "POST"}
+{"timestamp": "2026-11-11T17:11:44.332+00:00", "level": "INFO", "logger": "edugrade", "event": "grade_created", "user_id": 1, "role": "teacher", "route": "/teacher/grades/new", "ip": "172.19.0.1", "status": 302, "method": "POST", "grade_id": 29, "student_id": 5}
+{"timestamp": "2026-11-11T17:11:45.300+00:00", "level": "INFO", "logger": "edugrade", "event": "login_success", "user_id": 3, "role": "student", "route": "/login", "ip": "172.19.0.1", "status": 302, "method": "POST"}
+{"timestamp": "2026-11-11T17:11:46.609+00:00", "level": "WARNING", "logger": "edugrade", "event": "suspicious_input", "user_id": 1, "role": "teacher", "route": "/teacher/students", "ip": "172.19.0.1", "status": 200, "method": "GET", "field": "q", "patterns": ["quote"], "length": 11}
+{"timestamp": "2026-11-11T17:11:46.739+00:00", "level": "WARNING", "logger": "edugrade", "event": "suspicious_input", "user_id": 1, "role": "teacher", "route": "/teacher/students", "ip": "172.19.0.1", "status": 200, "method": "GET", "field": "q", "patterns": ["quote", "sql_comment", "union"], "length": 53}
+{"timestamp": "2026-11-11T17:11:46.922+00:00", "level": "WARNING", "logger": "edugrade", "event": "suspicious_input", "user_id": 1, "role": "teacher", "route": "/teacher/students", "ip": "172.19.0.1", "status": 200, "method": "GET", "field": "q", "patterns": ["script_tag"], "length": 246}
+{"timestamp": "2026-11-11T17:12:13.940+00:00", "level": "WARNING", "logger": "edugrade", "event": "login_failed", "user_id": null, "role": null, "route": "/login", "ip": "172.19.0.1", "status": 401, "method": "POST"}
+{"timestamp": "2026-11-11T17:12:14.101+00:00", "level": "INFO", "logger": "edugrade", "event": "login_success", "user_id": 3, "role": "student", "route": "/login", "ip": "172.19.0.1", "status": 302, "method": "POST"}
+{"timestamp": "2026-11-11T17:12:14.118+00:00", "level": "WARNING", "logger": "edugrade", "event": "access_denied", "user_id": 3, "role": "student", "route": "/teacher/students", "ip": "172.19.0.1", "status": 403, "method": "GET", "reason": "role", "required_roles": ["teacher"]}
+[code de retour : 0]

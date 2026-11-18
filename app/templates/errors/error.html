@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Erreur {{ code }}{% endblock %}
+{% block content %}
+<section class="card error-page">
+  <div class="error-code">{{ code }}</div>
+  <h1>{{ message }}</h1>
+  <p>
+    {%- if code == 403 %}Vous n'avez pas les droits nécessaires pour accéder à cette page.
+    {%- elif code == 404 %}La page demandée n'existe pas ou a été déplacée.
+    {%- else %}Une erreur est survenue. Réessayez dans un instant.{% endif -%}
+  </p>
+  <a class="btn btn-primary" href="/">{{ ui.icon("back", 16) }} Retour à l'accueil</a>
+</section>
+{% endblock %}

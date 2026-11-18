@@ -1,0 +1,6 @@
+# Preuve : 02-terraform-fmt
+# Date   : 2026-11-11 16:54:13 CET
+# Dossier: terraform/github
+$ terraform fmt -check -diff -recursive && echo "fmt : aucun écart"
+fmt : aucun écart
+[code de retour : 0]

@@ -1,0 +1,7 @@
+# Preuve : 15-docker-compose-exec-id
+# Date   : 2026-11-11 18:09:58 CET
+# Dossier: .
+$ docker compose exec backend id && docker compose exec frontend id
+uid=10001(app) gid=10001(app) groups=10001(app)
+uid=101(nginx) gid=101(nginx) groups=101(nginx)
+[code de retour : 0]

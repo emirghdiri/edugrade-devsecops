@@ -1,0 +1,54 @@
+# Preuve : 91-k3s-cluster-terraform-apply
+# Date   : 2026-11-12 22:06:34 WAT
+# Dossier: .
+$ terraform -chdir=terraform/cluster state list; echo; kubectl get ns edugrade monitoring kyverno --show-labels | cut -c1-160; echo; kubectl -n edugrade get secrets,networkpolicies; echo; helm list -A | grep -v kube-system; echo; kubectl get validatingpolicies.policies.kyverno.io,imagevalidatingpolicies.policies.kyverno.io
+helm_release.alloy
+helm_release.kube_prometheus_stack
+helm_release.kyverno
+helm_release.kyverno_policies
+helm_release.loki
+kubernetes_config_map_v1.grafana_alerts
+kubernetes_config_map_v1.grafana_dashboard
+kubernetes_namespace_v1.edugrade
+kubernetes_namespace_v1.monitoring
+kubernetes_network_policy.allow_dns
+kubernetes_network_policy.backend
+kubernetes_network_policy.db
+kubernetes_network_policy.default_deny
+kubernetes_network_policy.frontend
+kubernetes_secret_v1.app
+kubernetes_secret_v1.db
+kubernetes_secret_v1.grafana_admin
+random_password.app_secret_key
+random_password.grafana_admin
+random_password.postgres
+
+NAME         STATUS   AGE   LABELS
+edugrade     Active   45m   app.kubernetes.io/part-of=edugrade,kubernetes.io/metadata.name=edugrade,pod-security.kubernetes.io/audit=restricted,pod-security.kub
+monitoring   Active   45m   app.kubernetes.io/part-of=edugrade,kubernetes.io/metadata.name=monitoring,pod-security.kubernetes.io/enforce=privileged
+kyverno      Active   45m   kubernetes.io/metadata.name=kyverno,name=kyverno
+
+NAME                  TYPE     DATA   AGE
+secret/edugrade-app   Opaque   1      45m
+secret/edugrade-db    Opaque   1      45m
+
+NAME                                               POD-SELECTOR                      AGE
+networkpolicy.networking.k8s.io/allow-dns          <none>                            45m
+networkpolicy.networking.k8s.io/backend            app.kubernetes.io/name=backend    45m
+networkpolicy.networking.k8s.io/db                 app.kubernetes.io/name=db         45m
+networkpolicy.networking.k8s.io/default-deny-all   <none>                            45m
+networkpolicy.networking.k8s.io/frontend           app.kubernetes.io/name=frontend   45m
+
+NAME             	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                        	APP VERSION
+alloy            	monitoring 	1       	2026-11-12 21:26:39.447020862 +0100 WAT	deployed	alloy-1.15.0                 	v1.21.3    
+edugrade-policies	kyverno    	1       	2026-11-12 22:06:04.75362087 +0100 WAT 	deployed	edugrade-policies-1.0.0      	           
+kps              	monitoring 	2       	2026-11-12 21:38:21.837937239 +0100 WAT	deployed	kube-prometheus-stack-93.2.2 	v0.95.2    
+kyverno          	kyverno    	1       	2026-11-12 22:05:33.184899968 +0100 WAT	deployed	kyverno-3.10.0               	v1.20.0    
+loki             	monitoring 	1       	2026-11-12 21:20:40.530577065 +0100 WAT	deployed	loki-7.6.0                   	3.6.18     
+
+NAME                                                         AGE   READY
+validatingpolicy.policies.kyverno.io/edugrade-pod-security   30s   true
+
+NAME                                                                        AGE   READY
+imagevalidatingpolicy.policies.kyverno.io/edugrade-verify-image-signature   30s   true
+[code de retour : 0]

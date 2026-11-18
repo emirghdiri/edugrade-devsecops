@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Connexion{% endblock %}
+{% block topbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block main %}
+<main class="auth">
+  <section class="auth-hero">
+    <a class="brand" href="/"><span class="logo">{{ ui.icon("cap", 20) }}</span> EduGrade</a>
+
+    <div class="auth-pitch">
+      <h1>Toutes vos notes, au même endroit.</h1>
+      <p>Les enseignants saisissent les évaluations, chaque étudiant suit ses résultats en temps réel.</p>
+      <ul class="features">
+        <li><span class="ficon">{{ ui.icon("book") }}</span> Consultation des notes par matière</li>
+        <li><span class="ficon">{{ ui.icon("chart") }}</span> Moyennes et mentions calculées automatiquement</li>
+        <li><span class="ficon">{{ ui.icon("users") }}</span> Gestion des évaluations pour les enseignants</li>
+      </ul>
+    </div>
+
+    <div class="auth-foot">Projet pédagogique DevSecOps · données fictives</div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h1>Connexion</h1>
+      <p class="sub">Connectez-vous avec votre adresse institutionnelle.</p>
+
+      {% include "_flashes.html" %}
+
+      <form method="post" class="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <div class="input-wrap">
+            {{ ui.icon("mail") }}
+            <input id="email" name="email" type="email" value="{{ email or '' }}" placeholder="prenom.nom@edugrade.test" autocomplete="username" required autofocus>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <div class="input-wrap">
+            {{ ui.icon("lock") }}
+            <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+      </form>
+
+      <p class="auth-note">{{ ui.icon("shield", 16) }} Session sécurisée · vos actions sont journalisées</p>
+    </div>
+  </section>
+</main>
+{% endblock %}

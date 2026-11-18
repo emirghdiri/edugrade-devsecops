@@ -1,0 +1,62 @@
+{% import "_ui.html" as ui with context %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}EduGrade{% endblock %} · EduGrade</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% block topbar %}
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/">
+        <span class="logo">{{ ui.icon("cap", 20) }}</span> EduGrade
+      </a>
+      {% if session.user_id %}
+      <nav class="nav" aria-label="Navigation principale">
+        {% if session.role == 'admin' %}
+          <a href="{{ url_for('admin.users') }}" class="{{ 'active' if request.blueprint == 'admin' or request.endpoint == 'student.grades' }}">{{ ui.icon("users") }}<span>Utilisateurs</span></a>
+        {% elif session.role == 'teacher' %}
+          <a href="{{ url_for('teacher.students') }}" class="{{ 'active' if request.blueprint == 'teacher' or request.endpoint == 'student.grades' }}">{{ ui.icon("users") }}<span>Étudiants</span></a>
+          <a href="{{ url_for('manage.subjects') }}" class="{{ 'active' if request.blueprint == 'manage' }}">{{ ui.icon("book") }}<span>Matières</span></a>
+        {% else %}
+          <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint == 'student.dashboard' }}">{{ ui.icon("grid") }}<span>Tableau de bord</span></a>
+          <a href="{{ url_for('student.grades', student_id=session.user_id) }}" class="{{ 'active' if request.endpoint == 'student.grades' }}">{{ ui.icon("book") }}<span>Mes notes</span></a>
+        {% endif %}
+      </nav>
+      <div class="user">
+        <div class="user-text">
+          <span class="user-name">{{ session.name }}</span>
+          <span class="badge badge-{{ session.role }}">{{ {'admin': 'Administrateur', 'teacher': 'Enseignant'}.get(session.role, 'Étudiant') }}</span>
+        </div>
+        {{ ui.avatar(session.name, session.user_id) }}
+        <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ghost btn-icon" title="Déconnexion" aria-label="Déconnexion">{{ ui.icon("logout") }}</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  {% endblock %}
+
+  {% block main %}
+  <main class="container page">
+    {% include "_flashes.html" %}
+    {% block content %}{% endblock %}
+  </main>
+  {% endblock %}
+
+  {% block footer %}
+  <footer class="footer">
+    <div class="container">
+      <span>EduGrade · portail de gestion des notes</span>
+      <span>Projet pédagogique DevSecOps · données fictives</span>
+    </div>
+  </footer>
+  {% endblock %}
+</body>
+</html>

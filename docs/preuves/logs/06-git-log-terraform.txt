@@ -1,0 +1,15 @@
+# Preuve : 06-git-log-terraform
+# Date   : 2026-11-11 17:08:39 CET
+# Dossier: .
+$ git log --oneline --graph --decorate --all
+* f8ea81e (HEAD -> feature/terraform-github) fix(scripts): permet le rendu des captures sans dépendances système installées
+* b8433a6 chore(scripts): ajoute l'outil de capture des commandes pour les preuves
+* de4081f feat(terraform): expose les sorties du dépôt sans valeur sensible
+* ab843e6 feat(terraform): ajoute la collaboratrice et les secrets GitHub Actions
+* e26b991 feat(terraform): protège la branche main (PR, relecture, check build-test)
+* de77e74 feat(terraform): déclare le dépôt, les alertes Dependabot et la branche develop
+* cb41428 feat(terraform): ajoute les variables du dépôt et un exemple de tfvars
+* ca562aa build(terraform): épingle le provider integrations/github 6.13.0
+* f13f04d (origin/main, origin/develop, main) chore: initialise le dépôt avec le README et le .gitignore
+* e2c22ac Initial commit
+[code de retour : 0]

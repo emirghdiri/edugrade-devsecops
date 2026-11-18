@@ -1,0 +1,11 @@
+# Copier en terraform.tfvars (non versionné) puis adapter.
+# Le jeton GitHub ne va PAS ici : export GITHUB_TOKEN=$(gh auth token)
+
+github_owner          = "emirghdiri"
+repository_name       = "edugrade-devsecops"
+repository_visibility = "public"
+collaborator_username = "arijcheikhrouhou"
+
+# Valeurs FACTICES uniquement (projet pédagogique).
+app_secret_key    = "changez-moi-valeur-factice"
+postgres_password = "changez-moi-valeur-factice"

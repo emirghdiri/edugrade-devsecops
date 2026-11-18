@@ -1,0 +1,34 @@
+# Preuve : 07-gitleaks-detect
+# Date   : 2026-11-11 17:35:22 CET
+# Dossier: .
+$ gitleaks detect --source . --redact --no-banner --no-color -v
+Finding:     SECRET_KEY = "REDACTED"
+Secret:      REDACTED
+RuleID:      generic-api-key
+Entropy:     3.905639
+File:        app/config.py
+Line:        10
+Commit:      f78fd006d264ae3feb09585813ffaf312df0a8db
+Author:      Amir Ghdiri
+Email:       emirghdiri1@gmail.com
+Date:        2026-11-11T16:28:17Z
+Fingerprint: f78fd006d264ae3feb09585813ffaf312df0a8db:app/config.py:generic-api-key:10
+Link:        https://github.com/emirghdiri/edugrade-devsecops/blob/f78fd006d264ae3feb09585813ffaf312df0a8db/app/config.py#L10
+
+Finding:     DB_PASSWORD = "REDACTED"
+Secret:      REDACTED
+RuleID:      generic-api-key
+Entropy:     4.262692
+File:        app/config.py
+Line:        11
+Commit:      f78fd006d264ae3feb09585813ffaf312df0a8db
+Author:      Amir Ghdiri
+Email:       emirghdiri1@gmail.com
+Date:        2026-11-11T16:28:17Z
+Fingerprint: f78fd006d264ae3feb09585813ffaf312df0a8db:app/config.py:generic-api-key:11
+Link:        https://github.com/emirghdiri/edugrade-devsecops/blob/f78fd006d264ae3feb09585813ffaf312df0a8db/app/config.py#L11
+
+5:35PM INF 35 commits scanned.
+5:35PM INF scanned ~90434 bytes (90.43 KB) in 243ms
+5:35PM WRN leaks found: 2
+[code de retour : 1]

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}Modifier une matière{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('manage.subjects') }}">{{ ui.icon("back", 16) }} Retour aux matières</a>
+
+<section class="card card-narrow">
+  <div class="card-head">
+    <div class="person">
+      <span class="stat-icon">{{ ui.icon("book") }}</span>
+      <div>
+        <h2>Modifier une matière</h2>
+        <div class="person-mail">{{ subject.grade_count }} note(s) utilisent cette matière : elles seront renommées aussi.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="post" class="form" action="{{ url_for('manage.edit_subject', subject_id=subject.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="name">Nom de la matière</label>
+        <input id="name" name="name" type="text" value="{{ subject.name }}" minlength="2" maxlength="60" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ ui.icon("check") }} Enregistrer</button>
+        <a class="btn" href="{{ url_for('manage.subjects') }}">Annuler</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

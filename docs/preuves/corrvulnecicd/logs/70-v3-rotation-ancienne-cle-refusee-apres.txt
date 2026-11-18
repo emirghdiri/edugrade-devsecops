@@ -1,0 +1,8 @@
+# Preuve : 70-v3-rotation-ancienne-cle-refusee-apres
+# Date   : 2026-11-12 19:28:17 WAT
+# Dossier: .
+$ scripts/v3_forge_cookie.sh
+cle lue dans l'historique (commit f78fd00) : ****MASQUEE**** (32 caracteres)
+cookie enseignant forge : eyJ1c2VyX2lk...(tronque)
+GET /teacher/students avec le cookie forge -> HTTP 302 -> http://localhost:8080/login
+[code de retour : 0]

@@ -1,0 +1,26 @@
+# Preuve : 90-k3s-terraform-plan
+# Date   : 2026-11-12 21:20:13 WAT
+# Dossier: .
+$ grep -E '^  # |^Plan:' /tmp/plan.txt
+  # helm_release.alloy will be created
+  # helm_release.kube_prometheus_stack will be created
+  # helm_release.kyverno will be created
+  # helm_release.kyverno_policies will be created
+  # helm_release.loki will be created
+  # kubernetes_config_map_v1.grafana_alerts will be created
+  # kubernetes_config_map_v1.grafana_dashboard will be created
+  # kubernetes_namespace_v1.edugrade will be created
+  # kubernetes_namespace_v1.monitoring will be created
+  # kubernetes_network_policy.allow_dns will be created
+  # kubernetes_network_policy.backend will be created
+  # kubernetes_network_policy.db will be created
+  # kubernetes_network_policy.default_deny will be created
+  # kubernetes_network_policy.frontend will be created
+  # kubernetes_secret_v1.app will be created
+  # kubernetes_secret_v1.db will be created
+  # kubernetes_secret_v1.grafana_admin will be created
+  # random_password.app_secret_key will be created
+  # random_password.grafana_admin will be created
+  # random_password.postgres will be created
+Plan: 20 to add, 0 to change, 0 to destroy.
+[code de retour : 0]

@@ -1,0 +1,11 @@
+# Preuve : 84-ci-dast-zap-tout-vert
+# Date   : 2026-11-12 19:56:06 WAT
+# Dossier: .
+$ scripts/ci_log.sh 43281516275 dast 'Synthèse|^(High|Medium|Low) |ÉCHEC|OK : aucune|^  - ' --all
+Job : dast (compose, zap) — success
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43281516275/job/131405523045
+------------------------------------------------------------
+=== Synthèse ZAP (risque | alerte | occurrences) ===
+Low    | Cookie Slack Detector | 3
+OK : aucune alerte High.
+[code de retour : 0]

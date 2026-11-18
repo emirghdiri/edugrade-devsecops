@@ -1,0 +1,24 @@
+# Le contexte de build ne contient que ce dont l'image a besoin.
+.git
+.github
+.gitignore
+.dockerignore
+.env
+.env.*
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+*.tfstate
+*.tfstate.*
+*.tfvars
+terraform/
+tests/
+docs/
+k8s/
+policies/
+scripts/
+reports/
+docker-compose.yml
+README.md

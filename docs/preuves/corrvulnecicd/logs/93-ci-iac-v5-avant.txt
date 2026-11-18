@@ -1,0 +1,29 @@
+# Preuve : 93-ci-iac-v5-avant
+# Date   : 2026-11-12 22:09:48 WAT
+# Dossier: .
+$ gh run view 43305161689 --json jobs -q '.jobs[] | "\(.conclusion)\t\(.name)"'; scripts/ci_log.sh 43305161689 iac 'KUBE-|network.tf|Failures:|Tests:|##\[error\]'
+success	build-test
+success	secrets (gitleaks)
+success	security-tests (IDOR, SQLi)
+success	image (build, trivy image, sbom)
+success	sast (semgrep, bandit)
+success	dependencies (trivy fs)
+failure	iac (trivy config, checkov)
+success	dast (compose, zap)
+skipped	publish (ghcr, cosign)
+Job : iac (trivy config, checkov) — failure
+URL : https://github.com/emirghdiri/edugrade-devsecops/actions/runs/43305161689/job/131486715738
+------------------------------------------------------------
+│ terraform/cluster/network.tf                           │ terraform  │         1         │
+terraform/cluster/network.tf (terraform)
+Tests: 1 (SUCCESSES: 0, FAILURES: 1)
+Failures: 1 (HIGH: 1, CRITICAL: 0)
+KUBE-0002 (HIGH): Network policy allows unrestricted egress to any IP address.
+ terraform/cluster/network.tf:129
+   via terraform/cluster/network.tf:128-130 (ip_block)
+    via terraform/cluster/network.tf:127-131 (to)
+     via terraform/cluster/network.tf:126-132 (egress)
+      via terraform/cluster/network.tf:107-144 (spec)
+       via terraform/cluster/network.tf:102-145 (kubernetes_network_policy.backend)
+##[error]Process completed with exit code 1.
+[code de retour : 0]
