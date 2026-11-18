@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Page de garde</title>
+<style>
+  @page { size: A4; margin: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif; color: #1d2433; }
+  .page { width: 210mm; height: 297mm; position: relative; overflow: hidden; }
+  .band { position: absolute; left: 0; top: 0; bottom: 0; width: 14mm; background: #1f3a6e; }
+  .band::after { content: ""; position: absolute; left: 14mm; top: 0; bottom: 0; width: 2.2mm; background: #c9a227; }
+  .inner { position: absolute; left: 34mm; right: 22mm; top: 24mm; bottom: 22mm; display: flex; flex-direction: column; }
+  .uni { font-size: 19pt; font-weight: 700; color: #1f3a6e; letter-spacing: .6px; }
+  .dept { font-size: 10.5pt; color: #5b6475; margin-top: 1.5mm; line-height: 1.45; }
+  .rule { height: 1.2px; background: #1f3a6e; margin: 9mm 0 0; }
+  .kind { margin-top: 34mm; font-size: 10.5pt; font-weight: 700; color: #c9a227; letter-spacing: 3px; text-transform: uppercase; }
+  .title { font-size: 25pt; font-weight: 700; color: #1f3a6e; line-height: 1.22; margin: 5mm 0 0; }
+  .subtitle { font-size: 13pt; color: #3b4456; margin-top: 6mm; line-height: 1.45; }
+  .subtitle b { color: #1f3a6e; }
+  .short { width: 26mm; height: 3px; background: #c9a227; margin-top: 9mm; }
+  .bottom { margin-top: auto; }
+  .grid { display: flex; gap: 12mm; }
+  .grid > div { flex: 1; }
+  .label { font-size: 8.6pt; font-weight: 700; color: #5b6475; letter-spacing: 1.6px; text-transform: uppercase; margin-bottom: 2.5mm; }
+  .names { font-size: 12pt; line-height: 1.7; color: #1d2433; }
+  .year { margin-top: 14mm; padding-top: 5mm; border-top: 1px solid #d8dee9; display: flex; justify-content: space-between; font-size: 10pt; color: #5b6475; }
+  .year b { color: #1f3a6e; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="band"></div>
+  <div class="inner">
+    <div class="uni">TEK-UP University</div>
+    <div class="dept">Cycle ingénieur — Classe 5 SSIR D<br>Module : DevSecOps</div>
+    <div class="rule"></div>
+
+    <div class="kind">Rapport de projet</div>
+    <div class="title">Sécurisation de bout en bout d'une application web par une démarche DevSecOps</div>
+    <div class="subtitle"><b>EduGrade</b> — portail de gestion de notes&nbsp;: de la version volontairement vulnérable au déploiement Kubernetes signé, observé et défendu</div>
+    <div class="short"></div>
+
+    <div class="bottom">
+      <div class="grid">
+        <div>
+          <div class="label">Réalisé par</div>
+          <div class="names">Amir Ghdiri<br>Arij Cheikhrouhou<br>Oumaima Ben Othmen<br>Nasrallah Hadhri</div>
+        </div>
+        <div>
+          <div class="label">Encadré par</div>
+          <div class="names">M. Malek Ferchichi</div>
+        </div>
+      </div>
+      <div class="year"><span>Année universitaire <b>2026 – 2027</b></span><span>Novembre 2026</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
